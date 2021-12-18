@@ -1,3 +1,7 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+app_home:
+    path: /
+    controller: App\Controller\HomeController::home
+
+app_webtest:
+    path: /webtest
+    controller: App\Controller\HomeController::webtest
