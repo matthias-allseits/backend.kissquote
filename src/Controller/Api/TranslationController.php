@@ -15,7 +15,7 @@ class TranslationController extends AbstractFOSRestController
 {
 
     /**
-     * @Rest\Get("/translations/{lang}")
+     * @Rest\Get("/translations/{lang}", name="get_translations")
      * @param Request $request
      * @param string $lang
      * @return View
