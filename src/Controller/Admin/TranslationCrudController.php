@@ -22,6 +22,7 @@ class TranslationCrudController extends AbstractCrudController
             TextField::new('key'),
             TextField::new('de'),
             TextField::new('en'),
+            TextField::new('fr'),
         ];
     }
 }

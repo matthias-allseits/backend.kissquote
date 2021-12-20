@@ -43,6 +43,14 @@ class Translation
      */
     private $en;
 
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="fr", type="string", length=255, nullable=true)
+     */
+    private $fr;
+
+
     public function __construct()
     {
     }
@@ -67,9 +75,9 @@ class Translation
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }
@@ -112,6 +120,22 @@ class Translation
     public function setEn(?string $en): void
     {
         $this->en = $en;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFr(): ?string
+    {
+        return $this->fr;
+    }
+
+    /**
+     * @param string|null $fr
+     */
+    public function setFr(?string $fr): void
+    {
+        $this->fr = $fr;
     }
 
 }
