@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Entity\Portfolio;
-use App\Entity\Translation;
 use App\Helper\RandomizeHelper;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -20,8 +19,9 @@ class PortfolioController extends AbstractFOSRestController
      * @param Request $request
      * @return View
      */
-    public function translations(Request $request): View
+    public function createPortfolio(Request $request): View
     {
+        // todo: implement missing try catch loop since the randoms will not be unique...
         $randomUserName = RandomizeHelper::getRandomUserName();
         $randomHashKey = RandomizeHelper::getRandomHashKey();
 

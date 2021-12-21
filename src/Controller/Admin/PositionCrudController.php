@@ -2,26 +2,26 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\BankAccount;
+use App\Entity\Position;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 
-class BankAccountCrudController extends AbstractCrudController
+class PositionCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return BankAccount::class;
+        return Position::class;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('name'),
-            AssociationField::new('portfolio'),
+            AssociationField::new('currency'),
         ];
     }
+
 }

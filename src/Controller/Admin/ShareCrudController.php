@@ -2,18 +2,18 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\BankAccount;
+use App\Entity\Share;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 
-class BankAccountCrudController extends AbstractCrudController
+class ShareCrudController extends AbstractCrudController
 {
+
     public static function getEntityFqcn(): string
     {
-        return BankAccount::class;
+        return Share::class;
     }
 
     public function configureFields(string $pageName): iterable
@@ -21,7 +21,9 @@ class BankAccountCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             TextField::new('name'),
-            AssociationField::new('portfolio'),
+            TextField::new('shortName'),
+            TextField::new('isin'),
         ];
     }
+
 }

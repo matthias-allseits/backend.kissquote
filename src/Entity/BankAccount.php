@@ -26,18 +26,21 @@ class BankAccount
     private $id;
 
     /**
+     * @var Portfolio
+     *
+     * @ORM\ManyToOne(targetEntity="Portfolio")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
+     * })
+     */
+    private $portfolio;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     private $name;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="portfolio")
-     */
-    private $positions;
 
     /**
      * @var Collection
@@ -53,67 +56,36 @@ class BankAccount
      */
     private $transfersTo;
 
-
-    public function __construct()
-    {
-        $this->positions = new ArrayCollection();
-        $this->transfersFrom = new ArrayCollection();
-        $this->transfersTo = new ArrayCollection();
-    }
-
-
-    public function __toString()
-    {
-        return $this->name;
-    }
-
-
-    public function getSummedInvestment(): float
-    {
-        $value = 0;
-        if (null !== $this->positions) {
-            foreach($this->positions as $position) {
-                $value += $position->getSummedInvestment();
-            }
-        }
-
-        return $value;
-    }
-
-
-    public function getActualValue(): float
-    {
-        $value = 0;
-        if (null !== $this->positions) {
-            foreach($this->positions as $position) {
-                $value += $position->getActualValue();
-            }
-        }
-
-        return $value;
-    }
-
-
-    public function getTransferBalance(): float
-    {
-        $balance = 0;
-        foreach($this->transfersFrom as $transfer) {
-            $balance += $transfer->getAmount();
-        }
-        foreach($this->transfersTo as $transfer) {
-            $balance -= $transfer->getAmount();
-        }
-
-        return $balance;
-    }
-
-
     /**
-     * @return integer
+     * @return int
      */
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return Portfolio|null
+     */
+    public function getPortfolio(): ?Portfolio
+    {
+        return $this->portfolio;
+    }
+
+    /**
+     * @param Portfolio $portfolio
+     */
+    public function setPortfolio(Portfolio $portfolio): void
+    {
+        $this->portfolio = $portfolio;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
     }
 
     /**
@@ -125,98 +97,35 @@ class BankAccount
     }
 
     /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return Collection|Position[]
-     */
-    public function getPositions(): Collection
-    {
-        return $this->positions;
-    }
-
-    public function addPosition(Position $position): void
-    {
-        if (!$this->positions->contains($position)) {
-            $this->positions[] = $position;
-            $position->setPortfolio($this);
-        }
-    }
-
-    public function removePosition(Position $position): void
-    {
-        if ($this->positions->contains($position)) {
-            $this->positions->removeElement($position);
-            // set the owning side to null (unless already changed)
-            if ($position->getPortfolio() == $this) {
-                $position->setPortfolio(null);
-            }
-        }
-    }
-
-    /**
-     * @return Collection|Transfer[]
+     * @return Collection
      */
     public function getTransfersFrom(): Collection
     {
         return $this->transfersFrom;
     }
 
-    public function addTransfersFrom(Transfer $transfersFrom): void
+    /**
+     * @param Collection $transfersFrom
+     */
+    public function setTransfersFrom(Collection $transfersFrom): void
     {
-        if (!$this->transfersFrom->contains($transfersFrom)) {
-            $this->transfersFrom[] = $transfersFrom;
-            $transfersFrom->setPortfolioFrom($this);
-        }
-    }
-
-    public function removeTransfersFrom(Transfer $transfersFrom): self
-    {
-        if ($this->transfersFrom->contains($transfersFrom)) {
-            $this->transfersFrom->removeElement($transfersFrom);
-            // set the owning side to null (unless already changed)
-            if ($transfersFrom->getPortfolioFrom() === $this) {
-                $transfersFrom->setPortfolioFrom(null);
-            }
-        }
-
-        return $this;
+        $this->transfersFrom = $transfersFrom;
     }
 
     /**
-     * @return Collection|Transfer[]
+     * @return Collection
      */
     public function getTransfersTo(): Collection
     {
         return $this->transfersTo;
     }
 
-    public function addTransfersTo(Transfer $transfersTo): self
+    /**
+     * @param Collection $transfersTo
+     */
+    public function setTransfersTo(Collection $transfersTo): void
     {
-        if (!$this->transfersTo->contains($transfersTo)) {
-            $this->transfersTo[] = $transfersTo;
-            $transfersTo->setPortfolioTo($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransfersTo(Transfer $transfersTo): self
-    {
-        if ($this->transfersTo->contains($transfersTo)) {
-            $this->transfersTo->removeElement($transfersTo);
-            // set the owning side to null (unless already changed)
-            if ($transfersTo->getPortfolioTo() === $this) {
-                $transfersTo->setPortfolioTo(null);
-            }
-        }
-
-        return $this;
+        $this->transfersTo = $transfersTo;
     }
 
 }
