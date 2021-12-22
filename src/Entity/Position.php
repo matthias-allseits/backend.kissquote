@@ -25,6 +25,16 @@ class Position
 	private $id;
 
     /**
+     * @var Portfolio
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Portfolio")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
+     * })
+     */
+    private $portfolio;
+
+    /**
      * @var Currency
      *
      * @ORM\ManyToOne(targetEntity="Currency")
@@ -55,38 +65,13 @@ class Position
      */
     private $activeUntil;
 
-    /**
-     * @var Share
-     *
-     * @ORM\ManyToOne(targetEntity="Share")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="share_id", referencedColumnName="id")
-     * })
-     */
+// todo: add annotations
 //    private $share;
 
-    /**
-     * @var Portfolio
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Portfolio")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
-     * })
-     */
-//    private $portfolio;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position")
-     */
+// todo: add annotations
 //    private $transactions;
 
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Stockrate", mappedBy="position")
-     */
+// todo: add annotations
 //    private $rates;
 
 
@@ -120,6 +105,22 @@ class Position
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return Portfolio|null
+     */
+    public function getPortfolio(): ?Portfolio
+    {
+        return $this->portfolio;
+    }
+
+    /**
+     * @param Portfolio $portfolio
+     */
+    public function setPortfolio(Portfolio $portfolio): void
+    {
+        $this->portfolio = $portfolio;
     }
 
     /**

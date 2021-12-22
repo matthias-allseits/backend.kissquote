@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -44,6 +45,13 @@ class Portfolio
      * @ORM\Column(name="start_date", type="date", nullable=false)
      */
     private $startDate;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="Position", mappedBy="portfolio")
+     */
+    private $positions;
 
 
     public function __construct()
@@ -110,6 +118,30 @@ class Portfolio
     public function setStartDate(DateTime $startDate): void
     {
         $this->startDate = $startDate;
+    }
+
+    /**
+     * @param Position $position
+     */
+    public function addPosition(Position $position): void
+    {
+        $this->positions[] = $position;
+    }
+
+    /**
+     * @param Position $position
+     */
+    public function removeProbability(Position $position)
+    {
+        $this->positions->removeElement($position);
+    }
+
+    /**
+     * @return Collection|Position[]
+     */
+    public function getPositions(): Collection
+    {
+        return $this->positions;
     }
 
 }
