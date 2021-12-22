@@ -21,6 +21,7 @@ class PositionCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             AssociationField::new('portfolio'),
+            AssociationField::new('share'),
             AssociationField::new('currency'),
         ];
     }

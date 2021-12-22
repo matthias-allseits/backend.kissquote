@@ -35,6 +35,16 @@ class Position
     private $portfolio;
 
     /**
+     * @var Share
+     *
+     * @ORM\ManyToOne(targetEntity="Share")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="share_id", referencedColumnName="id")
+     * })
+     */
+    private $share;
+
+    /**
      * @var Currency
      *
      * @ORM\ManyToOne(targetEntity="Currency")
@@ -64,9 +74,6 @@ class Position
      * @ORM\Column(name="active_until", type="date", nullable=true)
      */
     private $activeUntil;
-
-// todo: add annotations
-//    private $share;
 
 // todo: add annotations
 //    private $transactions;
@@ -121,6 +128,22 @@ class Position
     public function setPortfolio(Portfolio $portfolio): void
     {
         $this->portfolio = $portfolio;
+    }
+
+    /**
+     * @return Share|null
+     */
+    public function getShare(): ?Share
+    {
+        return $this->share;
+    }
+
+    /**
+     * @param Share $share
+     */
+    public function setShare(Share $share): void
+    {
+        $this->share = $share;
     }
 
     /**
