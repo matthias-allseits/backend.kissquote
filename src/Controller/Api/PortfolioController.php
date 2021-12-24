@@ -51,11 +51,12 @@ class PortfolioController extends AbstractFOSRestController
 //        $postedKey = $request->request->get('bambus');
 //        var_dump($postedKey);
 
-        $postedKey = $request->query->get('key');
-
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            trigger_error('not found ' . $key);
+        }
 
-        return View::create($portfolio, Response::HTTP_CREATED);
+        return View::create($portfolio, Response::HTTP_OK);
     }
 
 }

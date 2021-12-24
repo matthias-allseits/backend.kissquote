@@ -32,7 +32,7 @@ class TranslationController extends AbstractFOSRestController
             }
         }
 
-        return View::create($data, Response::HTTP_CREATED);
+        return View::create($data, Response::HTTP_OK);
     }
 
 }
