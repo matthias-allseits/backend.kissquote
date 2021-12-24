@@ -38,12 +38,12 @@ class PortfolioController extends AbstractFOSRestController
 
 
     /**
-     * @Rest\Get("/portfolio/restore/{key}", name="restore_portfolio")
+     * @Rest\Post("/portfolio/restore", name="restore_portfolio")
      * @param Request $request
      * @param string $key
      * @return View
      */
-    public function restorePortfolio(Request $request, string $key): View
+    public function restorePortfolio(Request $request): View
     {
 //        var_dump($_GET);
 //        var_dump($_POST);
@@ -51,9 +51,12 @@ class PortfolioController extends AbstractFOSRestController
 //        $postedKey = $request->request->get('bambus');
 //        var_dump($postedKey);
 
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        // todo: implement a better solution
+        $content = json_decode($request->getContent());
+
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $content->hashKey]);
         if (null === $portfolio) {
-            trigger_error('not found ' . $key);
+            return View::create(null, Response::HTTP_NOT_FOUND);
         }
 
         return View::create($portfolio, Response::HTTP_OK);
