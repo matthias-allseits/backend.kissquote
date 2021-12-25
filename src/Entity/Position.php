@@ -25,14 +25,14 @@ class Position
 	private $id;
 
     /**
-     * @var Portfolio
+     * @var BankAccount
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Portfolio")
+     * @ORM\ManyToOne(targetEntity="App\Entity\BankAccount")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id")
      * })
      */
-    private $portfolio;
+    private $bankAccount;
 
     /**
      * @var Share
@@ -115,19 +115,19 @@ class Position
     }
 
     /**
-     * @return Portfolio|null
+     * @return BankAccount|null
      */
-    public function getPortfolio(): ?Portfolio
+    public function getBankAccount(): ?BankAccount
     {
-        return $this->portfolio;
+        return $this->bankAccount;
     }
 
     /**
-     * @param Portfolio $portfolio
+     * @param BankAccount $bankAccount
      */
-    public function setPortfolio(Portfolio $portfolio): void
+    public function setBankAccount(BankAccount $bankAccount): void
     {
-        $this->portfolio = $portfolio;
+        $this->bankAccount = $bankAccount;
     }
 
     /**

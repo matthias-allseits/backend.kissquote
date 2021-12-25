@@ -49,9 +49,9 @@ class Portfolio
     /**
      * @var Collection
      *
-     * @ORM\OneToMany(targetEntity="Position", mappedBy="portfolio")
+     * @ORM\OneToMany(targetEntity="App\Entity\BankAccount", mappedBy="portfolio")
      */
-    private $positions;
+    private $bankAccounts;
 
 
     public function __construct()
@@ -121,27 +121,27 @@ class Portfolio
     }
 
     /**
-     * @param Position $position
+     * @param BankAccount $bankAccount
      */
-    public function addPosition(Position $position): void
+    public function addBankAccount(BankAccount $bankAccount): void
     {
-        $this->positions[] = $position;
+        $this->bankAccounts[] = $bankAccount;
     }
 
     /**
-     * @param Position $position
+     * @param BankAccount $bankAccount
      */
-    public function removeProbability(Position $position)
+    public function removeBankAccount(BankAccount $bankAccount)
     {
-        $this->positions->removeElement($position);
+        $this->bankAccounts->removeElement($bankAccount);
     }
 
     /**
-     * @return Collection|Position[]
+     * @return Collection|BankAccount[]
      */
-    public function getPositions(): Collection
+    public function getBankAccounts(): Collection
     {
-        return $this->positions;
+        return $this->bankAccounts;
     }
 
 }

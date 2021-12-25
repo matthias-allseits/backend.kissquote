@@ -23,24 +23,24 @@ class Transfer
 	private $id;
 
     /**
-     * @var Portfolio
+     * @var BankAccount
      *
-     * @ORM\ManyToOne(targetEntity="Portfolio")
+     * @ORM\ManyToOne(targetEntity="BankAccount")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_from_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="bank_account_from_id", referencedColumnName="id")
      * })
      */
-    private $portfolioFrom;
+    private $bankAccountFrom;
 
     /**
-     * @var Portfolio
+     * @var BankAccount
      *
-     * @ORM\ManyToOne(targetEntity="Portfolio")
+     * @ORM\ManyToOne(targetEntity="BankAccount")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_to_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="bank_account_to_id", referencedColumnName="id")
      * })
      */
-    private $portfolioTo;
+    private $bankAccountTo;
 
     /**
      * @var \DateTime
@@ -83,25 +83,36 @@ class Transfer
         $this->amount = $amount;
     }
 
-    public function getPortfolioFrom(): ?Portfolio
+    /**
+     * @return BankAccount
+     */
+    public function getBankAccountFrom(): BankAccount
     {
-        return $this->portfolioFrom;
+        return $this->bankAccountFrom;
     }
 
-    public function setPortfolioFrom(?Portfolio $portfolioFrom): void
+    /**
+     * @param BankAccount $bankAccountFrom
+     */
+    public function setBankAccountFrom(BankAccount $bankAccountFrom): void
     {
-        $this->portfolioFrom = $portfolioFrom;
+        $this->bankAccountFrom = $bankAccountFrom;
     }
 
-    public function getPortfolioTo(): ?Portfolio
+    /**
+     * @return BankAccount
+     */
+    public function getBankAccountTo(): BankAccount
     {
-        return $this->portfolioTo;
+        return $this->bankAccountTo;
     }
 
-    public function setPortfolioTo(?Portfolio $portfolioTo): void
+    /**
+     * @param BankAccount $bankAccountTo
+     */
+    public function setBankAccountTo(BankAccount $bankAccountTo): void
     {
-        $this->portfolioTo = $portfolioTo;
+        $this->bankAccountTo = $bankAccountTo;
     }
-
 
 }
