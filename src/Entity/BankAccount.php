@@ -45,16 +45,29 @@ class BankAccount
     /**
      * @var Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="portfolioFrom")
+     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="bankAccountFrom")
      */
     private $transfersFrom;
 
     /**
      * @var Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="portfolioTo")
+     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="bankAccountTo")
      */
     private $transfersTo;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="bankAccount")
+     */
+    private $positions;
+
+
+    public function __toString(): string
+    {
+        return $this->getName() . ' (' . $this->getPortfolio() . ')';
+    }
 
     /**
      * @return int
@@ -126,6 +139,30 @@ class BankAccount
     public function setTransfersTo(Collection $transfersTo): void
     {
         $this->transfersTo = $transfersTo;
+    }
+
+    /**
+     * @param Position $position
+     */
+    public function addPosition(Position $position): void
+    {
+        $this->positions[] = $position;
+    }
+
+    /**
+     * @param Position $bankAccount
+     */
+    public function removePosition(Position $bankAccount)
+    {
+        $this->positions->removeElement($bankAccount);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getPositions(): Collection
+    {
+        return $this->positions;
     }
 
 }

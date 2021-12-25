@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\BankAccount;
 use App\Entity\Portfolio;
 use App\Helper\RandomizeHelper;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -30,7 +31,12 @@ class PortfolioController extends AbstractFOSRestController
         $portfolio->setHashKey($randomHashKey);
         $portfolio->setStartDate(new \DateTime());
 
+        $bankAccount = new BankAccount();
+        $bankAccount->setName('Meine Bank A');
+        $bankAccount->setPortfolio($portfolio);
+
         $this->getDoctrine()->getManager()->persist($portfolio);
+        $this->getDoctrine()->getManager()->persist($bankAccount);
         $this->getDoctrine()->getManager()->flush();
 
         return View::create($portfolio, Response::HTTP_CREATED);
