@@ -46,7 +46,6 @@ class PortfolioController extends AbstractFOSRestController
     /**
      * @Rest\Post("/portfolio/restore", name="restore_portfolio")
      * @param Request $request
-     * @param string $key
      * @return View
      */
     public function restorePortfolio(Request $request): View

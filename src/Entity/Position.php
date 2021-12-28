@@ -179,33 +179,33 @@ class Position
     }
 
     /**
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getActiveFrom(): DateTime
+    public function getActiveFrom(): ?DateTime
     {
         return $this->activeFrom;
     }
 
     /**
-     * @param DateTime $activeFrom
+     * @param DateTime|null $activeFrom
      */
-    public function setActiveFrom(DateTime $activeFrom): void
+    public function setActiveFrom(?DateTime $activeFrom): void
     {
         $this->activeFrom = $activeFrom;
     }
 
     /**
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getActiveUntil(): DateTime
+    public function getActiveUntil(): ?DateTime
     {
         return $this->activeUntil;
     }
 
     /**
-     * @param DateTime $activeUntil
+     * @param DateTime|null $activeUntil
      */
-    public function setActiveUntil(DateTime $activeUntil): void
+    public function setActiveUntil(?DateTime $activeUntil): void
     {
         $this->activeUntil = $activeUntil;
     }
