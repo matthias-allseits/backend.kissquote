@@ -75,8 +75,12 @@ class Position
      */
     private $activeUntil;
 
-// todo: add annotations
-//    private $transactions;
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position")
+     */
+    private $transactions;
 
 // todo: add annotations
 //    private $rates;
@@ -208,6 +212,22 @@ class Position
     public function setActiveUntil(?DateTime $activeUntil): void
     {
         $this->activeUntil = $activeUntil;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    /**
+     * @param Collection $transactions
+     */
+    public function setTransactions(Collection $transactions): void
+    {
+        $this->transactions = $transactions;
     }
 
 }
