@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\BankAccount;
 use App\Entity\Currency;
+use App\Entity\Dividend;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Share;
@@ -30,7 +31,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Bo Kissquote');
+            ->setTitle('Backoffice Kissquote');
     }
 
     public function configureMenuItems(): iterable
@@ -41,6 +42,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Bank accounts', 'fas fa-list', BankAccount::class);
         yield MenuItem::linkToCrud('Positions', 'fas fa-list', Position::class);
         yield MenuItem::linkToCrud('Transactions', 'fas fa-list', Transaction::class);
+        yield MenuItem::linkToCrud('Dividends', 'fas fa-list', Dividend::class);
         yield MenuItem::linkToCrud('Currencies', 'fas fa-list', Currency::class);
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
     }
