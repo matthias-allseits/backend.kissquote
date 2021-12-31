@@ -32,6 +32,13 @@ class Transaction
     private $position;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", length=64, nullable=true)
+     */
+    private $title;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="date", nullable=false)
@@ -88,6 +95,22 @@ class Transaction
     public function setPosition(Position $position): void
     {
         $this->position = $position;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string|null $title
+     */
+    public function setTitle(?string $title): void
+    {
+        $this->title = $title;
     }
 
     /**
