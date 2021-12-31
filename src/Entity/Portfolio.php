@@ -47,7 +47,7 @@ class Portfolio
     private $startDate;
 
     /**
-     * @var Collection
+     * @var Collection|BankAccount[]
      *
      * @ORM\OneToMany(targetEntity="App\Entity\BankAccount", mappedBy="portfolio")
      */
@@ -63,6 +63,21 @@ class Portfolio
     {
         return (string) $this->userName;
     }
+
+
+    /**
+     * @return Position[]
+     */
+    public function getAllPositions(): array
+    {
+        $positions = [];
+        foreach($this->bankAccounts as $account) {
+            $positions = array_merge($positions, $account->getPositions()->toArray());
+        }
+
+        return $positions;
+    }
+
 
     /**
      * @return int

@@ -82,6 +82,13 @@ class Position
      */
     private $transactions;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="isCash", type="boolean", nullable=false)
+     */
+    private $isCash = false;
+
 // todo: add annotations
 //    private $rates;
 
@@ -228,6 +235,22 @@ class Position
     public function setTransactions(Collection $transactions): void
     {
         $this->transactions = $transactions;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCash(): bool
+    {
+        return $this->isCash;
+    }
+
+    /**
+     * @param bool $isCash
+     */
+    public function setIsCash(bool $isCash): void
+    {
+        $this->isCash = $isCash;
     }
 
 }
