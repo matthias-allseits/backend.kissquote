@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 
 /**
@@ -16,6 +17,7 @@ class Currency
 
 	/**
 	 * @var integer
+     * @Serializer\Type("integer")
 	 *
 	 * @ORM\Column(name="id", type="integer")
 	 * @ORM\Id
@@ -25,6 +27,7 @@ class Currency
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="name", type="string", length=64, nullable=false)
      */
@@ -32,6 +35,7 @@ class Currency
 
     /**
      * @var float
+     * @Serializer\Type("float")
      *
      * @ORM\Column(name="rate", type="float", precision=10, scale=3, nullable=false)
      */

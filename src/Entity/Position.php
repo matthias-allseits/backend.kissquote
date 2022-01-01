@@ -6,6 +6,7 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Position
@@ -17,6 +18,7 @@ class Position
 {
 	/**
 	 * @var integer
+     * @Serializer\Type("integer")
 	 *
 	 * @ORM\Column(name="id", type="integer")
 	 * @ORM\Id
@@ -36,6 +38,7 @@ class Position
 
     /**
      * @var Share
+     * @Serializer\Type("App\Entity\Share")
      *
      * @ORM\ManyToOne(targetEntity="Share")
      * @ORM\JoinColumns({
@@ -46,6 +49,7 @@ class Position
 
     /**
      * @var Currency
+     * @Serializer\Type("App\Entity\Currency")
      *
      * @ORM\ManyToOne(targetEntity="Currency")
      * @ORM\JoinColumns({
@@ -56,6 +60,7 @@ class Position
 
     /**
      * @var boolean
+     * @Serializer\Type("boolean")
      *
      * @ORM\Column(name="active", type="boolean", nullable=false)
      */
@@ -77,6 +82,7 @@ class Position
 
     /**
      * @var Collection
+     * @Serializer\Exclude()
      *
      * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position")
      */

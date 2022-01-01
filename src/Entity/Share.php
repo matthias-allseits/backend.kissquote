@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 
 /**
@@ -15,6 +16,7 @@ class Share
 {
 	/**
 	 * @var integer
+     * @Serializer\Type("integer")
 	 *
 	 * @ORM\Column(name="id", type="integer")
 	 * @ORM\Id
@@ -34,6 +36,7 @@ class Share
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="name", type="string", length=64, nullable=false)
      */
@@ -41,6 +44,7 @@ class Share
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="shortname", type="string", length=16, nullable=false)
      */
@@ -55,6 +59,7 @@ class Share
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="isin", type="string", length=16, nullable=false)
      */
