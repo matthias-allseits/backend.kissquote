@@ -49,7 +49,7 @@ class Portfolio
     /**
      * @var Collection|BankAccount[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\BankAccount", mappedBy="portfolio")
+     * @ORM\OneToMany(targetEntity="App\Entity\BankAccount", mappedBy="portfolio", cascade={"remove"})
      */
     private $bankAccounts;
 
