@@ -35,6 +35,16 @@ class Share
     private $currency;
 
     /**
+     * @var Portfolio
+     *
+     * @ORM\ManyToOne(targetEntity="Portfolio")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
+     * })
+     */
+    private $portfolio;
+
+    /**
      * @var string
      * @Serializer\Type("string")
      *
@@ -74,6 +84,7 @@ class Share
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="type", type="string", length=16, nullable=false)
      */
@@ -129,6 +140,22 @@ class Share
     public function setCurrency(Currency $currency): void
     {
         $this->currency = $currency;
+    }
+
+    /**
+     * @return Portfolio|null
+     */
+    public function getPortfolio(): ?Portfolio
+    {
+        return $this->portfolio;
+    }
+
+    /**
+     * @param Portfolio $portfolio
+     */
+    public function setPortfolio(Portfolio $portfolio): void
+    {
+        $this->portfolio = $portfolio;
     }
 
     /**

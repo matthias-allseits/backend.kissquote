@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 
 /**
@@ -18,6 +19,7 @@ class BankAccount
 
     /**
      * @var integer
+     * @Serializer\Type("integer")
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -37,6 +39,7 @@ class BankAccount
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
@@ -58,6 +61,7 @@ class BankAccount
 
     /**
      * @var Collection
+     * @Serializer\Type("ArrayCollection<App\Entity\Position>")
      *
      * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="bankAccount")
      */

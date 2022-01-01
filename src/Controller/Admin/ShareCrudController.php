@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Share;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -20,6 +21,7 @@ class ShareCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
+            AssociationField::new('portfolio'),
             TextField::new('name'),
             TextField::new('shortName'),
             TextField::new('isin'),

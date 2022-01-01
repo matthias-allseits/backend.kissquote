@@ -28,10 +28,12 @@ class Position
 
     /**
      * @var BankAccount
+     * @Serializer\Type("App\Entity\BankAccount")
+     * @Serializer\SerializedName("bankAccount")
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\BankAccount")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $bankAccount;
@@ -68,6 +70,8 @@ class Position
 
     /**
      * @var DateTime
+     * @Serializer\Type("DateTime<'Y-m-d'>")
+     * @Serializer\SerializedName("activeFrom")
      *
      * @ORM\Column(name="active_from", type="date", nullable=true)
      */

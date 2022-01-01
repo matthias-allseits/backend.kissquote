@@ -10,7 +10,7 @@ use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
 class PositionController extends AbstractFOSRestController
@@ -59,19 +59,44 @@ class PositionController extends AbstractFOSRestController
      */
     public function createPosition(Request $request): View
     {
-        // todo: implement a better solution
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
-//            throw new \Exception(AuthenticationException::class);
+            throw new \Exception(AccessDeniedException::class);
         }
 
         $serializer = SerializerBuilder::create()->build();
         /** @var Position $position */
-        $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
+        $content = json_decode($request->getContent());
+        $content->activeFrom = $content->activeFrom ? substr($content->activeFrom, 0, 10): null;
+        $position = $serializer->deserialize(json_encode($content), Position::class, 'json');
 
-        $this->getDoctrine()->getManager()->persist($position->getShare());
-        $this->getDoctrine()->getManager()->persist($position->getCurrency());
+        $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
+        if (null === $bankAccount) {
+            throw new \Exception(AccessDeniedException::class);
+        } else {
+            $position->setBankAccount($bankAccount);
+        }
+
+        $share = $portfolio->getShareByIsin($position->getShare()->getIsin());
+        if (null === $share) {
+            $share = $position->getShare();
+            if (strlen($share->getShortname()) == 0) {
+                $share->setShortname(substr($share->getName(), 0, 15));
+            }
+            $share->setPortfolio($portfolio);
+            $this->getDoctrine()->getManager()->persist($share);
+        }
+        $position->setShare($share);
+
+        $currency = $portfolio->getCurrencyByName($position->getCurrency()->getName());
+        if (null === $currency) {
+            $currency = $position->getCurrency();
+            $currency->setPortfolio($portfolio);
+            $this->getDoctrine()->getManager()->persist($currency);
+        }
+        $position->setCurrency($currency);
+
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->flush();
 

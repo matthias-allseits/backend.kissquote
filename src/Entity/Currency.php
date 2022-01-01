@@ -26,6 +26,16 @@ class Currency
 	private $id;
 
     /**
+     * @var Portfolio
+     *
+     * @ORM\ManyToOne(targetEntity="Portfolio")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
+     * })
+     */
+    private $portfolio;
+
+    /**
      * @var string
      * @Serializer\Type("string")
      *
@@ -53,6 +63,22 @@ class Currency
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return Portfolio|null
+     */
+    public function getPortfolio(): ?Portfolio
+    {
+        return $this->portfolio;
+    }
+
+    /**
+     * @param Portfolio $portfolio
+     */
+    public function setPortfolio(Portfolio $portfolio): void
+    {
+        $this->portfolio = $portfolio;
     }
 
     /**

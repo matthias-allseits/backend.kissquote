@@ -53,6 +53,20 @@ class Portfolio
      */
     private $bankAccounts;
 
+    /**
+     * @var Collection|Share[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Share", mappedBy="portfolio")
+     */
+    private $shares;
+
+    /**
+     * @var Collection|Currency[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Currency", mappedBy="portfolio")
+     */
+    private $currencies;
+
 
     public function __construct()
     {
@@ -76,6 +90,45 @@ class Portfolio
         }
 
         return $positions;
+    }
+
+
+    public function getBankAccountById(int $id): ?BankAccount
+    {
+        $hit = null;
+        foreach ($this->bankAccounts as $account) {
+            if ($account->getId() == $id) {
+                $hit = $account;
+            }
+        }
+
+        return $hit;
+    }
+
+
+    public function getShareByIsin(string $isin): ?Share
+    {
+        $hit = null;
+        foreach ($this->shares as $share) {
+            if ($share->getIsin() == $isin) {
+                $hit = $share;
+            }
+        }
+
+        return $hit;
+    }
+
+
+    public function getCurrencyByName(string $name): ?Currency
+    {
+        $hit = null;
+        foreach ($this->currencies as $currency) {
+            if ($currency->getName() == $name) {
+                $hit = $currency;
+            }
+        }
+
+        return $hit;
     }
 
 
@@ -157,6 +210,38 @@ class Portfolio
     public function getBankAccounts(): Collection
     {
         return $this->bankAccounts;
+    }
+
+    /**
+     * @return Share[]|Collection
+     */
+    public function getShares()
+    {
+        return $this->shares;
+    }
+
+    /**
+     * @param Share[]|Collection $shares
+     */
+    public function setShares($shares): void
+    {
+        $this->shares = $shares;
+    }
+
+    /**
+     * @return Currency[]|Collection
+     */
+    public function getCurrencies()
+    {
+        return $this->currencies;
+    }
+
+    /**
+     * @param Currency[]|Collection $currencies
+     */
+    public function setCurrencies($currencies): void
+    {
+        $this->currencies = $currencies;
     }
 
 }
