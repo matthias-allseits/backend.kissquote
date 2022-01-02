@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Transaction
@@ -14,6 +15,7 @@ class Transaction
 {
 	/**
 	 * @var integer
+     * @Serializer\Type("integer")
 	 *
 	 * @ORM\Column(name="id", type="integer")
 	 * @ORM\Id
@@ -23,6 +25,7 @@ class Transaction
 
     /**
      * @var Position
+     * @Serializer\Type("App\Entity\Position")
      *
      * @ORM\ManyToOne(targetEntity="Position")
      * @ORM\JoinColumns({
@@ -33,6 +36,7 @@ class Transaction
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="title", type="string", length=64, nullable=true)
      */
@@ -40,6 +44,7 @@ class Transaction
 
     /**
      * @var \DateTime
+     * @Serializer\Type("DateTime<'Y-m-d'>")
      *
      * @ORM\Column(name="date", type="date", nullable=false)
      */
@@ -47,6 +52,7 @@ class Transaction
 
     /**
      * @var integer
+     * @Serializer\Type("integer")
      *
      * @ORM\Column(name="quantity", type="integer", nullable=false)
      */
@@ -54,6 +60,7 @@ class Transaction
 
     /**
      * @var float
+     * @Serializer\Type("float")
      *
      * @ORM\Column(name="rate", type="float", precision=10, scale=0, nullable=false)
      */
@@ -61,6 +68,7 @@ class Transaction
 
     /**
      * @var float
+     * @Serializer\Type("float")
      *
      * @ORM\Column(name="fee", type="float", precision=10, scale=0, nullable=true)
      */

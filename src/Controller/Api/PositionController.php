@@ -66,9 +66,9 @@ class PositionController extends AbstractFOSRestController
         }
 
         $serializer = SerializerBuilder::create()->build();
-        /** @var Position $position */
         $content = json_decode($request->getContent());
         $content->activeFrom = $content->activeFrom ? substr($content->activeFrom, 0, 10): null;
+        /** @var Position $position */
         $position = $serializer->deserialize(json_encode($content), Position::class, 'json');
 
         $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());

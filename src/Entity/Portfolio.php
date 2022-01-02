@@ -106,6 +106,21 @@ class Portfolio
     }
 
 
+    public function getPositionById(int $id): ?Position
+    {
+        $hit = null;
+        foreach ($this->bankAccounts as $account) {
+            foreach($account->getPositions() as $position) {
+                if ($position->getId() == $id) {
+                    $hit = $position;
+                }
+            }
+        }
+
+        return $hit;
+    }
+
+
     public function getShareByIsin(string $isin): ?Share
     {
         $hit = null;

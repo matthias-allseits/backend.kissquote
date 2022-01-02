@@ -86,7 +86,7 @@ class Position
 
     /**
      * @var Collection
-     * @Serializer\Exclude()
+     * @Serializer\Type("ArrayCollection<App\Entity\Transaction>")
      *
      * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position")
      */
