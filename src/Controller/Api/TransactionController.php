@@ -62,4 +62,48 @@ class TransactionController extends AbstractFOSRestController
         return View::create($transaction, Response::HTTP_OK);
     }
 
+
+    /**
+     * @Rest\Put("/transaction/{transactionId}", name="update_transaction")
+     * @param Request $request
+     * @param int $transactionId
+     * @return View
+     * @throws \Exception
+     */
+    public function updateTransaction(Request $request, int $transactionId): View
+    {
+        $key = $request->headers->get('Authorization');
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            throw new \Exception(AccessDeniedException::class);
+        }
+
+        $existingTransaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
+        if (null === $existingTransaction) {
+            throw new \Exception(AccessDeniedException::class);
+        }
+
+        $serializer = SerializerBuilder::create()->build();
+        /** @var Transaction $updatedTransaction */
+        $updatedTransaction = $serializer->deserialize($request->getContent(), Transaction::class, 'json');
+
+        $position = $portfolio->getPositionById($updatedTransaction->getPosition()->getId());
+        if (null === $position) {
+            throw new \Exception(AccessDeniedException::class);
+        } else {
+            $updatedTransaction->setPosition($position);
+        }
+
+        $existingTransaction->setDate($updatedTransaction->getDate());
+        $existingTransaction->setTitle($updatedTransaction->getTitle());
+        $existingTransaction->setQuantity($updatedTransaction->getQuantity());
+        $existingTransaction->setRate($updatedTransaction->getRate());
+        $existingTransaction->setFee($updatedTransaction->getFee());
+
+        $this->getDoctrine()->getManager()->persist($existingTransaction);
+        $this->getDoctrine()->getManager()->flush();
+
+        return View::create($updatedTransaction, Response::HTTP_OK);
+    }
+
 }
