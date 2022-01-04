@@ -106,4 +106,20 @@ class TransactionController extends AbstractFOSRestController
         return View::create($updatedTransaction, Response::HTTP_OK);
     }
 
+
+    /**
+     * @Rest\Delete("/transaction/{transactionId}", name="delete_transaction")
+     * @param Request $request
+     * @param int $transactionId
+     * @return View
+     */
+    public function deleteTransaction(Request $request, int $transactionId): View
+    {
+        $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
+        $this->getDoctrine()->getManager()->remove($transaction);
+        $this->getDoctrine()->getManager()->flush();
+
+        return new View("Transaction Delete Successfully", Response::HTTP_OK);
+    }
+
 }
