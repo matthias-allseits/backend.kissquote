@@ -56,14 +56,14 @@ class Portfolio
     /**
      * @var Collection|Share[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Share", mappedBy="portfolio")
+     * @ORM\OneToMany(targetEntity="App\Entity\Share", mappedBy="portfolio", cascade={"remove"})
      */
     private $shares;
 
     /**
      * @var Collection|Currency[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Currency", mappedBy="portfolio")
+     * @ORM\OneToMany(targetEntity="App\Entity\Currency", mappedBy="portfolio", cascade={"remove"})
      */
     private $currencies;
 
