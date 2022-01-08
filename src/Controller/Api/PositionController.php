@@ -106,4 +106,20 @@ class PositionController extends AbstractFOSRestController
         return View::create($position, Response::HTTP_OK);
     }
 
+
+    /**
+     * @Rest\Delete("/position/{positionId}", name="delete_position")
+     * @param Request $request
+     * @param int $positionId
+     * @return View
+     */
+    public function deletePosition(Request $request, int $positionId): View
+    {
+        $transaction = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
+        $this->getDoctrine()->getManager()->remove($transaction);
+        $this->getDoctrine()->getManager()->flush();
+
+        return new View("Position Delete Successfully", Response::HTTP_OK);
+    }
+
 }

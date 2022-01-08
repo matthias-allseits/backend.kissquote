@@ -90,7 +90,7 @@ class Position
      * @var Collection
      * @Serializer\Type("ArrayCollection<App\Entity\Transaction>")
      *
-     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position")
+     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position", cascade={"remove"})
      */
     private $transactions;
 

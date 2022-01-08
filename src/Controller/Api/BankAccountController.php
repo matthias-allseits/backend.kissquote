@@ -65,4 +65,20 @@ class BankAccountController extends AbstractFOSRestController
         return View::create($bankAccount, Response::HTTP_OK);
     }
 
+
+    /**
+     * @Rest\Delete("/bank-account/{accountId}", name="delete_account")
+     * @param Request $request
+     * @param int $accountId
+     * @return View
+     */
+    public function deletePosition(Request $request, int $accountId): View
+    {
+        $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
+        $this->getDoctrine()->getManager()->remove($bankAccount);
+        $this->getDoctrine()->getManager()->flush();
+
+        return new View("Bank-Account Delete Successfully", Response::HTTP_OK);
+    }
+
 }
