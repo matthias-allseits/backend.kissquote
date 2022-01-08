@@ -81,6 +81,18 @@ class Transaction
     }
 
 
+    public function calculateTransactionCostsGross(): float
+    {
+        return ($this->getRate() * $this->getQuantity()) + $this->getFee();
+    }
+
+
+    public function calculateTransactionCostsNet(): float
+    {
+        return $this->getRate() * $this->getQuantity();
+    }
+
+
     /**
      * @return int
      */

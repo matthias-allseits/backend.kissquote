@@ -126,6 +126,81 @@ class Position
         }
     }
 
+
+    public function getCountOfSharesByDate(\DateTime $date = null): int
+    {
+        if (null == $date) {
+            $date = new DateTime();
+        }
+
+        $quantity = 0;
+        if (null !== $this->transactions) {
+            /** @var Transaction $transaction */
+            foreach($this->transactions as $transaction) {
+                if ($transaction->getDate() < $date) {
+                    $quantity += $transaction->getQuantity();
+                }
+            }
+        }
+
+        return $quantity;
+    }
+
+
+    public function getAveragePayedPriceGross(): float
+    {
+        return round($this->getSummedInvestmentGross() / $this->getCountOfSharesByDate(), 2);
+    }
+
+
+    public function getAveragePayedPriceNet(): float
+    {
+        return round($this->getSummedInvestmentNet() / $this->getCountOfSharesByDate(), 2);
+    }
+
+
+    public function getSummedInvestmentGross(): int
+    {
+        $value = 0;
+        if (null !== $this->transactions) {
+            /** @var Transaction $transaction */
+            foreach($this->transactions as $transaction) {
+                $value += $transaction->calculateTransactionCostsGross();
+            }
+        }
+
+        return round($value);
+    }
+
+
+    public function getSummedInvestmentNet(): int
+    {
+        $value = 0;
+        if (null !== $this->transactions) {
+            /** @var Transaction $transaction */
+            foreach($this->transactions as $transaction) {
+                $value += $transaction->calculateTransactionCostsNet();
+            }
+        }
+
+        return round($value);
+    }
+
+
+    public function getSummedFees(): int
+    {
+        $value = 0;
+        if (null !== $this->transactions) {
+            /** @var Transaction $transaction */
+            foreach($this->transactions as $transaction) {
+                $value += $transaction->getFee();
+            }
+        }
+
+        return round($value);
+    }
+
+
     /**
      * @return int
      */
