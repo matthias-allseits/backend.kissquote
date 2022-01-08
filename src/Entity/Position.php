@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use App\Model\Balance;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * Position
@@ -102,6 +104,11 @@ class Position
 // todo: add annotations
 //    private $rates;
 
+    /**
+     * @var Balance|null
+     */
+    private $balance;
+
 
     public function __construct()
     {
@@ -144,9 +151,9 @@ class Position
     }
 
     /**
-     * @param BankAccount $bankAccount
+     * @param BankAccount|null $bankAccount
      */
-    public function setBankAccount(BankAccount $bankAccount): void
+    public function setBankAccount(?BankAccount $bankAccount): void
     {
         $this->bankAccount = $bankAccount;
     }
@@ -261,6 +268,22 @@ class Position
     public function setIsCash(bool $isCash): void
     {
         $this->isCash = $isCash;
+    }
+
+    /**
+     * @return Balance|null
+     */
+    public function getBalance(): ?Balance
+    {
+        return $this->balance;
+    }
+
+    /**
+     * @param Balance|null $balance
+     */
+    public function setBalance(?Balance $balance): void
+    {
+        $this->balance = $balance;
     }
 
 }

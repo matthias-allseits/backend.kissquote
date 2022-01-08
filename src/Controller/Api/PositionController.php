@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Portfolio;
 use App\Entity\Position;
+use App\Model\Balance;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -26,6 +27,10 @@ class PositionController extends AbstractFOSRestController
     {
 
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
+        $position->setBankAccount(null);
+
+        $balance = new Balance($position);
+        $position->setBalance($balance);
 
         return View::create($position, Response::HTTP_CREATED);
     }
