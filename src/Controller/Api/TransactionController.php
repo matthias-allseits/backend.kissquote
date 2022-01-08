@@ -56,6 +56,10 @@ class TransactionController extends AbstractFOSRestController
             $transaction->setPosition($position);
         }
 
+        if ($transaction->getDate() < $position->getActiveFrom()) {
+            $position->setActiveFrom($transaction->getDate());
+        }
+
         $this->getDoctrine()->getManager()->persist($transaction);
         $this->getDoctrine()->getManager()->flush();
 

@@ -138,7 +138,11 @@ class Position
             /** @var Transaction $transaction */
             foreach($this->transactions as $transaction) {
                 if ($transaction->getDate() < $date) {
-                    $quantity += $transaction->getQuantity();
+                    if ($transaction->getTitle() == 'Kauf') {
+                        $quantity += $transaction->getQuantity();
+                    } elseif ($transaction->getTitle() == 'Verkauf') {
+                        $quantity -= $transaction->getQuantity();
+                    }
                 }
             }
         }
@@ -165,7 +169,12 @@ class Position
         if (null !== $this->transactions) {
             /** @var Transaction $transaction */
             foreach($this->transactions as $transaction) {
-                $value += $transaction->calculateTransactionCostsGross();
+                if ($transaction->getTitle() == 'Kauf') {
+                    $value += $transaction->calculateTransactionCostsGross();
+                } elseif ($transaction->getTitle() == 'Verkauf') {
+                    $value -= $transaction->calculateTransactionCostsNet();
+                    $value += $transaction->getFee();
+                }
             }
         }
 
@@ -179,7 +188,11 @@ class Position
         if (null !== $this->transactions) {
             /** @var Transaction $transaction */
             foreach($this->transactions as $transaction) {
-                $value += $transaction->calculateTransactionCostsNet();
+                if ($transaction->getTitle() == 'Kauf') {
+                    $value += $transaction->calculateTransactionCostsNet();
+                } elseif ($transaction->getTitle() == 'Verkauf') {
+                    $value -= $transaction->calculateTransactionCostsNet();
+                }
             }
         }
 
