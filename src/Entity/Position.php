@@ -70,7 +70,7 @@ class Position
 
     /**
      * @var DateTime
-     * @Serializer\Type("DateTime<'Y-m-d'>")
+     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
      * @Serializer\SerializedName("activeFrom")
      *
      * @ORM\Column(name="active_from", type="date", nullable=true)
