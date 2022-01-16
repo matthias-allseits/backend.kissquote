@@ -162,11 +162,19 @@ class BankAccount
     }
 
     /**
-     * @return Collection
+     * @return Position[]
      */
-    public function getPositions(): Collection
+    public function getPositions(): array
     {
-        return $this->positions;
+        $positions = $this->positions->toArray();
+        $sortArray = [];
+        /** @var Position[] $positions */
+        foreach($positions as $position) {
+            $sortArray[] = $position->getActiveFrom();
+        }
+        array_multisort($sortArray, SORT_ASC, $positions);
+
+        return $positions;
     }
 
 }
