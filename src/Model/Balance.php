@@ -25,6 +25,12 @@ class Balance
     /** @var int */
     private $transactionFeesTotal;
 
+    /** @var int */
+    private $collectedDividends;
+
+    /** @var int */
+    private $projectedNextDividendPayment;
+
 
     public function __construct(Position $position)
     {
@@ -34,6 +40,8 @@ class Balance
         $this->averagePayedPriceNet = $position->getAveragePayedPriceNet();
         $this->investment = $position->getSummedInvestmentGross();
         $this->transactionFeesTotal = $position->getSummedFees();
+        $this->collectedDividends = $position->getCollectedDividends();
+        $this->projectedNextDividendPayment = $position->calculateNextDividendPayment();
     }
 
 }

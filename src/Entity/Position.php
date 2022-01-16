@@ -18,6 +18,10 @@ use JMS\Serializer\Annotation\Exclude;
  */
 class Position
 {
+
+    const TITLES_TRANSACTION = ['Kauf', 'Verkauf'];
+    const TITLES_DIVIDEND = ['Dividende', 'Capital Gain'];
+
 	/**
 	 * @var integer
      * @Serializer\Type("integer")
@@ -144,8 +148,7 @@ class Position
 
         $quantity = 0;
         if (null !== $this->transactions) {
-            /** @var Transaction $transaction */
-            foreach($this->transactions as $transaction) {
+            foreach($this->getTransactions() as $transaction) {
                 if ($transaction->getDate() < $date) {
                     if ($transaction->getTitle() == 'Kauf') {
                         $quantity += $transaction->getQuantity();
@@ -176,8 +179,7 @@ class Position
     {
         $value = 0;
         if (null !== $this->transactions) {
-            /** @var Transaction $transaction */
-            foreach($this->transactions as $transaction) {
+            foreach($this->getTransactions() as $transaction) {
                 if ($transaction->getTitle() == 'Kauf') {
                     $value += $transaction->calculateTransactionCostsGross();
                 } elseif ($transaction->getTitle() == 'Verkauf') {
@@ -195,8 +197,7 @@ class Position
     {
         $value = 0;
         if (null !== $this->transactions) {
-            /** @var Transaction $transaction */
-            foreach($this->transactions as $transaction) {
+            foreach($this->getTransactions() as $transaction) {
                 if ($transaction->getTitle() == 'Kauf') {
                     $value += $transaction->calculateTransactionCostsNet();
                 } elseif ($transaction->getTitle() == 'Verkauf') {
@@ -213,13 +214,57 @@ class Position
     {
         $value = 0;
         if (null !== $this->transactions) {
-            /** @var Transaction $transaction */
-            foreach($this->transactions as $transaction) {
-                $value += $transaction->getFee();
+            foreach($this->getTransactions() as $transaction) {
+                if (in_array($transaction->getTitle(), self::TITLES_TRANSACTION)) {
+                    $value += $transaction->getFee();
+                }
             }
         }
 
         return round($value);
+    }
+
+    public function getCollectedDividends(): int
+    {
+        $value = 0;
+        if (null !== $this->transactions) {
+            foreach($this->getTransactions() as $transaction) {
+                if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND)) {
+                    $value += $transaction->getRate();
+                }
+            }
+        }
+
+        return round($value);
+    }
+
+    public function getLastDividendTransaction(): ?Transaction
+    {
+        $hit = null;
+        if (null !== $this->transactions) {
+            $transactions = array_reverse($this->getTransactions());
+            foreach($transactions as $transaction) {
+                if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND)) {
+                    $hit = $transaction;
+                    break;
+                }
+            }
+        }
+
+        return $hit;
+    }
+
+    public function calculateNextDividendPayment(): int
+    {
+        $value = 0;
+        $lastDividendTransaction = $this->getLastDividendTransaction();
+        if (null !== $lastDividendTransaction) {
+            $amountAtLastPayment = $this->getCountOfSharesByDate($lastDividendTransaction->getDate());
+            $dividendByShare = $lastDividendTransaction->getRate() / $amountAtLastPayment;
+            $value = round($this->getCountOfSharesByDate() * $dividendByShare);
+        }
+
+        return $value;
     }
 
 
