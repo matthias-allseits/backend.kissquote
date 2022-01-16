@@ -29,7 +29,7 @@ class PositionController extends AbstractFOSRestController
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $position->setBankAccount(null);
 
-        if ($position->getTransactions()->count() > 0) {
+        if (count($position->getTransactions()) > 0) {
             $balance = new Balance($position);
             $position->setBalance($balance);
         }

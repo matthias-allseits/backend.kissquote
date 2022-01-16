@@ -101,6 +101,15 @@ class Position
      */
     private $isCash = false;
 
+    /**
+     * @var integer|null
+     * @Serializer\Type("integer")
+     *
+     * @ORM\Column(name="sharehead_id", type="integer", nullable=true)
+     */
+    private $shareheadId;
+
+
 // todo: add annotations
 //    private $rates;
 
@@ -327,11 +336,19 @@ class Position
     }
 
     /**
-     * @return Collection
+     * @return Collection|Transaction[]
      */
-    public function getTransactions(): Collection
+    public function getTransactions(): array
     {
-        return $this->transactions;
+        $transactions = $this->transactions->toArray();
+        $sortArray = [];
+        /** @var Transaction[] $transactions */
+        foreach($transactions as $transaction) {
+            $sortArray[] = $transaction->getDate();
+        }
+        array_multisort($sortArray, SORT_ASC, $transactions);
+
+        return $transactions;
     }
 
     /**
@@ -356,6 +373,22 @@ class Position
     public function setIsCash(bool $isCash): void
     {
         $this->isCash = $isCash;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getShareheadId(): ?int
+    {
+        return $this->shareheadId;
+    }
+
+    /**
+     * @param int|null $shareheadId
+     */
+    public function setShareheadId(?int $shareheadId): void
+    {
+        $this->shareheadId = $shareheadId;
     }
 
     /**

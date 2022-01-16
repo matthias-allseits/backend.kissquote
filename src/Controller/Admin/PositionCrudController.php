@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 
 
 class PositionCrudController extends AbstractCrudController
@@ -26,6 +27,7 @@ class PositionCrudController extends AbstractCrudController
             AssociationField::new('currency'),
             DateField::new('activeFrom'),
             DateField::new('activeUntil'),
+            NumberField::new('shareheadId'),
             BooleanField::new('active'),
             BooleanField::new('isCash'),
         ];
