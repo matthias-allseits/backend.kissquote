@@ -86,7 +86,7 @@ class Portfolio
     {
         $positions = [];
         foreach($this->bankAccounts as $account) {
-            $positions = array_merge($positions, $account->getPositions()->toArray());
+            $positions = array_merge($positions, $account->getPositions());
         }
 
         return $positions;

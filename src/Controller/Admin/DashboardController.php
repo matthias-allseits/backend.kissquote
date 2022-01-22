@@ -8,6 +8,7 @@ use App\Entity\Dividend;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Share;
+use App\Entity\Stockrate;
 use App\Entity\SwissquoteShare;
 use App\Entity\Transaction;
 use App\Entity\Translation;
@@ -46,6 +47,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Dividends', 'fas fa-list', Dividend::class);
         yield MenuItem::linkToCrud('Currencies', 'fas fa-list', Currency::class);
         yield MenuItem::linkToCrud('SwissquoteShares', 'fas fa-list', SwissquoteShare::class);
+        yield MenuItem::linkToCrud('StockRates', 'fas fa-list', Stockrate::class);
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
     }
 

@@ -23,6 +23,16 @@ class Stockrate
 	private $id;
 
     /**
+     * @var SwissquoteShare
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\SwissquoteShare", inversedBy="rates")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="share_id", referencedColumnName="id", nullable=false)
+     * })
+     */
+    private $share;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="date", nullable=false)
@@ -35,16 +45,6 @@ class Stockrate
      * @ORM\Column(name="rate", type="float", precision=10, scale=3, nullable=false)
      */
     private $rate;
-
-    /**
-     * @var Share
-     *
-     * @ORM\ManyToOne(targetEntity="SwissquoteShare", inversedBy="rates")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="share_id", referencedColumnName="id")
-     * })
-     */
-    private $share;
 
     /**
      * @var string
@@ -89,19 +89,19 @@ class Stockrate
         return $this;
     }
 
-    public function getShare(): ?Share
+    public function getShare(): ?SwissquoteShare
     {
         return $this->share;
     }
 
-    public function setShare(?Share $share): self
+    public function setShare(?SwissquoteShare $share): self
     {
         $this->share = $share;
 
         return $this;
     }
 
-    public function getCurrency(): string
+    public function getCurrency(): ?string
     {
         return $this->currency;
     }

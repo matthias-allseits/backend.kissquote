@@ -20,7 +20,7 @@ class Position
 {
 
     const TITLES_TRANSACTION = ['Kauf', 'Verkauf'];
-    const TITLES_DIVIDEND = ['Dividende', 'Capital Gain'];
+    const TITLES_DIVIDEND = ['Dividende', 'Capital Gain', 'Kapitalrückzahlung'];
 
 	/**
 	 * @var integer

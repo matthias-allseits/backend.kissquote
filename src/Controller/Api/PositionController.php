@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Portfolio;
 use App\Entity\Position;
+use App\Entity\SwissquoteShare;
 use App\Model\Balance;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -31,6 +32,11 @@ class PositionController extends AbstractFOSRestController
 
         if (count($position->getTransactions()) > 0) {
             $balance = new Balance($position);
+            $swissquoteShare = $this->getDoctrine()->getRepository(SwissquoteShare::class)->findOneBy(['isin' => $position->getShare()->getIsin(), 'currency' => $position->getCurrency()->getName()]);
+            if (null !== $swissquoteShare) {
+                $balance->setLastRate($swissquoteShare->getLastRate());
+            }
+
             $position->setBalance($balance);
         }
 

@@ -3,6 +3,8 @@
 namespace App\Model;
 
 use App\Entity\Position;
+use App\Entity\Stockrate;
+use Doctrine\ORM\EntityManager;
 
 class Balance
 {
@@ -31,6 +33,9 @@ class Balance
     /** @var int */
     private $projectedNextDividendPayment;
 
+    /** @var Stockrate|null */
+    private $lastRate;
+
 
     public function __construct(Position $position)
     {
@@ -42,6 +47,16 @@ class Balance
         $this->transactionFeesTotal = $position->getSummedFees();
         $this->collectedDividends = $position->getCollectedDividends();
         $this->projectedNextDividendPayment = $position->calculateNextDividendPayment();
+
+        $this->lastRate = null;
+    }
+
+    /**
+     * @param Stockrate|null $lastRate
+     */
+    public function setLastRate(?Stockrate $lastRate): void
+    {
+        $this->lastRate = $lastRate;
     }
 
 }

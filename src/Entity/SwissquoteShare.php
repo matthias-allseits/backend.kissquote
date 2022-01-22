@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -92,6 +93,30 @@ class SwissquoteShare
      */
     private $headquarter;
 
+    /**
+     * @var Collection|Stockrate[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Stockrate", mappedBy="share", cascade={"remove"})
+     */
+    private $rates;
+
+
+
+    public function getLastRate(): ?Stockrate
+    {
+        $rates = $this->rates->toArray();
+        if (count($rates) > 0) {
+            $sortArray = [];
+            foreach($rates as $rate) {
+                $sortArray[] = $rate->getDate();
+            }
+            array_multisort($sortArray, SORT_DESC, $rates);
+
+            return $rates[0];
+        }
+
+        return null;
+    }
 
 	public function __toString()
     {
@@ -195,9 +220,9 @@ class SwissquoteShare
     }
 
     /**
-     * @param string $url
+     * @param string|null $url
      */
-    public function setUrl(string $url): void
+    public function setUrl(?string $url): void
     {
         $this->url = $url;
     }
@@ -264,6 +289,22 @@ class SwissquoteShare
     public function setHeadquarter(?string $headquarter): void
     {
         $this->headquarter = $headquarter;
+    }
+
+    /**
+     * @return Stockrate[]|Collection
+     */
+    public function getRates()
+    {
+        return $this->rates;
+    }
+
+    /**
+     * @param Stockrate[]|Collection $rates
+     */
+    public function setRates($rates): void
+    {
+        $this->rates = $rates;
     }
 
 }
