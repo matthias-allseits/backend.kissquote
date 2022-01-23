@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\BankAccount;
 use App\Entity\Currency;
 use App\Entity\Dividend;
+use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Share;
@@ -46,6 +47,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Transactions', 'fas fa-list', Transaction::class);
         yield MenuItem::linkToCrud('Dividends', 'fas fa-list', Dividend::class);
         yield MenuItem::linkToCrud('Currencies', 'fas fa-list', Currency::class);
+        yield MenuItem::linkToCrud('Marketplaces', 'fas fa-list', Marketplace::class);
         yield MenuItem::linkToCrud('SwissquoteShares', 'fas fa-list', SwissquoteShare::class);
         yield MenuItem::linkToCrud('StockRates', 'fas fa-list', Stockrate::class);
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);

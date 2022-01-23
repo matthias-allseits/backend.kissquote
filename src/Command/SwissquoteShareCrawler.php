@@ -3,6 +3,7 @@
 
 namespace App\Command;
 
+use App\Entity\Marketplace;
 use App\Entity\Stockrate;
 use App\Entity\SwissquoteShare;
 use DateInterval;
@@ -45,24 +46,24 @@ class SwissquoteShareCrawler extends Command
             $force = false;
         }
 
-        $marketPlaces = [
-            'CH' => 4,
-            'FR' => 25,
-            'NL' => 38,
-            'DE' => 13,
-            'GB' => 361,
-            'JE' => 361,
-            'SE' => 53,
-            'IT' => 46,
-            'DK' => 12,
-            'ES' => 1058,
-            'NO' => 48,
-            'AT' => 50,
-            'FI' => 40,
-            'BE' => 6,
-            'BM' => 65,
-            'US' => [65, 67],
-        ];
+//        $marketPlaces = [
+//            'CH' => 4,
+//            'FR' => 25,
+//            'NL' => 38,
+//            'DE' => 13,
+//            'GB' => 361,
+//            'JE' => 361,
+//            'SE' => 53,
+//            'IT' => 46,
+//            'DK' => 12,
+//            'ES' => 1058,
+//            'NO' => 48,
+//            'AT' => 50,
+//            'FI' => 40,
+//            'BE' => 6,
+//            'BM' => 65,
+//            'US' => [65, 67],
+//        ];
 
         $shares = $this->entityManager->getRepository(SwissquoteShare::class)->findBy([], ['name' => 'ASC']);
         foreach($shares as $share) {
@@ -84,28 +85,24 @@ class SwissquoteShareCrawler extends Command
             $urls = [];
             if (null === $share->getUrl()) {
                 $countryKey = substr($share->getIsin(), 0, 2);
-                if (!isset($marketPlaces[$countryKey])) {
+                $possibleMarketplaces = $this->entityManager->getRepository(Marketplace::class)->findBy(['isinKey' => $countryKey]);
+                if (count($possibleMarketplaces) == 0) {
                     $output->writeln('<error>no marketplace found for isin ' . $share->getIsin() . '</error>');
                     sleep($this->sleep);
                     continue;
                 }
-                $marketPlaceId = $marketPlaces[$countryKey];
-                $currency = $share->getCurrency();
-                if ($currency == 'GBP') {
-                    $currency = 'GBX';
-                }
-                if ($currency == 'DLR') {
-                    $currency = 'USD';
-                }
-                if ($currency == 'SFR') {
-                    $currency = 'CHF';
-                }
-                if (is_array($marketPlaceId)) {
-                    foreach($marketPlaceId as $id) {
-                        $urls[] = 'https://www.swissquote.ch/sq_mi/public/market/Detail.action?s=' . $share->getIsin() . '_' . $id . '_' . $currency;
-                    }
-                } else {
-                    $urls[] = 'https://www.swissquote.ch/sq_mi/public/market/Detail.action?s=' . $share->getIsin() . '_' . $marketPlaceId . '_' . $currency;
+//                $currency = $share->getCurrency();
+//                if ($currency == 'GBP') {
+//                    $currency = 'GBX';
+//                }
+//                if ($currency == 'DLR') {
+//                    $currency = 'USD';
+//                }
+//                if ($currency == 'SFR') {
+//                    $currency = 'CHF';
+//                }
+                foreach($possibleMarketplaces as $marketplace) {
+                    $urls[] = 'https://www.swissquote.ch/sq_mi/public/market/Detail.action?s=' . $share->getIsin() . '_' . $marketplace->getUrlKey() . '_' . $marketplace->getCurrency();
                 }
             } else {
                 $urls = [$share->getUrl()];

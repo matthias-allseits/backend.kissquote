@@ -27,6 +27,7 @@ class ShareCrudController extends AbstractCrudController
             TextField::new('name'),
             TextField::new('shortName'),
             TextField::new('isin'),
+            AssociationField::new('marketplace'),
         ];
     }
 
@@ -35,6 +36,7 @@ class ShareCrudController extends AbstractCrudController
         return $filters
             ->add(TextFilter::new('name'))
             ->add(TextFilter::new('isin'))
+            ->add(TextFilter::new('marketplace'))
             ;
     }
 

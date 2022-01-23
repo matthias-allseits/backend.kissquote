@@ -45,6 +45,16 @@ class Share
     private $portfolio;
 
     /**
+     * @var Marketplace|null
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Marketplace")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="marketplace_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $marketplace;
+
+    /**
      * @var string
      * @Serializer\Type("string")
      *
@@ -156,6 +166,22 @@ class Share
     public function setPortfolio(Portfolio $portfolio): void
     {
         $this->portfolio = $portfolio;
+    }
+
+    /**
+     * @return Marketplace|null
+     */
+    public function getMarketplace(): ?Marketplace
+    {
+        return $this->marketplace;
+    }
+
+    /**
+     * @param Marketplace|null $marketplace
+     */
+    public function setMarketplace(?Marketplace $marketplace): void
+    {
+        $this->marketplace = $marketplace;
     }
 
     /**
