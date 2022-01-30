@@ -36,7 +36,7 @@ class StockRateCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add(TextFilter::new('share'))
+            ->add('share')
             ->add(DateTimeFilter::new('date'))
             ->add(TextFilter::new('currency'))
             ;

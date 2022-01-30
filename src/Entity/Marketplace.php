@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 
 /**
@@ -16,6 +17,7 @@ class Marketplace
 {
 	/**
 	 * @var integer
+     * @Serializer\Type("integer")
 	 *
 	 * @ORM\Column(name="id", type="integer")
 	 * @ORM\Id
@@ -25,6 +27,7 @@ class Marketplace
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="name", type="string", length=64, nullable=false)
      */
@@ -32,6 +35,7 @@ class Marketplace
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="place", type="string", length=64, nullable=false)
      */
@@ -39,6 +43,7 @@ class Marketplace
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="currency", type="string", length=4, nullable=false)
      */
@@ -46,6 +51,7 @@ class Marketplace
 
     /**
      * @var int
+     * @Serializer\Type("integer")
      *
      * @ORM\Column(name="url_key", type="smallint", nullable=false)
      */
@@ -53,6 +59,7 @@ class Marketplace
 
     /**
      * @var string
+     * @Serializer\Type("string")
      *
      * @ORM\Column(name="isin_key", type="string", length=4, nullable=false)
      */

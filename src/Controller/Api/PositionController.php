@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\SwissquoteShare;
@@ -32,9 +33,17 @@ class PositionController extends AbstractFOSRestController
 
         if (count($position->getTransactions()) > 0) {
             $balance = new Balance($position);
-            $swissquoteShare = $this->getDoctrine()->getRepository(SwissquoteShare::class)->findOneBy(['isin' => $position->getShare()->getIsin(), 'currency' => $position->getCurrency()->getName()]);
+            $currencyName = $position->getCurrency()->getName();
+            if ($currencyName == 'CHF') {
+                $currencyName = 'SFR';
+            } elseif ($currencyName == 'USD') {
+                $currencyName = 'DLR';
+            }
+            $swissquoteShare = $this->getDoctrine()->getRepository(SwissquoteShare::class)->findOneBy(['isin' => $position->getShare()->getIsin(), 'currency' => $currencyName]);
             if (null !== $swissquoteShare) {
                 $balance->setLastRate($swissquoteShare->getLastRate());
+            } else {
+// todo: get quote from swissquote on the fly
             }
 
             $position->setBalance($balance);
@@ -89,13 +98,17 @@ class PositionController extends AbstractFOSRestController
             $position->setBankAccount($bankAccount);
         }
 
+        // todo: get share by isin is not enough. currency is missing
         $share = $portfolio->getShareByIsin($position->getShare()->getIsin());
         if (null === $share) {
             $share = $position->getShare();
             if (strlen($share->getShortname()) == 0) {
                 $share->setShortname(substr($share->getName(), 0, 15));
             }
+            $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($share->getMarketplace()->getId());
+            $share->setMarketplace($marketplace);
             $share->setPortfolio($portfolio);
+            $share->setType('stock');
             $this->getDoctrine()->getManager()->persist($share);
         }
         $position->setShare($share);

@@ -46,6 +46,7 @@ class Share
 
     /**
      * @var Marketplace|null
+     * @Serializer\Type("App\Entity\Marketplace")
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\Marketplace")
      * @ORM\JoinColumns({
