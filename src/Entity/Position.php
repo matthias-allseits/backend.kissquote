@@ -100,6 +100,8 @@ class Position
 
     /**
      * @var boolean
+     * @Serializer\Type("boolean")
+     * @Serializer\SerializedName("isCash")
      *
      * @ORM\Column(name="isCash", type="boolean", nullable=false)
      */

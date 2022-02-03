@@ -129,6 +129,46 @@ class PositionController extends AbstractFOSRestController
 
 
     /**
+     * @Rest\Post("/position/cash", name="create_cash_position")
+     * @param Request $request
+     * @return View
+     * @throws \Exception
+     */
+    public function createCashPosition(Request $request): View
+    {
+        $key = $request->headers->get('Authorization');
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            throw new \Exception(AccessDeniedException::class);
+        }
+
+        $serializer = SerializerBuilder::create()->build();
+        /** @var Position $position */
+        $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
+
+        $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
+        if (null === $bankAccount) {
+            throw new \Exception(AccessDeniedException::class);
+        } else {
+            $position->setBankAccount($bankAccount);
+        }
+
+        $currency = $portfolio->getCurrencyByName($position->getCurrency()->getName());
+        if (null === $currency) {
+            $currency = $position->getCurrency();
+            $currency->setPortfolio($portfolio);
+            $this->getDoctrine()->getManager()->persist($currency);
+        }
+        $position->setCurrency($currency);
+
+        $this->getDoctrine()->getManager()->persist($position);
+        $this->getDoctrine()->getManager()->flush();
+
+        return View::create($position, Response::HTTP_OK);
+    }
+
+
+    /**
      * @Rest\Delete("/position/{positionId}", name="delete_position")
      * @param Request $request
      * @param int $positionId
