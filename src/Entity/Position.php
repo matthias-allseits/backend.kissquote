@@ -270,6 +270,23 @@ class Position
     }
 
 
+    public function getCashValue(): float
+    {
+        $value = 0;
+        if (null !== $this->transactions) {
+            foreach($this->getTransactions() as $transaction) {
+                if ($transaction->getTitle() == 'Einzahlung') {
+                    $value += $transaction->getRate();
+                } elseif ($transaction->getTitle() == 'Auszahlung') {
+                    $value -= $transaction->getRate();
+                }
+            }
+        }
+
+        return $value;
+    }
+
+
     /**
      * @return int
      */

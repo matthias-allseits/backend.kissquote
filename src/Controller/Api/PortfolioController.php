@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\BankAccount;
 use App\Entity\Portfolio;
 use App\Helper\RandomizeHelper;
+use App\Service\BalanceService;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -49,13 +50,8 @@ class PortfolioController extends AbstractFOSRestController
      * @param Request $request
      * @return View
      */
-    public function restorePortfolio(Request $request): View
+    public function restorePortfolio(Request $request, BalanceService $balanceService): View
     {
-//        var_dump($_GET);
-//        var_dump($_POST);
-//        var_dump($request->getContent());
-//        $postedKey = $request->request->get('bambus');
-//        var_dump($postedKey);
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
@@ -63,6 +59,13 @@ class PortfolioController extends AbstractFOSRestController
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $content->hashKey]);
         if (null === $portfolio) {
             throw new AccessDeniedException();
+        }
+
+        foreach($portfolio->getBankAccounts() as $bankAccount) {
+            foreach($bankAccount->getPositions() as $position) {
+                $balance = $balanceService->getBalanceForPosition($position);
+                $position->setBalance($balance);
+            }
         }
 
         return View::create($portfolio, Response::HTTP_OK);

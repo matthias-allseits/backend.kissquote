@@ -7,6 +7,7 @@ use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\SwissquoteShare;
 use App\Model\Balance;
+use App\Service\BalanceService;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -25,27 +26,14 @@ class PositionController extends AbstractFOSRestController
      * @param int $positionId
      * @return View
      */
-    public function getPosition(Request $request, int $positionId): View
+    public function getPosition(Request $request, int $positionId, BalanceService $balanceService): View
     {
 
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $position->setBankAccount(null);
 
         if (count($position->getTransactions()) > 0) {
-            $balance = new Balance($position);
-            $currencyName = $position->getCurrency()->getName();
-            if ($currencyName == 'CHF') {
-                $currencyName = 'SFR';
-            } elseif ($currencyName == 'USD') {
-                $currencyName = 'DLR';
-            }
-            $swissquoteShare = $this->getDoctrine()->getRepository(SwissquoteShare::class)->findOneBy(['isin' => $position->getShare()->getIsin(), 'currency' => $currencyName]);
-            if (null !== $swissquoteShare) {
-                $balance->setLastRate($swissquoteShare->getLastRate());
-            } else {
-// todo: get quote from swissquote on the fly
-            }
-
+            $balance = $balanceService->getBalanceForPosition($position);
             $position->setBalance($balance);
         }
 

@@ -190,9 +190,9 @@ class Transaction
     }
 
     /**
-     * @param float $fee
+     * @param float|null $fee
      */
-    public function setFee(float $fee): void
+    public function setFee(?float $fee): void
     {
         $this->fee = $fee;
     }

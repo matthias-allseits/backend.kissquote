@@ -36,13 +36,20 @@ class Balance
     /** @var Stockrate|null */
     private $lastRate;
 
+    /** @var float */
+    private $cashValue;
+
 
     public function __construct(Position $position)
     {
         $this->amount = $position->getCountOfSharesByDate();
-        $this->firstRate = $position->getTransactions()[0]->getRate();
-        $this->averagePayedPriceGross = $position->getAveragePayedPriceGross();
-        $this->averagePayedPriceNet = $position->getAveragePayedPriceNet();
+        $this->firstRate = count($position->getTransactions()) > 0 ? $position->getTransactions()[0]->getRate() : null;
+        if (false === $position->isCash()) {
+            $this->averagePayedPriceGross = $position->getAveragePayedPriceGross();
+            $this->averagePayedPriceNet = $position->getAveragePayedPriceNet();
+        } else {
+            $this->cashValue = $position->getCashValue();
+        }
         $this->investment = $position->getSummedInvestmentGross();
         $this->transactionFeesTotal = $position->getSummedFees();
         $this->collectedDividends = $position->getCollectedDividends();
