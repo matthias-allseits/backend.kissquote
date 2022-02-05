@@ -165,15 +165,23 @@ class Position
     }
 
 
-    public function getAveragePayedPriceGross(): float
+    public function getAveragePayedPriceGross(): ?float
     {
-        return round($this->getSummedInvestmentGross() / $this->getCountOfSharesByDate(), 2);
+        if ($this->getCountOfSharesByDate()) {
+            return round($this->getSummedInvestmentGross() / $this->getCountOfSharesByDate(), 2);
+        }
+
+        return null;
     }
 
 
-    public function getAveragePayedPriceNet(): float
+    public function getAveragePayedPriceNet(): ?float
     {
-        return round($this->getSummedInvestmentNet() / $this->getCountOfSharesByDate(), 2);
+        if ($this->getCountOfSharesByDate()) {
+            return round($this->getSummedInvestmentNet() / $this->getCountOfSharesByDate(), 2);
+        }
+
+        return null;
     }
 
 

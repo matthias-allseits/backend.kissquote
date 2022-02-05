@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Marketplace;
+use App\Entity\Share;
 use App\Entity\Stockrate;
 use App\Entity\SwissquoteShare;
 use DateInterval;
@@ -45,9 +46,14 @@ class SwissquoteRatesCrawler extends Command
             $force = false;
         }
 
-        // todo: analyse the positions in the db and crawl the most used first
-
         $shares = $this->entityManager->getRepository(SwissquoteShare::class)->findBy([], ['name' => 'ASC']);
+        $sortArray = [];
+        foreach($shares as $share) {
+            $positions = $this->entityManager->getRepository(Share::class)->findBy(['isin' => $share->getIsin()]);
+            $sortArray[] = count($positions);
+        }
+        array_multisort($sortArray, SORT_DESC, $shares);
+
         foreach($shares as $share) {
             $output->writeln($share);
 
