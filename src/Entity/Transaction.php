@@ -29,7 +29,7 @@ class Transaction
      *
      * @ORM\ManyToOne(targetEntity="Position")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="position_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="position_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $position;

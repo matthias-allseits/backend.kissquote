@@ -336,9 +336,9 @@ class Position
     }
 
     /**
-     * @param Share $share
+     * @param Share|null $share
      */
-    public function setShare(Share $share): void
+    public function setShare(?Share $share): void
     {
         $this->share = $share;
     }
@@ -424,9 +424,9 @@ class Position
     }
 
     /**
-     * @param Collection $transactions
+     * @param array $transactions
      */
-    public function setTransactions(Collection $transactions): void
+    public function setTransactions(array $transactions): void
     {
         $this->transactions = $transactions;
     }

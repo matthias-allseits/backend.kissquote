@@ -149,6 +149,23 @@ class PositionController extends AbstractFOSRestController
         }
         $position->setCurrency($currency);
 
+        // happens in case of a import
+        if ($position->getShare()->getId() == 0) {
+            $position->setShare(null);
+        }
+
+        // happens in case of a import
+        if (count($position->getTransactions()) > 0) {
+            $this->getDoctrine()->getManager()->persist($position);
+            $persistedTransactions = [];
+            foreach($position->getTransactions() as $transaction) {
+                $transaction->setPosition($position);
+                $this->getDoctrine()->getManager()->persist($transaction);
+                $persistedTransactions[] = $transaction;
+            }
+            $position->setTransactions($persistedTransactions);
+        }
+
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->flush();
 

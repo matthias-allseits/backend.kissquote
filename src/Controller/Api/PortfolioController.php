@@ -36,6 +36,7 @@ class PortfolioController extends AbstractFOSRestController
         $bankAccount = new BankAccount();
         $bankAccount->setName('Meine Bank A');
         $bankAccount->setPortfolio($portfolio);
+        $portfolio->addBankAccount($bankAccount);
 
         $this->getDoctrine()->getManager()->persist($portfolio);
         $this->getDoctrine()->getManager()->persist($bankAccount);
