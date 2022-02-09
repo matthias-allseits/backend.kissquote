@@ -12,22 +12,38 @@ class HomeController extends AbstractController
 
     public function home(): Response
     {
-        $number = random_int(0, 100);
-
-        return $this->redirectToRoute('app_webtest');
+        return $this->redirectToRoute('app_positions');
     }
 
 
-    public function webtest(): Response
+    public function positions(): Response
     {
-        $number = random_int(0, 100);
-
         $portfolios = $this->getDoctrine()->getRepository(Portfolio::class)->findAll();
 
         return $this->render('home/home.html.twig', [
-            'number' => $number,
             'portfolios' => $portfolios,
         ]);
+    }
+
+
+    // todo: move this method to a action-controller thing...
+    public function deletePortfolio(int $portfolioId): Response
+    {
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->find($portfolioId);
+
+        foreach($portfolio->getAllPositions() as $position) {
+            foreach($position->getTransactions() as $transaction) {
+                $this->getDoctrine()->getManager()->remove($transaction);
+                $this->getDoctrine()->getManager()->flush();
+            }
+            $this->getDoctrine()->getManager()->remove($position);
+            $this->getDoctrine()->getManager()->flush();
+        }
+
+        $this->getDoctrine()->getManager()->remove($portfolio);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->redirectToRoute('app_home');
     }
 
 }

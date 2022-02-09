@@ -159,6 +159,7 @@ class PositionController extends AbstractFOSRestController
             $this->getDoctrine()->getManager()->persist($position);
             $persistedTransactions = [];
             foreach($position->getTransactions() as $transaction) {
+                $transaction->setQuantity(abs($transaction->getQuantity()));
                 $transaction->setPosition($position);
                 $this->getDoctrine()->getManager()->persist($transaction);
                 $persistedTransactions[] = $transaction;

@@ -6,6 +6,7 @@ use App\Entity\Position;
 use App\Entity\Stockrate;
 use Doctrine\ORM\EntityManager;
 
+
 class Balance
 {
 

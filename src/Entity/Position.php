@@ -280,17 +280,25 @@ class Position
 
     public function getCashValue(): float
     {
+        $positiveTitles = ['Einzahlung', 'Vergütung', 'Verkauf', 'Forex-Gutschrift', 'Fx-Gutschrift Comp.', 'Dividende', 'Kapitalrückzahlung', 'Capital Gain'];
+        $negativeTitles = ['Auszahlung', 'Kauf', 'Depotgebühren', 'Forex-Belastung', 'Fx-Belastung Comp.', 'Zins']; // todo: negativzinsen will not last forever!
+
         $value = 0;
         if (null !== $this->transactions) {
             foreach($this->getTransactions() as $transaction) {
-                if ($transaction->getTitle() == 'Einzahlung') {
+                if (in_array($transaction->getTitle(), $positiveTitles)) {
+//                    echo $transaction->getRate() . "\n";
                     $value += $transaction->getRate();
-                } elseif ($transaction->getTitle() == 'Auszahlung') {
+//                    echo 'result: ' . $value . "\n";
+                } elseif (in_array($transaction->getTitle(), $negativeTitles)) {
+//                    echo $transaction->getRate() . "\n";
                     $value -= $transaction->getRate();
+//                    echo 'result: ' . $value . "\n";
                 }
             }
         }
 
+//        echo 'result: ' . $value . "\n";
         return $value;
     }
 

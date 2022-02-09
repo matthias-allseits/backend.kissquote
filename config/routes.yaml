@@ -2,6 +2,10 @@ app_home:
     path: /
     controller: App\Controller\HomeController::home
 
-app_webtest:
-    path: /webtest
-    controller: App\Controller\HomeController::webtest
+app_positions:
+    path: /positions
+    controller: App\Controller\HomeController::positions
+
+app_portfolio_delete:
+    path: /portfolio/{portfolioId}/delete
+    controller: App\Controller\HomeController::deletePortfolio
