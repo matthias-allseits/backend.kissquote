@@ -67,6 +67,7 @@ class PositionController extends AbstractFOSRestController
      */
     public function createPosition(Request $request): View
     {
+        // todo: this has to be moved to the security implementation
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
@@ -106,6 +107,7 @@ class PositionController extends AbstractFOSRestController
             $this->getDoctrine()->getManager()->persist($currency);
         }
         $position->setCurrency($currency);
+        $position->getShare()->setCurrency($currency);
 
         // happens in case of a import
         if (count($position->getTransactions()) > 0) {
@@ -186,6 +188,53 @@ class PositionController extends AbstractFOSRestController
 
 
     /**
+     * @Rest\Put("/position/{positionId}", name="update_position")
+     * @param Request $request
+     * @param int $positionId
+     * @return View
+     * @throws \Exception
+     */
+    public function updatePosition(Request $request, int $positionId): View
+    {
+        $key = $request->headers->get('Authorization');
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            throw new \Exception(AccessDeniedException::class);
+        }
+
+        $serializer = SerializerBuilder::create()->build();
+        $content = json_decode($request->getContent());
+        unset($content->balance);
+        unset($content->transactions);
+//        var_dump($content);
+        /** @var Position $newPosition */
+        $newPosition = $serializer->deserialize(json_encode($content), Position::class, 'json');
+
+        $oldPosition = $this->getDoctrine()->getRepository(Position::class)->find($newPosition->getId());
+        if (null !== $oldPosition) {
+            $oldPosition->getShare()->setName($newPosition->getShare()->getName());
+            $oldPosition->getShare()->setIsin($newPosition->getShare()->getIsin());
+
+            $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
+            $oldPosition->getShare()->setMarketplace($marketplace);
+
+            $currency = $portfolio->getCurrencyByName($newPosition->getCurrency()->getName());
+            if (null === $currency) {
+                $currency = $newPosition->getCurrency();
+                $currency->setPortfolio($portfolio);
+                $this->getDoctrine()->getManager()->persist($currency);
+            }
+            $oldPosition->setCurrency($currency);
+
+            $this->getDoctrine()->getManager()->persist($oldPosition);
+            $this->getDoctrine()->getManager()->flush();
+        }
+
+        return new View("Position Update Successfully", Response::HTTP_OK);
+    }
+
+
+    /**
      * @Rest\Delete("/position/{positionId}", name="delete_position")
      * @param Request $request
      * @param int $positionId
@@ -193,8 +242,9 @@ class PositionController extends AbstractFOSRestController
      */
     public function deletePosition(Request $request, int $positionId): View
     {
-        $transaction = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
-        $this->getDoctrine()->getManager()->remove($transaction);
+        // todo: security check!!!
+        $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
+        $this->getDoctrine()->getManager()->remove($position);
         $this->getDoctrine()->getManager()->flush();
 
         return new View("Position Delete Successfully", Response::HTTP_OK);

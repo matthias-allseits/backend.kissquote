@@ -151,13 +151,23 @@ class Position
 
         $quantity = 0;
         if (null !== $this->transactions) {
-            foreach($this->getTransactions() as $transaction) {
-                if ($transaction->getDate() < $date) {
-                    if ($transaction->getTitle() == 'Kauf') {
-                        $quantity += $transaction->getQuantity();
-                    } elseif ($transaction->getTitle() == 'Verkauf') {
-                        $quantity -= $transaction->getQuantity();
+            $allTransactions = $this->getTransactions();
+            $ignoreNext = false;
+            foreach($allTransactions as $i => $transaction) {
+                if (false === $ignoreNext) {
+                    if ($transaction->getDate() < $date) {
+                        if ($transaction->getTitle() == 'Kauf') {
+                            $quantity += $transaction->getQuantity();
+                        } elseif ($transaction->getTitle() == 'Verkauf') {
+                            $quantity -= $transaction->getQuantity();
+                        } elseif ($transaction->getTitle() == 'Split') {
+                            $splitRatio = $allTransactions[$i + 1]->getQuantity() / $transaction->getQuantity();
+                            $quantity *= $splitRatio;
+                            $ignoreNext = true;
+                        }
                     }
+                } else {
+                    $ignoreNext = false;
                 }
             }
         }
@@ -271,8 +281,10 @@ class Position
         $lastDividendTransaction = $this->getLastDividendTransaction();
         if (null !== $lastDividendTransaction) {
             $amountAtLastPayment = $this->getCountOfSharesByDate($lastDividendTransaction->getDate());
-            $dividendByShare = $lastDividendTransaction->getRate() / $amountAtLastPayment;
-            $value = round($this->getCountOfSharesByDate() * $dividendByShare);
+            if ($amountAtLastPayment > 0) {
+                $dividendByShare = $lastDividendTransaction->getRate() / $amountAtLastPayment;
+                $value = round($this->getCountOfSharesByDate() * $dividendByShare);
+            }
         }
 
         return $value;

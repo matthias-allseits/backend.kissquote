@@ -2,42 +2,43 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Share;
+use App\Entity\UsersShareStockrate;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
 
-class ShareCrudController extends AbstractCrudController
+class UsersShareStockRateCrudController extends AbstractCrudController
 {
 
     public static function getEntityFqcn(): string
     {
-        return Share::class;
+        return UsersShareStockrate::class;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
-            AssociationField::new('portfolio'),
-            TextField::new('name'),
-            TextField::new('shortName'),
             TextField::new('isin'),
             AssociationField::new('marketplace'),
-            AssociationField::new('currency'),
+            TextField::new('currencyName'),
+            DateField::new('date'),
+            NumberField::new('rate'),
         ];
     }
 
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add(TextFilter::new('name'))
-            ->add(TextFilter::new('isin'))
-            ->add(TextFilter::new('marketplace'))
+            ->add(DateTimeFilter::new('date'))
+            ->add(TextFilter::new('currencyName'))
             ;
     }
 
