@@ -4,7 +4,7 @@ namespace App\Service;
 
 
 use App\Entity\Position;
-use App\Entity\SwissquoteShare;
+use App\Entity\UsersShareStockrate;
 use App\Model\Balance;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -24,16 +24,15 @@ class BalanceService
         $balance = new Balance($position);
         if (false === $position->isCash()) {
             $currencyName = $position->getCurrency()->getName();
-            if ($currencyName == 'CHF') {
-                $currencyName = 'SFR';
-            } elseif ($currencyName == 'USD') {
-                $currencyName = 'DLR';
-            }
-            $swissquoteShare = $this->em->getRepository(SwissquoteShare::class)->findOneBy(['isin' => $position->getShare()->getIsin(), 'currency' => $currencyName]);
-            if (null !== $swissquoteShare) {
-                $balance->setLastRate($swissquoteShare->getLastRate());
+            /** @var UsersShareStockrate $lastRate */
+            $lastRate = $this->em->getRepository(UsersShareStockrate::class)->findOneBy(
+                ['isin' => $position->getShare()->getIsin(), 'marketplace' => $position->getShare()->getMarketplace(), 'currencyName' => $currencyName],
+                ['date' => 'DESC']
+            );
+            if (null !== $lastRate) {
+                $balance->setLastRate($lastRate);
             } else {
-// todo: get quote from swissquote on the fly
+                // todo: get quote from swissquote on the fly
             }
         }
 

@@ -88,13 +88,6 @@ class Share
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="url", type="string", length=255, nullable=true)
-     */
-    private $url;
-
-    /**
-     * @var string
      * @Serializer\Type("string")
      *
      * @ORM\Column(name="type", type="string", length=16, nullable=false)
@@ -247,22 +240,6 @@ class Share
     public function setIsin(string $isin): void
     {
         $this->isin = $isin;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    /**
-     * @param string $url
-     */
-    public function setUrl(string $url): void
-    {
-        $this->url = $url;
     }
 
     /**

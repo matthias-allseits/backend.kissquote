@@ -104,15 +104,15 @@ class SwissquoteShare
     private $headquarter;
 
     /**
-     * @var Collection|Stockrate[]
+     * @var Collection|UsersShareStockrate[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Stockrate", mappedBy="share", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\UsersShareStockrate", mappedBy="share", cascade={"remove"})
      */
     private $rates;
 
 
 
-    public function getLastRate(): ?Stockrate
+    public function getLastRate(): ?UsersShareStockrate
     {
         $rates = $this->rates->toArray();
         if (count($rates) > 0) {
@@ -318,7 +318,7 @@ class SwissquoteShare
     }
 
     /**
-     * @return Stockrate[]|Collection
+     * @return UsersShareStockrate[]|Collection
      */
     public function getRates()
     {
@@ -326,7 +326,7 @@ class SwissquoteShare
     }
 
     /**
-     * @param Stockrate[]|Collection $rates
+     * @param UsersShareStockrate[]|Collection $rates
      */
     public function setRates($rates): void
     {

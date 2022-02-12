@@ -3,8 +3,7 @@
 namespace App\Model;
 
 use App\Entity\Position;
-use App\Entity\Stockrate;
-use Doctrine\ORM\EntityManager;
+use App\Entity\UsersShareStockrate;
 
 
 class Balance
@@ -34,7 +33,7 @@ class Balance
     /** @var int */
     private $projectedNextDividendPayment;
 
-    /** @var Stockrate|null */
+    /** @var UsersShareStockrate|null */
     private $lastRate;
 
     /** @var float */
@@ -60,9 +59,9 @@ class Balance
     }
 
     /**
-     * @param Stockrate|null $lastRate
+     * @param UsersShareStockrate|null $lastRate
      */
-    public function setLastRate(?Stockrate $lastRate): void
+    public function setLastRate(?UsersShareStockrate $lastRate): void
     {
         $this->lastRate = $lastRate;
     }

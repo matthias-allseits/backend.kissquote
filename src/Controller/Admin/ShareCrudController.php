@@ -28,6 +28,7 @@ class ShareCrudController extends AbstractCrudController
             TextField::new('shortName'),
             TextField::new('isin'),
             AssociationField::new('marketplace'),
+            AssociationField::new('currency'),
         ];
     }
 

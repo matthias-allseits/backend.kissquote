@@ -9,10 +9,10 @@ use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Share;
-use App\Entity\Stockrate;
 use App\Entity\SwissquoteShare;
 use App\Entity\Transaction;
 use App\Entity\Translation;
+use App\Entity\UsersShareStockrate;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -49,7 +49,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Currencies', 'fas fa-list', Currency::class);
         yield MenuItem::linkToCrud('Marketplaces', 'fas fa-list', Marketplace::class);
         yield MenuItem::linkToCrud('SwissquoteShares', 'fas fa-list', SwissquoteShare::class);
-        yield MenuItem::linkToCrud('StockRates', 'fas fa-list', Stockrate::class);
+        yield MenuItem::linkToCrud('User-Share StockRates', 'fas fa-list', UsersShareStockrate::class);
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
     }
 

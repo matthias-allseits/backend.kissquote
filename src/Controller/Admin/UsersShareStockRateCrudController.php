@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Stockrate;
+use App\Entity\UsersShareStockrate;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -14,31 +14,31 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
 
-class StockRateCrudController extends AbstractCrudController
+class UsersShareStockRateCrudController extends AbstractCrudController
 {
 
     public static function getEntityFqcn(): string
     {
-        return Stockrate::class;
+        return UsersShareStockrate::class;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
-            AssociationField::new('share'),
+            TextField::new('isin'),
+            AssociationField::new('marketplace'),
+            TextField::new('currencyName'),
             DateField::new('date'),
             NumberField::new('rate'),
-            TextField::new('currency'),
         ];
     }
 
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('share')
             ->add(DateTimeFilter::new('date'))
-            ->add(TextFilter::new('currency'))
+            ->add(TextFilter::new('currencyName'))
             ;
     }
 
