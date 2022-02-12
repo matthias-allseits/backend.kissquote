@@ -110,6 +110,7 @@ class Position
     /**
      * @var integer|null
      * @Serializer\Type("integer")
+     * @Serializer\SerializedName("shareheadId")
      *
      * @ORM\Column(name="sharehead_id", type="integer", nullable=true)
      */
