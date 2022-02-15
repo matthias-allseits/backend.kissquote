@@ -264,9 +264,17 @@ class Position
         $hit = null;
         if (null !== $this->transactions) {
             $transactions = array_reverse($this->getTransactions());
-            foreach($transactions as $transaction) {
+            foreach($transactions as $i => $transaction) {
                 if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND)) {
                     $hit = $transaction;
+                    // sometimes the dividends are divided in dividends and capital-gains
+                    if (isset($transactions[$i + 1])) {
+                        $nextTransaction = $transactions[$i + 1];
+                        if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND) && $transaction->getDate() == $nextTransaction->getDate()) {
+                            $hit->setRate($hit->getRate() + $nextTransaction->getRate());
+                            $hit->setFee($hit->getFee() + $nextTransaction->getFee());
+                        }
+                    }
                     break;
                 }
             }
