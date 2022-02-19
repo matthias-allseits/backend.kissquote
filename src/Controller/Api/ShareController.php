@@ -3,7 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Share;
-use App\Entity\SwissquoteShare;
+use App\Entity\ShareheadShare;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -34,7 +34,7 @@ class ShareController extends AbstractFOSRestController
      */
     public function listSwissquoteShares(Request $request): View
     {
-        $shares = $this->getDoctrine()->getRepository(SwissquoteShare::class)->findAll();
+        $shares = $this->getDoctrine()->getRepository(ShareheadShare::class)->findAll();
 
         return View::create($shares, Response::HTTP_CREATED);
     }

@@ -4,7 +4,7 @@
 namespace App\Command;
 
 use App\Entity\Share;
-use App\Entity\SwissquoteShare;
+use App\Entity\ShareheadShare;
 use Doctrine\ORM\EntityManagerInterface;
 use mysqli;
 use Symfony\Component\Console\Command\Command;
@@ -29,8 +29,8 @@ class ShareheadImporter extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Imports all shares from sharehead')
-            ->setHelp('Imports all shares from sharehead')
+            ->setDescription('Imports and updates all shares from sharehead')
+            ->setHelp('Imports and updates all shares from sharehead')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Forces the flush')
         ;
     }
@@ -42,6 +42,14 @@ class ShareheadImporter extends Command
         } else {
             $force = false;
         }
+
+
+
+
+        // todo: this must work as a updater!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
 
         $servername = "localhost";
         $username = "stathead";
@@ -58,8 +66,13 @@ class ShareheadImporter extends Command
 
         $result = $conn->query("SELECT * FROM sharehead.share;");
         foreach ($result as $row) {
-            echo " id = " . $row['id'] . ", symbol = " . $row['symbol'] . "\n";
-            $share = new SwissquoteShare();
+            $output->writeln("id = " . $row['id'] . ", symbol = " . $row['symbol']);
+            $dbCheck = $this->entityManager->getRepository(ShareheadShare::class)->findBy(['isin' => $row['isin']]);
+            if (count($dbCheck) > 0) {
+                $output->writeln('<info>already existing in kissquote-db</info>');
+                continue;
+            }
+            $share = new ShareheadShare();
             $share->setName($row['name']);
             $share->setShortname($row['symbol'] !== null ? $row['symbol'] : '');
             $share->setIsin($row['isin']);

@@ -1,11 +1,10 @@
 <?php
 
-
 namespace App\Command;
 
 use App\Entity\Marketplace;
 use App\Entity\Stockrate;
-use App\Entity\SwissquoteShare;
+use App\Entity\ShareheadShare;
 use DateInterval;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,9 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
 
-class SwissquoteShareCrawler extends Command
+class ShareheadShareTransformer extends Command
 {
-    protected static $defaultName = 'kissquote:swissquote-share-crawler';
+    protected static $defaultName = 'kissquote:sharehead-transformer';
     private $entityManager;
     private $sleep = 5;
 
@@ -32,8 +31,8 @@ class SwissquoteShareCrawler extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Tries to find the swissquote-url of a given share')
-            ->setHelp('Tries to find the swissquote-url of a given share')
+            ->setDescription('Tries to find the matching swissquote-url and marketplace of all given sharehead-shares')
+            ->setHelp('Tries to find the matching swissquote-url and marketplace of all given sharehead-shares')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Forces the flush')
         ;
     }
@@ -65,52 +64,55 @@ class SwissquoteShareCrawler extends Command
 //            'US' => [65, 67],
 //        ];
 
-        $shares = $this->entityManager->getRepository(SwissquoteShare::class)->findBy([], ['name' => 'ASC']);
+        $shares = $this->entityManager->getRepository(ShareheadShare::class)->findBy([], ['name' => 'ASC']);
         foreach($shares as $share) {
             $output->writeln($share);
 
 
-            // todo: remove this for debugging
-//            $date  = new DateTime();
-//            $interval = new DateInterval('P1D');
-//            $date->sub($interval);
-//            $dbCheck = $this->entityManager->getRepository(Stockrate::class)->findBy(['share' => $share, 'date' => $date]);
-//            if (count($dbCheck) > 0) {
-//                $output->writeln('<info>rate already exists for this share and date</info>');
-//                $output->writeln('---------------------------');
-//                continue;
-//            }
+            // todo: remove this after all shares have a url
+            $date  = new DateTime('2022-01-24');
+            $dbCheck = $this->entityManager->getRepository(Stockrate::class)->findBy(['share' => $share]);
+            if (count($dbCheck) > 0) {
+                $output->writeln('<info>rate already exists for this share and date</info>');
+                $output->writeln('---------------------------');
+                continue;
+            }
 
 
             $urls = [];
             if (null === $share->getUrl()) {
                 $countryKey = substr($share->getIsin(), 0, 2);
                 $possibleMarketplaces = $this->entityManager->getRepository(Marketplace::class)->findBy(['isinKey' => $countryKey]);
+                if (count($possibleMarketplaces) == 0 && $share->getCurrency() == 'GBP') {
+                    $possibleMarketplaces = $this->entityManager->getRepository(Marketplace::class)->findBy(['isinKey' => 'GB']);
+                }
                 if (count($possibleMarketplaces) == 0) {
-                    $output->writeln('<error>no marketplace found for isin ' . $share->getIsin() . '</error>');
+                    $output->writeln('<error>no marketplace found for isin ' . $share->getIsin() . ' and currency ' . $share->getCurrency() . '</error>');
+                    $output->writeln('---------------------------');
                     sleep($this->sleep);
                     continue;
                 }
-//                $currency = $share->getCurrency();
-//                if ($currency == 'GBP') {
-//                    $currency = 'GBX';
-//                }
-//                if ($currency == 'DLR') {
-//                    $currency = 'USD';
-//                }
-//                if ($currency == 'SFR') {
-//                    $currency = 'CHF';
-//                }
                 foreach($possibleMarketplaces as $marketplace) {
                     $urls[] = 'https://www.swissquote.ch/sq_mi/public/market/Detail.action?s=' . $share->getIsin() . '_' . $marketplace->getUrlKey() . '_' . $marketplace->getCurrency();
                 }
             } else {
+                if (null === $share->getMarketplace()) {
+                    $explUrl = explode('_', $share->getUrl());
+                    $marketplaceId = $explUrl[count($explUrl)-2];
+                    /** @var Marketplace $marketplace */
+                    $marketplace = $this->entityManager->getRepository(Marketplace::class)->findOneBy(['urlKey' => $marketplaceId]);
+                    if (null !== $marketplace) {
+                        $share->setMarketplace($marketplace);
+                    }
+                }
                 $urls = [$share->getUrl()];
             }
 
             foreach($urls as $i => $url) {
                 try {
                     $rate = $this->getRateBySwissquoteUrl($url, $share);
+                    // todo: remove this for productive
+                    $rate->setDate($date);
                     break;
                 } catch (\Exception $e) {
                     $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
@@ -145,7 +147,8 @@ class SwissquoteShareCrawler extends Command
 
     }
 
-    private function getRateBySwissquoteUrl(string $url, SwissquoteShare $share): Stockrate
+
+    private function getRateBySwissquoteUrl(string $url, ShareheadShare $share): Stockrate
     {
         $content = file_get_contents($url);
         sleep($this->sleep);

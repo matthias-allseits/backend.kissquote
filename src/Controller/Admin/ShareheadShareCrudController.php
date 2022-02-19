@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\SwissquoteShare;
+use App\Entity\ShareheadShare;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -11,12 +11,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
 
-class SwissquoteShareCrudController extends AbstractCrudController
+class ShareheadShareCrudController extends AbstractCrudController
 {
 
     public static function getEntityFqcn(): string
     {
-        return SwissquoteShare::class;
+        return ShareheadShare::class;
     }
 
     public function configureFields(string $pageName): iterable

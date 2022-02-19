@@ -2,17 +2,16 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
 /**
  * SwissquoteShare
  *
- * @ORM\Table(name="swissquote_share")
+ * @ORM\Table(name="sharehead_share")
  * @ORM\Entity
  */
-class SwissquoteShare
+class ShareheadShare
 {
 	/**
 	 * @var integer
@@ -292,22 +291,6 @@ class SwissquoteShare
     public function setHeadquarter(?string $headquarter): void
     {
         $this->headquarter = $headquarter;
-    }
-
-    /**
-     * @return UsersShareStockrate[]|Collection
-     */
-    public function getRates()
-    {
-        return $this->rates;
-    }
-
-    /**
-     * @param UsersShareStockrate[]|Collection $rates
-     */
-    public function setRates($rates): void
-    {
-        $this->rates = $rates;
     }
 
 }
