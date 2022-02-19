@@ -212,6 +212,7 @@ class PositionController extends AbstractFOSRestController
 
         $oldPosition = $this->getDoctrine()->getRepository(Position::class)->find($newPosition->getId());
         if (null !== $oldPosition) {
+            $oldPosition->setDividendPeriodicity($newPosition->getDividendPeriodicity());
             $oldPosition->getShare()->setName($newPosition->getShare()->getName());
             $oldPosition->getShare()->setIsin($newPosition->getShare()->getIsin());
 

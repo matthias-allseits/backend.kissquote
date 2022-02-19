@@ -108,6 +108,15 @@ class Position
     private $isCash = false;
 
     /**
+     * @var string
+     * @Serializer\Type("string")
+     * @Serializer\SerializedName("dividendPeriodicity")
+     *
+     * @ORM\Column(name="dividend_periodicity", type="string", length=32, nullable=true)
+     */
+    private $dividendPeriodicity;
+
+    /**
      * @var integer|null
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("shareheadId")
@@ -474,6 +483,22 @@ class Position
     public function setIsCash(bool $isCash): void
     {
         $this->isCash = $isCash;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDividendPeriodicity(): ?string
+    {
+        return $this->dividendPeriodicity;
+    }
+
+    /**
+     * @param string|null $dividendPeriodicity
+     */
+    public function setDividendPeriodicity(?string $dividendPeriodicity): void
+    {
+        $this->dividendPeriodicity = $dividendPeriodicity;
     }
 
     /**

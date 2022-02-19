@@ -103,30 +103,7 @@ class SwissquoteShare
      */
     private $headquarter;
 
-    /**
-     * @var Collection|UsersShareStockrate[]
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\UsersShareStockrate", mappedBy="share", cascade={"remove"})
-     */
-    private $rates;
 
-
-
-    public function getLastRate(): ?UsersShareStockrate
-    {
-        $rates = $this->rates->toArray();
-        if (count($rates) > 0) {
-            $sortArray = [];
-            foreach($rates as $rate) {
-                $sortArray[] = $rate->getDate();
-            }
-            array_multisort($sortArray, SORT_DESC, $rates);
-
-            return $rates[0];
-        }
-
-        return null;
-    }
 
 	public function __toString()
     {
