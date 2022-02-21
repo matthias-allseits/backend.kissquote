@@ -3,7 +3,6 @@
 
 namespace App\Command;
 
-use App\Entity\Share;
 use App\Entity\ShareheadShare;
 use Doctrine\ORM\EntityManagerInterface;
 use mysqli;
@@ -11,7 +10,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DomCrawler\Crawler;
 
 
 class ShareheadImporter extends Command
@@ -73,6 +71,7 @@ class ShareheadImporter extends Command
                 continue;
             }
             $share = new ShareheadShare();
+            $share->setShareheadId($row['id']);
             $share->setName($row['name']);
             $share->setShortname($row['symbol'] !== null ? $row['symbol'] : '');
             $share->setIsin($row['isin']);

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 
 /**
@@ -23,14 +24,13 @@ class ShareheadShare
 	private $id;
 
     /**
-     * @var Marketplace|null
+     * @var integer
+     * @Serializer\Type("integer")
+     * @Serializer\SerializedName("shareheadId")
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Marketplace")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="marketplace_id", referencedColumnName="id", nullable=true)
-     * })
+     * @ORM\Column(name="shareheadId", type="integer", nullable=false)
      */
-    private $marketplace;
+    private $shareheadId;
 
     /**
      * @var string
@@ -103,7 +103,6 @@ class ShareheadShare
     private $headquarter;
 
 
-
 	public function __toString()
     {
         return (string) $this->getName();
@@ -118,19 +117,19 @@ class ShareheadShare
     }
 
     /**
-     * @return Marketplace|null
+     * @return int
      */
-    public function getMarketplace(): ?Marketplace
+    public function getShareheadId(): int
     {
-        return $this->marketplace;
+        return $this->shareheadId;
     }
 
     /**
-     * @param Marketplace|null $marketplace
+     * @param int $shareheadId
      */
-    public function setMarketplace(?Marketplace $marketplace): void
+    public function setShareheadId(int $shareheadId): void
     {
-        $this->marketplace = $marketplace;
+        $this->shareheadId = $shareheadId;
     }
 
     /**

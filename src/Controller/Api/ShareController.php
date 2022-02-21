@@ -28,7 +28,7 @@ class ShareController extends AbstractFOSRestController
 
 
     /**
-     * @Rest\Get ("/share/swissquote", name="list_swissquote_shares")
+     * @Rest\Get ("/share/sharehead", name="list_sharehead_shares")
      * @param Request $request
      * @return View
      */
