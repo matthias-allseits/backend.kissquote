@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\UsersShareStockrate;
+use App\Entity\Stockrate;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -19,7 +19,7 @@ class UsersShareStockRateCrudController extends AbstractCrudController
 
     public static function getEntityFqcn(): string
     {
-        return UsersShareStockrate::class;
+        return Stockrate::class;
     }
 
     public function configureFields(string $pageName): iterable

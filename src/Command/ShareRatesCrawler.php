@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\Marketplace;
 use App\Entity\Share;
-use App\Entity\UsersShareStockrate;
+use App\Entity\Stockrate;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,9 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
 
-class UsersShareRatesCrawler extends Command
+class ShareRatesCrawler extends Command
 {
-    protected static $defaultName = 'kissquote:users-shares-rates-crawler';
+    protected static $defaultName = 'kissquote:rates-crawler';
     private $entityManager;
     private $output;
     private $sleep = 5;
@@ -55,7 +55,7 @@ class UsersShareRatesCrawler extends Command
         $allShares = $this->entityManager->getRepository(Share::class)->findAll();
         $filteredShares = [];
         foreach($allShares as $share) {
-            $dbCheck = $this->entityManager->getRepository(UsersShareStockrate::class)->findBy(['isin' => $share->getIsin(), 'marketplace' => $share->getMarketplace(), 'currencyName' => $share->getCurrency()->getName(), 'date' => $date]);
+            $dbCheck = $this->entityManager->getRepository(Stockrate::class)->findBy(['isin' => $share->getIsin(), 'marketplace' => $share->getMarketplace(), 'currencyName' => $share->getCurrency()->getName(), 'date' => $date]);
             if (count($dbCheck) == 0) {
                 $filteredShares[] = $share;
             }
@@ -108,7 +108,7 @@ class UsersShareRatesCrawler extends Command
     }
 
 
-    private function getRateBySwissquoteUrl(string $url, Share $share): ?UsersShareStockrate
+    private function getRateBySwissquoteUrl(string $url, Share $share): ?Stockrate
     {
         $content = file_get_contents($url);
         sleep($this->sleep);
@@ -136,7 +136,7 @@ class UsersShareRatesCrawler extends Command
         $explDate = explode('-', $dateCell);
         $date = new \DateTime($explDate[2] . '-' . $explDate[1] . '-' . $explDate[0]);
 
-        $stockRate = new UsersShareStockrate();
+        $stockRate = new Stockrate();
         $stockRate->setIsin($share->getIsin());
         $stockRate->setMarketplace($share->getMarketplace());
         $stockRate->setCurrencyName($currency);

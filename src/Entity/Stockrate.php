@@ -8,10 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Stockrate
  *
- * @ORM\Table(name="users_share_stockrate")
+ * @ORM\Table(name="stockrate")
  * @ORM\Entity
  */
-class UsersShareStockrate
+class Stockrate
 {
 	/**
 	 * @var integer

@@ -4,7 +4,7 @@ namespace App\Service;
 
 
 use App\Entity\Position;
-use App\Entity\UsersShareStockrate;
+use App\Entity\Stockrate;
 use App\Model\Balance;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -24,8 +24,8 @@ class BalanceService
         $balance = new Balance($position);
         if (false === $position->isCash()) {
             $currencyName = $position->getCurrency()->getName();
-            /** @var UsersShareStockrate $lastRate */
-            $lastRate = $this->em->getRepository(UsersShareStockrate::class)->findOneBy(
+            /** @var Stockrate $lastRate */
+            $lastRate = $this->em->getRepository(Stockrate::class)->findOneBy(
                 ['isin' => $position->getShare()->getIsin(), 'marketplace' => $position->getShare()->getMarketplace(), 'currencyName' => $currencyName],
                 ['date' => 'DESC']
             );
