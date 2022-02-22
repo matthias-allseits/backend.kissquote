@@ -7,7 +7,7 @@ use JMS\Serializer\Annotation as Serializer;
 
 
 /**
- * SwissquoteShare
+ * ShareheadShare
  *
  * @ORM\Table(name="sharehead_share")
  * @ORM\Entity

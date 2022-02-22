@@ -32,7 +32,7 @@ class ShareController extends AbstractFOSRestController
      * @param Request $request
      * @return View
      */
-    public function listSwissquoteShares(Request $request): View
+    public function listShareheadShares(Request $request): View
     {
         $shares = $this->getDoctrine()->getRepository(ShareheadShare::class)->findAll();
 
