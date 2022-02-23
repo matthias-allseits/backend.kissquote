@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\BankAccount;
 use App\Entity\Currency;
 use App\Entity\Dividend;
+use App\Entity\FeedbackProposal;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
@@ -51,6 +52,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Sharehead Shares', 'fas fa-list', ShareheadShare::class);
         yield MenuItem::linkToCrud('StockRates', 'fas fa-list', Stockrate::class);
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
+        yield MenuItem::linkToCrud('Feedback Proposals', 'fas fa-list', FeedbackProposal::class);
     }
 
 }

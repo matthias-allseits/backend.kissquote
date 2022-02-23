@@ -14,7 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
 
-class UsersShareStockRateCrudController extends AbstractCrudController
+class StockRateCrudController extends AbstractCrudController
 {
 
     public static function getEntityFqcn(): string
