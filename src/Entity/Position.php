@@ -390,9 +390,9 @@ class Position
     }
 
     /**
-     * @param Currency $currency
+     * @param Currency|null $currency
      */
-    public function setCurrency(Currency $currency): void
+    public function setCurrency(?Currency $currency): void
     {
         $this->currency = $currency;
     }
@@ -462,9 +462,9 @@ class Position
     }
 
     /**
-     * @param array $transactions
+     * @param array|null $transactions
      */
-    public function setTransactions(array $transactions): void
+    public function setTransactions(?array $transactions): void
     {
         $this->transactions = $transactions;
     }
