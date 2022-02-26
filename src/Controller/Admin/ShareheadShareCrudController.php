@@ -25,6 +25,7 @@ class ShareheadShareCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             NumberField::new('shareheadId'),
+            AssociationField::new('marketplace'),
             TextField::new('name'),
             TextField::new('shortname'),
             TextField::new('isin'),
@@ -36,6 +37,7 @@ class ShareheadShareCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
+            ->add(TextFilter::new('marketplace'))
             ->add(TextFilter::new('name'))
             ->add(TextFilter::new('isin'))
             ->add(TextFilter::new('url'))

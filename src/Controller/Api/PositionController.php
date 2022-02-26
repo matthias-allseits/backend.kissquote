@@ -226,6 +226,7 @@ class PositionController extends AbstractFOSRestController
                 $this->getDoctrine()->getManager()->persist($currency);
             }
             $oldPosition->setCurrency($currency);
+            $oldPosition->getShare()->setCurrency($currency);
 
             $this->getDoctrine()->getManager()->persist($oldPosition);
             $this->getDoctrine()->getManager()->flush();

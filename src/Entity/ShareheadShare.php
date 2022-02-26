@@ -33,6 +33,17 @@ class ShareheadShare
     private $shareheadId;
 
     /**
+     * @var Marketplace|null
+     * @Serializer\Type("App\Entity\Marketplace")
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Marketplace")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="marketplace_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $marketplace;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="currency", type="string", length=4, nullable=false)
@@ -130,6 +141,22 @@ class ShareheadShare
     public function setShareheadId(int $shareheadId): void
     {
         $this->shareheadId = $shareheadId;
+    }
+
+    /**
+     * @return Marketplace|null
+     */
+    public function getMarketplace(): ?Marketplace
+    {
+        return $this->marketplace;
+    }
+
+    /**
+     * @param Marketplace|null $marketplace
+     */
+    public function setMarketplace(?Marketplace $marketplace): void
+    {
+        $this->marketplace = $marketplace;
     }
 
     /**
