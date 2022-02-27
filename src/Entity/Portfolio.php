@@ -160,6 +160,19 @@ class Portfolio
     }
 
 
+    public function getCurrencyById(int $id): ?Currency
+    {
+        $hit = null;
+        foreach ($this->currencies as $currency) {
+            if ($currency->getId() == $id) {
+                $hit = $currency;
+            }
+        }
+
+        return $hit;
+    }
+
+
     /**
      * @return int
      */

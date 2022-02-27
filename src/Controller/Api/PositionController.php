@@ -71,7 +71,7 @@ class PositionController extends AbstractFOSRestController
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         }
 
         $serializer = SerializerBuilder::create()->build();
@@ -80,7 +80,7 @@ class PositionController extends AbstractFOSRestController
 
         $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
         if (null === $bankAccount) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         } else {
             $position->setBankAccount($bankAccount);
         }
@@ -140,7 +140,7 @@ class PositionController extends AbstractFOSRestController
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         }
 
         $serializer = SerializerBuilder::create()->build();
@@ -149,7 +149,7 @@ class PositionController extends AbstractFOSRestController
 
         $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
         if (null === $bankAccount) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         } else {
             $position->setBankAccount($bankAccount);
         }
@@ -199,7 +199,7 @@ class PositionController extends AbstractFOSRestController
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         }
 
         $serializer = SerializerBuilder::create()->build();

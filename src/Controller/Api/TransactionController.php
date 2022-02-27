@@ -42,7 +42,7 @@ class TransactionController extends AbstractFOSRestController
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         }
 
         $serializer = SerializerBuilder::create()->build();
@@ -51,7 +51,7 @@ class TransactionController extends AbstractFOSRestController
 
         $position = $portfolio->getPositionById($transaction->getPosition()->getId());
         if (null === $position) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         } else {
             $transaction->setPosition($position);
         }
@@ -80,12 +80,12 @@ class TransactionController extends AbstractFOSRestController
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         }
 
         $existingTransaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
         if (null === $existingTransaction) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         }
 
         $serializer = SerializerBuilder::create()->build();
@@ -94,7 +94,7 @@ class TransactionController extends AbstractFOSRestController
 
         $position = $portfolio->getPositionById($updatedTransaction->getPosition()->getId());
         if (null === $position) {
-            throw new \Exception(AccessDeniedException::class);
+            throw new AccessDeniedException();
         } else {
             $updatedTransaction->setPosition($position);
         }
