@@ -26,6 +26,7 @@ class TransactionCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             AssociationField::new('position'),
+            AssociationField::new('currency'),
             TextField::new('title'),
             DateField::new('date'),
             NumberField::new('quantity'),

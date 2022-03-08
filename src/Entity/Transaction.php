@@ -35,6 +35,17 @@ class Transaction
     private $position;
 
     /**
+     * @var Currency
+     * @Serializer\Type("App\Entity\Currency")
+     *
+     * @ORM\ManyToOne(targetEntity="Currency")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="currency_id", referencedColumnName="id")
+     * })
+     */
+    private $currency;
+
+    /**
      * @var string
      * @Serializer\Type("string")
      *
@@ -99,6 +110,22 @@ class Transaction
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return Currency
+     */
+    public function getCurrency(): Currency
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @param Currency $currency
+     */
+    public function setCurrency(Currency $currency): void
+    {
+        $this->currency = $currency;
     }
 
     /**

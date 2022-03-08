@@ -27,6 +27,7 @@ class Currency
 
     /**
      * @var Portfolio
+     * @Serializer\Exclude()
      *
      * @ORM\ManyToOne(targetEntity="Portfolio")
      * @ORM\JoinColumns({

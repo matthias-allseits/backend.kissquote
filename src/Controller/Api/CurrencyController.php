@@ -3,9 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Currency;
-use App\Entity\Marketplace;
 use App\Entity\Portfolio;
-use App\Entity\Position;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
