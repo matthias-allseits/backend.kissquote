@@ -12,11 +12,11 @@ class HomeController extends AbstractController
 
     public function home(): Response
     {
-        return $this->redirectToRoute('app_positions');
+        return $this->redirectToRoute('app_portfolios');
     }
 
 
-    public function positions(): Response
+    public function portfolios(): Response
     {
         $portfolios = $this->getDoctrine()->getRepository(Portfolio::class)->findAll();
 

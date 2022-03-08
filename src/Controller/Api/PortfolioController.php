@@ -72,4 +72,29 @@ class PortfolioController extends AbstractFOSRestController
         return View::create($portfolio, Response::HTTP_OK);
     }
 
+
+    /**
+     * @Rest\Get("/portfolio/demo", name="create_demo_portfolio")
+     * @param Request $request
+     * @return View
+     */
+    public function createDemoPortfolio(Request $request): View
+    {
+        // todo: implement missing try catch loop since the randoms will not be unique...
+        $randomUserName = RandomizeHelper::getRandomUserName();
+        $randomHashKey = RandomizeHelper::getRandomHashKey();
+
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 95]);
+
+        $demoPortfolio = clone $portfolio;
+        $demoPortfolio->setUserName($randomUserName);
+        $demoPortfolio->setHashKey($randomHashKey);
+        $demoPortfolio->setStartDate(new \DateTime());
+
+        $this->getDoctrine()->getManager()->persist($demoPortfolio);
+        $this->getDoctrine()->getManager()->flush();
+
+        return View::create($demoPortfolio, Response::HTTP_CREATED);
+    }
+
 }

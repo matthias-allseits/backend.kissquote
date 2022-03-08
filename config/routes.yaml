@@ -2,9 +2,9 @@ app_home:
     path: /
     controller: App\Controller\HomeController::home
 
-app_positions:
-    path: /positions
-    controller: App\Controller\HomeController::positions
+app_portfolios:
+    path: /portfolios
+    controller: App\Controller\HomeController::portfolios
 
 app_portfolio_delete:
     path: /portfolio/{portfolioId}/delete

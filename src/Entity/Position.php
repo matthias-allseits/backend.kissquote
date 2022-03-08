@@ -450,15 +450,19 @@ class Position
      */
     public function getTransactions(): array
     {
-        $transactions = $this->transactions->toArray();
-        $sortArray = [];
-        /** @var Transaction[] $transactions */
-        foreach($transactions as $transaction) {
-            $sortArray[] = $transaction->getDate();
-        }
-        array_multisort($sortArray, SORT_ASC, $transactions);
+        if (null !== $this->transactions) {
+            $transactions = $this->transactions->toArray();
+            $sortArray = [];
+            /** @var Transaction[] $transactions */
+            foreach ($transactions as $transaction) {
+                $sortArray[] = $transaction->getDate();
+            }
+            array_multisort($sortArray, SORT_ASC, $transactions);
 
-        return $transactions;
+            return $transactions;
+        }
+
+        return [];
     }
 
     /**
