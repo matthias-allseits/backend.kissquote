@@ -49,7 +49,7 @@ class Portfolio
     /**
      * @var Collection|BankAccount[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\BankAccount", mappedBy="portfolio", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\BankAccount", mappedBy="portfolio", cascade={"remove", "persist"})
      */
     private $bankAccounts;
 
@@ -67,6 +67,18 @@ class Portfolio
      */
     private $currencies;
 
+
+    public function __clone() {
+        $this->id = null;
+        $newAccounts = [];
+        foreach($this->getBankAccounts() as $account) {
+            $newAccount = clone $account;
+            $newAccount->setPositions([]);
+            $newAccount->setPortfolio($this);
+            $newAccounts[] = $newAccount;
+        }
+        $this->setBankAccounts($newAccounts);
+    }
 
     public function __construct()
     {
@@ -243,6 +255,14 @@ class Portfolio
     public function removeBankAccount(BankAccount $bankAccount)
     {
         $this->bankAccounts->removeElement($bankAccount);
+    }
+
+    /**
+     * @param BankAccount[]|Collection $bankAccounts
+     */
+    public function setBankAccounts($bankAccounts): void
+    {
+        $this->bankAccounts = $bankAccounts;
     }
 
     /**

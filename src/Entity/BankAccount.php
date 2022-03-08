@@ -68,6 +68,11 @@ class BankAccount
     private $positions;
 
 
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
     public function __toString(): string
     {
         return $this->getName() . ' (' . $this->getPortfolio() . ')';
@@ -159,6 +164,14 @@ class BankAccount
     public function removePosition(Position $bankAccount)
     {
         $this->positions->removeElement($bankAccount);
+    }
+
+    /**
+     * @param Position[]|Collection $positions
+     */
+    public function setPositions($positions): void
+    {
+        $this->positions = $positions;
     }
 
     /**
