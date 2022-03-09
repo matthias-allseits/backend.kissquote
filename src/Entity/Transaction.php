@@ -113,9 +113,9 @@ class Transaction
     }
 
     /**
-     * @return Currency
+     * @return Currency|null
      */
-    public function getCurrency(): Currency
+    public function getCurrency(): ?Currency
     {
         return $this->currency;
     }

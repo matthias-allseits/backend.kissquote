@@ -22,6 +22,7 @@ class PositionController extends AbstractFOSRestController
      * @Rest\Get ("/position/{positionId}", name="get_position")
      * @param Request $request
      * @param int $positionId
+     * @param BalanceService $balanceService
      * @return View
      */
     public function getPosition(Request $request, int $positionId, BalanceService $balanceService): View
@@ -114,6 +115,14 @@ class PositionController extends AbstractFOSRestController
             $this->getDoctrine()->getManager()->persist($position);
             $persistedTransactions = [];
             foreach($position->getTransactions() as $transaction) {
+                $transactionCurrency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
+                if (null === $transactionCurrency) {
+                    $transactionCurrency = $transaction->getCurrency();
+                    $transactionCurrency->setPortfolio($portfolio);
+                    $this->getDoctrine()->getManager()->persist($transactionCurrency);
+                }
+                $transaction->setCurrency($transactionCurrency);
+
                 $transaction->setQuantity(abs($transaction->getQuantity()));
                 $transaction->setPosition($position);
                 $this->getDoctrine()->getManager()->persist($transaction);
@@ -154,13 +163,13 @@ class PositionController extends AbstractFOSRestController
             $position->setBankAccount($bankAccount);
         }
 
-        $currency = $portfolio->getCurrencyByName($position->getCurrency()->getName());
-        if (null === $currency) {
-            $currency = $position->getCurrency();
-            $currency->setPortfolio($portfolio);
-            $this->getDoctrine()->getManager()->persist($currency);
+        $positionCurrency = $portfolio->getCurrencyByName($position->getCurrency()->getName());
+        if (null === $positionCurrency) {
+            $positionCurrency = $position->getCurrency();
+            $positionCurrency->setPortfolio($portfolio);
+            $this->getDoctrine()->getManager()->persist($positionCurrency);
         }
-        $position->setCurrency($currency);
+        $position->setCurrency($positionCurrency);
 
         // happens in case of a import
         if ($position->getShare()->getId() == 0) {
@@ -172,6 +181,14 @@ class PositionController extends AbstractFOSRestController
             $this->getDoctrine()->getManager()->persist($position);
             $persistedTransactions = [];
             foreach($position->getTransactions() as $transaction) {
+                $transactionCurrency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
+                if (null === $transactionCurrency) {
+                    $transactionCurrency = $transaction->getCurrency();
+                    $transactionCurrency->setPortfolio($portfolio);
+                    $this->getDoctrine()->getManager()->persist($transactionCurrency);
+                }
+                $transaction->setCurrency($transactionCurrency);
+
                 $transaction->setQuantity(abs($transaction->getQuantity()));
                 $transaction->setPosition($position);
                 $this->getDoctrine()->getManager()->persist($transaction);
