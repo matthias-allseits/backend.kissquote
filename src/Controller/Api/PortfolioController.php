@@ -84,7 +84,7 @@ class PortfolioController extends AbstractFOSRestController
         $randomUserName = RandomizeHelper::getRandomUserName();
         $randomHashKey = RandomizeHelper::getRandomHashKey();
 
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 95]);
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 102]);
 
         $demoPortfolio = clone $portfolio;
         $demoPortfolio->setUserName($randomUserName);

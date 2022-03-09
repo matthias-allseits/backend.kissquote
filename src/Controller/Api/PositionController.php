@@ -50,7 +50,7 @@ class PositionController extends AbstractFOSRestController
         $hashKey = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $hashKey]);
         if (null === $portfolio) {
-            throw new \Exception(AuthenticationException::class);
+            throw new AccessDeniedException();
         }
 
         $positions = $portfolio->getAllPositions();

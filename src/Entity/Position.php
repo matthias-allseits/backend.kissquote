@@ -39,7 +39,7 @@ class Position
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\BankAccount")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=true)
      * })
      */
     private $bankAccount;
@@ -48,7 +48,7 @@ class Position
      * @var Share
      * @Serializer\Type("App\Entity\Share")
      *
-     * @ORM\ManyToOne(targetEntity="Share", cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Share", cascade={"remove", "persist"})
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="share_id", referencedColumnName="id")
      * })
@@ -135,6 +135,12 @@ class Position
     private $balance;
 
 
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
+
     public function __construct()
     {
     }
@@ -147,7 +153,7 @@ class Position
             return $this->getShare()->getName() . ' (' . $this->getId() . ')';
         } else {
 
-            return (string) $this->getId();
+            return (string) $this->id;
         }
     }
 

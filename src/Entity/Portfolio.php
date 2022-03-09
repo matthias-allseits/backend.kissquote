@@ -73,7 +73,7 @@ class Portfolio
         $newAccounts = [];
         foreach($this->getBankAccounts() as $account) {
             $newAccount = clone $account;
-            $newAccount->setPositions([]);
+//            $newAccount->setPositions([]);
             $newAccount->setPortfolio($this);
             $newAccounts[] = $newAccount;
         }
@@ -103,9 +103,9 @@ class Portfolio
         $filteredPositions = [];
         /** @var Position $position */
         foreach($positions as $position) {
-            if (false === $position->isCash()) {
+//            if (false === $position->isCash()) {
                 $filteredPositions[] = $position;
-            }
+//            }
         }
         /** @var Position $position */
         foreach($filteredPositions as $position) {

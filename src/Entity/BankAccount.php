@@ -63,14 +63,29 @@ class BankAccount
      * @var Collection
      * @Serializer\Type("ArrayCollection<App\Entity\Position>")
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="bankAccount")
+     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="bankAccount", cascade={"persist"})
      */
     private $positions;
 
 
-    public function __clone()
-    {
+    public function __clone() {
         $this->id = null;
+        $newPositions = [];
+        foreach($this->getPositions() as $position) {
+            $newPosition = clone $position;
+            $newPosition->setBankAccount($this);
+            $newPosition->setTransactions([]);
+
+            $share = $position->getShare();
+            $newShare = null;
+            if (null !== $share) {
+                $newShare = clone $share;
+                $newShare->setPortfolio($this->portfolio);
+            }
+            $newPosition->setShare($newShare);
+            $newPositions[] = $newPosition;
+        }
+        $this->setPositions($newPositions);
     }
 
     public function __toString(): string

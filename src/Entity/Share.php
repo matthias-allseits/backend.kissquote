@@ -109,6 +109,12 @@ class Share
     private $headquarter;
 
 
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
+
 	public function __toString()
     {
         return (string) $this->getName();
