@@ -27,7 +27,7 @@ class Share
     /**
      * @var Currency
      *
-     * @ORM\ManyToOne(targetEntity="Currency")
+     * @ORM\ManyToOne(targetEntity="Currency", cascade={"persist"})
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="currency_id", referencedColumnName="id")
      * })
@@ -112,6 +112,8 @@ class Share
     public function __clone()
     {
         $this->id = null;
+        $newCurrency = clone $this->getCurrency();
+        $this->setCurrency($newCurrency);
     }
 
 

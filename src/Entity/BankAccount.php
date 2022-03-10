@@ -74,13 +74,13 @@ class BankAccount
         foreach($this->getPositions() as $position) {
             $newPosition = clone $position;
             $newPosition->setBankAccount($this);
-            $newPosition->setTransactions([]);
+//            $newPosition->setTransactions([]);
 
             $share = $position->getShare();
             $newShare = null;
             if (null !== $share) {
                 $newShare = clone $share;
-                $newShare->setPortfolio($this->portfolio);
+//                $newShare->setPortfolio($this->portfolio);
             }
             $newPosition->setShare($newShare);
             $newPositions[] = $newPosition;
@@ -194,10 +194,14 @@ class BankAccount
      */
     public function getPositions(): array
     {
-        $positions = $this->positions->toArray();
+        if (is_array($this->positions)) {
+            $positions = $this->positions;
+        } else {
+            $positions = $this->positions->toArray();
+        }
         $sortArray = [];
         /** @var Position[] $positions */
-        foreach($positions as $position) {
+        foreach ($positions as $position) {
             $sortArray[] = $position->getActiveFrom();
         }
         array_multisort($sortArray, SORT_ASC, $positions);

@@ -39,7 +39,7 @@ class Position
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\BankAccount")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=true)
+     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $bankAccount;
@@ -94,7 +94,7 @@ class Position
      * @var Collection
      * @Serializer\Type("ArrayCollection<App\Entity\Transaction>")
      *
-     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position", cascade={"remove", "persist"})
      */
     private $transactions;
 
@@ -138,6 +138,14 @@ class Position
     public function __clone()
     {
         $this->id = null;
+        $newTransactions = [];
+        foreach($this->getTransactions() as $transaction) {
+            $newTransaction = clone $transaction;
+            $newTransaction->setPosition($this);
+            $newTransaction->setCurrency(null);
+            $newTransactions[] = $newTransaction;
+        }
+        $this->setTransactions($newTransactions);
     }
 
 
@@ -150,7 +158,7 @@ class Position
     {
         if (null !== $this->getShare()) {
 
-            return $this->getShare()->getName() . ' (' . $this->getId() . ')';
+            return $this->getShare()->getName() . ' (' . $this->id . ')';
         } else {
 
             return (string) $this->id;

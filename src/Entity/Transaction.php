@@ -86,6 +86,12 @@ class Transaction
     private $fee;
 
 
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
+
     public function __toString()
     {
         return 'Transaction for position: ' . $this->position;
@@ -121,9 +127,9 @@ class Transaction
     }
 
     /**
-     * @param Currency $currency
+     * @param Currency|null $currency
      */
-    public function setCurrency(Currency $currency): void
+    public function setCurrency(?Currency $currency): void
     {
         $this->currency = $currency;
     }
