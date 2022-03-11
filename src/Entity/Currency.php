@@ -53,6 +53,12 @@ class Currency
     private $rate;
 
 
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
+
     public function __toString()
     {
         return (string) $this->name;

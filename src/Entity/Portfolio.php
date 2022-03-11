@@ -78,6 +78,14 @@ class Portfolio
             $newAccounts[] = $newAccount;
         }
         $this->setBankAccounts($newAccounts);
+        foreach($this->getAllPositions() as $position) {
+            if (null !== $position->getShare()) {
+                $position->getShare()->setPortfolio($this);
+            }
+        }
+        foreach($this->getCurrencies() as $currency) {
+            $currency->setPortfolio($this);
+        }
     }
 
     public function __construct()
@@ -108,11 +116,11 @@ class Portfolio
 //            }
         }
         /** @var Position $position */
-        foreach($filteredPositions as $position) {
-            $position->setTransactions(null);
-            $position->setBankAccount(null);
-            $position->setCurrency(null);
-        }
+//        foreach($filteredPositions as $position) {
+//            $position->setTransactions(null);
+//            $position->setBankAccount(null);
+//            $position->setCurrency(null);
+//        }
 
         return $filteredPositions;
     }
