@@ -30,6 +30,36 @@ class CurrencyController extends AbstractFOSRestController
 
 
     /**
+     * @Rest\Post("/currency", name="create_currency")
+     * @param Request $request
+     * @return View
+     */
+    public function createPosition(Request $request): View
+    {
+        $key = $request->headers->get('Authorization');
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            throw new AccessDeniedException();
+        }
+
+        $serializer = SerializerBuilder::create()->build();
+        $content = json_decode($request->getContent());
+        /** @var Currency $postedCurrency */
+        $postedCurrency = $serializer->deserialize(json_encode($content), Currency::class, 'json');
+
+        $existingCurrency = $portfolio->getCurrencyByName($postedCurrency->getName());
+        if (null === $existingCurrency) {
+            $postedCurrency->setPortfolio($portfolio);
+
+            $this->getDoctrine()->getManager()->persist($postedCurrency);
+            $this->getDoctrine()->getManager()->flush();
+        }
+
+        return new View("Currency Update Successfully", Response::HTTP_OK);
+    }
+
+
+    /**
      * @Rest\Put("/currency/{currencyId}", name="update_currency")
      * @param Request $request
      * @param int $currencyId

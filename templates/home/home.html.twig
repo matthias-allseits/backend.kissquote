@@ -11,6 +11,7 @@
             <th>Key</th>
             <th>Bank-Accounts</th>
             <th>Positions</th>
+            <th>Currencies
             <th></th>
         </tr>
         {% for portfolio in portfolios %}
@@ -19,6 +20,7 @@
                 <td>{{ portfolio.hashKey }}</td>
                 <td>{{ portfolio.bankAccounts|length }}</td>
                 <td>{{ portfolio.allPositions|length }}</td>
+                <td>{{ portfolio.currencies|length }}</td>
                 <td><a href="{{ path('app_portfolio_delete', { portfolioId: portfolio.id }) }}" type="button" class="btn btn-sm btn-outline-primary">Löschen</a></td>
             </tr>
         {% endfor %}

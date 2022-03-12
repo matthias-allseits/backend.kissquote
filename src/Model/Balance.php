@@ -33,6 +33,9 @@ class Balance
     /** @var int */
     private $projectedNextDividendPayment;
 
+    /** @var string */
+    private $projectedNextDividendCurrency;
+
     /** @var Stockrate|null */
     private $lastRate;
 
@@ -54,6 +57,7 @@ class Balance
         $this->transactionFeesTotal = $position->getSummedFees();
         $this->collectedDividends = $position->getCollectedDividends();
         $this->projectedNextDividendPayment = $position->calculateNextDividendPayment();
+        $this->projectedNextDividendCurrency = $position->getLastDividendTransaction() ? $position->getLastDividendTransaction()->getCurrency()->getName() : null;
 
         $this->lastRate = null;
     }
