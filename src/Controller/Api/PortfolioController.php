@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\BankAccount;
+use App\Entity\Currency;
 use App\Entity\Portfolio;
 use App\Helper\RandomizeHelper;
 use App\Service\BalanceService;
@@ -40,6 +41,26 @@ class PortfolioController extends AbstractFOSRestController
 
         $this->getDoctrine()->getManager()->persist($portfolio);
         $this->getDoctrine()->getManager()->persist($bankAccount);
+
+        $currencies = [
+            ['CHF', 1],
+            ['EUR', 1.05],
+            ['USD', 0.92],
+            ['GBP', 1.25],
+            ['DKK', 0.14],
+            ['NOK', 0.11],
+            ['SEK', 0.1],
+            ['PLN', 0.25],
+            ['CZK', 0.04],
+        ];
+        foreach($currencies as $currency) {
+            $baseCurrency = new Currency();
+            $baseCurrency->setPortfolio($portfolio);
+            $baseCurrency->setName($currency[0]);
+            $baseCurrency->setRate($currency[1]);
+            $this->getDoctrine()->getManager()->persist($baseCurrency);
+        }
+
         $this->getDoctrine()->getManager()->flush();
 
         return View::create($portfolio, Response::HTTP_CREATED);
