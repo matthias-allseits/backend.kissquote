@@ -22,7 +22,7 @@ class TransactionController extends AbstractFOSRestController
      * @param int $transactionId
      * @return View
      */
-    public function getPosition(Request $request, int $transactionId): View
+    public function getTransaction(Request $request, int $transactionId): View
     {
 
         $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);

@@ -294,8 +294,14 @@ class Position
                     if (isset($transactions[$i + 1])) {
                         $nextTransaction = $transactions[$i + 1];
                         if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND) && $transaction->getDate() == $nextTransaction->getDate()) {
-                            $hit->setRate($hit->getRate() + $nextTransaction->getRate());
-                            $hit->setFee($hit->getFee() + $nextTransaction->getFee());
+                            $hit = new Transaction();
+                            $hit->setTitle('Combined Dividend');
+                            $hit->setDate($transaction->getDate());
+                            $hit->setCurrency($transaction->getCurrency());
+                            $hit->setQuantity(1);
+                            $hit->setPosition($transaction->getPosition());
+                            $hit->setRate($transaction->getRate() + $nextTransaction->getRate());
+                            $hit->setFee($transaction->getFee() + $nextTransaction->getFee());
                         }
                     }
                     break;
