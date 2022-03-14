@@ -282,6 +282,29 @@ class Position
         return round($value);
     }
 
+
+    public function getCollectedDividendsCurrency(): string
+    {
+        $result = '';
+        if (null !== $this->transactions) {
+            $currencies = [];
+            foreach($this->getTransactions() as $transaction) {
+                if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND)) {
+                    $currencies[] = $transaction->getCurrency()->getName();
+                }
+            }
+            $currencies = array_unique($currencies);
+            if (count($currencies) == 1) {
+                $result = $currencies[0];
+            } elseif (count($currencies) > 1) {
+                $result = implode('/', $currencies);
+            }
+        }
+
+        return $result;
+    }
+
+
     public function getLastDividendTransaction(): ?Transaction
     {
         $hit = null;

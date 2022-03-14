@@ -30,6 +30,9 @@ class Balance
     /** @var int */
     private $collectedDividends;
 
+    /** @var string */
+    private $collectedDividendsCurrency;
+
     /** @var int */
     private $projectedNextDividendPayment;
 
@@ -56,6 +59,7 @@ class Balance
         $this->investment = $position->getSummedInvestmentGross();
         $this->transactionFeesTotal = $position->getSummedFees();
         $this->collectedDividends = $position->getCollectedDividends();
+        $this->collectedDividendsCurrency = $position->getCollectedDividendsCurrency();
         $this->projectedNextDividendPayment = $position->calculateNextDividendPayment();
         $this->projectedNextDividendCurrency = $position->getLastDividendTransaction() ? $position->getLastDividendTransaction()->getCurrency()->getName() : null;
 
