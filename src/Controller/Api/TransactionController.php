@@ -60,6 +60,9 @@ class TransactionController extends AbstractFOSRestController
             $position->setActiveFrom($transaction->getDate());
         }
 
+        $currency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
+        $transaction->setCurrency($currency);
+
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->persist($transaction);
         $this->getDoctrine()->getManager()->flush();
@@ -104,6 +107,9 @@ class TransactionController extends AbstractFOSRestController
         $existingTransaction->setQuantity($updatedTransaction->getQuantity());
         $existingTransaction->setRate($updatedTransaction->getRate());
         $existingTransaction->setFee($updatedTransaction->getFee());
+
+        $currency = $portfolio->getCurrencyByName($updatedTransaction->getCurrency()->getName());
+        $existingTransaction->setCurrency($currency);
 
         if ($updatedTransaction->getDate() < $position->getActiveFrom()) {
             $position->setActiveFrom($updatedTransaction->getDate());
