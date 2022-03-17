@@ -305,29 +305,31 @@ class Position
     }
 
 
-    public function getLastDividendTransaction(): ?Transaction
+    public function getLastDividendTransaction(DateTime $startDate = null): ?Transaction
     {
         $hit = null;
         if (null !== $this->transactions) {
             $transactions = array_reverse($this->getTransactions());
             foreach($transactions as $i => $transaction) {
                 if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND)) {
-                    $hit = $transaction;
-                    // sometimes the dividends are divided in dividends and capital-gains
-                    if (isset($transactions[$i + 1])) {
-                        $nextTransaction = $transactions[$i + 1];
-                        if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND) && $transaction->getDate() == $nextTransaction->getDate()) {
-                            $hit = new Transaction();
-                            $hit->setTitle('Combined Dividend');
-                            $hit->setDate($transaction->getDate());
-                            $hit->setCurrency($transaction->getCurrency());
-                            $hit->setQuantity(1);
-                            $hit->setPosition($transaction->getPosition());
-                            $hit->setRate($transaction->getRate() + $nextTransaction->getRate());
-                            $hit->setFee($transaction->getFee() + $nextTransaction->getFee());
+                    if ($startDate === null || $transaction->getDate() < $startDate) {
+                        $hit = $transaction;
+                        // sometimes the dividends are divided in dividends and capital-gains
+                        if (isset($transactions[$i + 1])) {
+                            $nextTransaction = $transactions[$i + 1];
+                            if (in_array($transaction->getTitle(), self::TITLES_DIVIDEND) && $transaction->getDate() == $nextTransaction->getDate()) {
+                                $hit = new Transaction();
+                                $hit->setTitle('Combined Dividend');
+                                $hit->setDate($transaction->getDate());
+                                $hit->setCurrency($transaction->getCurrency());
+                                $hit->setQuantity(1);
+                                $hit->setPosition($transaction->getPosition());
+                                $hit->setRate($transaction->getRate() + $nextTransaction->getRate());
+                                $hit->setFee($transaction->getFee() + $nextTransaction->getFee());
+                            }
                         }
+                        break;
                     }
-                    break;
                 }
             }
         }
@@ -343,7 +345,19 @@ class Position
             $amountAtLastPayment = $this->getCountOfSharesByDate($lastDividendTransaction->getDate());
             if ($amountAtLastPayment > 0) {
                 $dividendByShare = $lastDividendTransaction->getRate() / $amountAtLastPayment;
+                if ($this->getDividendPeriodicity() == 'half-yearly') {
+                    $nextTolastDividendTransaction = $this->getLastDividendTransaction($lastDividendTransaction->getDate());
+                    if (null !== $nextTolastDividendTransaction) {
+                        $amountAtNextToLastPayment = $this->getCountOfSharesByDate($nextTolastDividendTransaction->getDate());
+                        if ($amountAtNextToLastPayment > 0) {
+                            $dividendByShareNextToLast = $nextTolastDividendTransaction->getRate() / $amountAtNextToLastPayment;
+                        }
+                    }
+                }
                 $value = round($this->getCountOfSharesByDate() * $dividendByShare);
+                if (isset($dividendByShareNextToLast)) {
+                    $value += round($this->getCountOfSharesByDate() * $dividendByShareNextToLast);
+                }
             }
         }
         if ($this->getDividendPeriodicity() == 'quaterly') {
