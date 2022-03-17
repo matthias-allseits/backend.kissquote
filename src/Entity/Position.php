@@ -346,6 +346,9 @@ class Position
                 $value = round($this->getCountOfSharesByDate() * $dividendByShare);
             }
         }
+        if ($this->getDividendPeriodicity() == 'quaterly') {
+            $value *= 4;
+        }
 
         return $value;
     }
