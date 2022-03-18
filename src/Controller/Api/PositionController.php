@@ -55,6 +55,11 @@ class PositionController extends AbstractFOSRestController
         }
 
         $positions = $portfolio->getAllPositions();
+        foreach($positions as $position) {
+            $position->setBankAccount(null);
+            $position->setShare(null);
+            $position->setCurrency(null);
+        }
 
         return View::create($positions, Response::HTTP_CREATED);
     }
