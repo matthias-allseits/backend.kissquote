@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Feedback;
 use App\Entity\Portfolio;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,16 @@ class HomeController extends AbstractController
 
         return $this->render('home/home.html.twig', [
             'portfolios' => $portfolios,
+        ]);
+    }
+
+
+    public function feedbacks(): Response
+    {
+        $feedbacks = $this->getDoctrine()->getRepository(Feedback::class)->findAll();
+
+        return $this->render('home/feedback.html.twig', [
+            'feedbacks' => $feedbacks,
         ]);
     }
 
