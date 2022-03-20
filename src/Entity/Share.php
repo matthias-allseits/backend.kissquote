@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -107,6 +108,13 @@ class Share
      * @ORM\Column(name="headquarter", type="string", length=64, nullable=true)
      */
     private $headquarter;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="share", cascade={"remove"})
+     */
+    private $positions;
 
 
     public function __clone()

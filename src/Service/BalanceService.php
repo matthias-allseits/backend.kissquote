@@ -24,11 +24,14 @@ class BalanceService
         $balance = new Balance($position);
         if (false === $position->isCash()) {
             $currencyName = $position->getCurrency()->getName();
-            /** @var Stockrate $lastRate */
-            $lastRate = $this->em->getRepository(Stockrate::class)->findOneBy(
-                ['isin' => $position->getShare()->getIsin(), 'marketplace' => $position->getShare()->getMarketplace(), 'currencyName' => $currencyName],
-                ['date' => 'DESC']
-            );
+            $lastRate = null;
+            if (null !== $position->getShare()) {
+                /** @var Stockrate $lastRate */
+                $lastRate = $this->em->getRepository(Stockrate::class)->findOneBy(
+                    ['isin' => $position->getShare()->getIsin(), 'marketplace' => $position->getShare()->getMarketplace(), 'currencyName' => $currencyName],
+                    ['date' => 'DESC']
+                );
+            }
             if (null !== $lastRate) {
                 $balance->setLastRate($lastRate);
             } else {

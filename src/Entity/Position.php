@@ -85,6 +85,8 @@ class Position
 
     /**
      * @var DateTime
+     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
+     * @Serializer\SerializedName("activeUntil")
      *
      * @ORM\Column(name="active_until", type="date", nullable=true)
      */

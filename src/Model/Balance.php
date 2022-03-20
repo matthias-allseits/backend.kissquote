@@ -45,6 +45,9 @@ class Balance
     /** @var float */
     private $cashValue;
 
+    /** @var int */
+    private $closedResult;
+
 
     public function __construct(Position $position)
     {
@@ -62,6 +65,19 @@ class Balance
         $this->collectedDividendsCurrency = $position->getCollectedDividendsCurrency();
         $this->projectedNextDividendPayment = $position->calculateNextDividendPayment();
         $this->projectedNextDividendCurrency = $position->getLastDividendTransaction() ? $position->getLastDividendTransaction()->getCurrency()->getName() : null;
+        if (false === $position->isActive()) {
+            $this->closedResult = $position->getSummedInvestmentGross() * -1;
+            // automatic setting active-until
+            if (null === $position->getActiveUntil()) {
+                $transactions = $position->getTransactions();
+                if (count($transactions) > 0) {
+                    $lastTransaction = $transactions[count($transactions) -1];
+                    if ($lastTransaction->getTitle() == 'Verkauf') {
+                        $position->setActiveUntil($lastTransaction->getDate());
+                    }
+                }
+            }
+        }
 
         $this->lastRate = null;
     }
