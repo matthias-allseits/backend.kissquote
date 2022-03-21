@@ -52,6 +52,7 @@ class PortfolioController extends AbstractFOSRestController
             ['SEK', 0.1],
             ['PLN', 0.25],
             ['CZK', 0.04],
+            ['not defined', 1],
         ];
         foreach($currencies as $currency) {
             $baseCurrency = new Currency();
