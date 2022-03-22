@@ -143,9 +143,9 @@ class Transaction
     }
 
     /**
-     * @param Position $position
+     * @param Position|null $position
      */
-    public function setPosition(Position $position): void
+    public function setPosition(?Position $position): void
     {
         $this->position = $position;
     }

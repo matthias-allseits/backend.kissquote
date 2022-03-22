@@ -26,6 +26,7 @@ class TransactionController extends AbstractFOSRestController
     {
 
         $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
+        $transaction->setPosition(null);
 
         return View::create($transaction, Response::HTTP_CREATED);
     }
@@ -67,6 +68,7 @@ class TransactionController extends AbstractFOSRestController
         $this->getDoctrine()->getManager()->persist($transaction);
         $this->getDoctrine()->getManager()->flush();
 
+        $transaction->setPosition(null);
         return View::create($transaction, Response::HTTP_OK);
     }
 
@@ -119,6 +121,7 @@ class TransactionController extends AbstractFOSRestController
         $this->getDoctrine()->getManager()->persist($existingTransaction);
         $this->getDoctrine()->getManager()->flush();
 
+        $updatedTransaction->setPosition(null);
         return View::create($updatedTransaction, Response::HTTP_OK);
     }
 
