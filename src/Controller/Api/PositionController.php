@@ -66,6 +66,49 @@ class PositionController extends AbstractFOSRestController
 
 
     /**
+     * @Rest\Post("/position/bunch", name="create_position_bunch")
+     * @param Request $request
+     * @return View
+     * @throws \Exception
+     */
+    public function persistPositionsBunch(Request $request): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        $serializer = SerializerBuilder::create()->build();
+        $rawPositions = $request->getContent();
+        $bankAccount = null;
+        /** @var Position[] $positions */
+        $positions = [];
+        foreach($rawPositions as $rawPosition) {
+            $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
+            if (null === $bankAccount) {
+                $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
+                if (null === $bankAccount) {
+                    throw new AccessDeniedException();
+                }
+            }
+            $position->setBankAccount($bankAccount);
+            $positions[] = $position;
+        }
+
+        foreach($positions as $position) {
+            $this->persistShare($portfolio, $position);
+            $this->persistCurrency($portfolio, $position, $position);
+
+            // happens in case of a import
+            if (count($position->getTransactions()) > 0) {
+                $this->persistTransactions($position, $portfolio);
+            }
+            $this->getDoctrine()->getManager()->persist($position);
+        }
+        $this->getDoctrine()->getManager()->flush();
+
+        return View::create($positions, Response::HTTP_CREATED);
+    }
+
+
+    /**
      * @Rest\Post("/position", name="create_position")
      * @param Request $request
      * @return View
@@ -73,67 +116,15 @@ class PositionController extends AbstractFOSRestController
      */
     public function createPosition(Request $request): View
     {
-        // todo: this has to be moved to the security implementation
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
-        $serializer = SerializerBuilder::create()->build();
-        /** @var Position $position */
-        $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
-
-        $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
-        if (null === $bankAccount) {
-            throw new AccessDeniedException();
-        } else {
-            $position->setBankAccount($bankAccount);
-        }
-
-        // todo: get share by isin is not enough. currency is missing
-        $share = $portfolio->getShareByIsin($position->getShare()->getIsin());
-        if (null === $share) {
-            $share = $position->getShare();
-            if (strlen($share->getShortname()) == 0) {
-                $share->setShortname(substr($share->getName(), 0, 15));
-            }
-            $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($share->getMarketplace()->getId());
-            $share->setMarketplace($marketplace);
-            $share->setPortfolio($portfolio);
-            $share->setType('stock');
-            $this->getDoctrine()->getManager()->persist($share);
-        }
-        $position->setShare($share);
-
-        $currency = $portfolio->getCurrencyByName($position->getCurrency()->getName());
-        if (null === $currency) {
-            $currency = $position->getCurrency();
-            $currency->setPortfolio($portfolio);
-            $this->getDoctrine()->getManager()->persist($currency);
-        }
-        $position->setCurrency($currency);
-        $position->getShare()->setCurrency($currency);
+        $position = $this->deserializePosition($request, $portfolio);
+        $this->persistShare($portfolio, $position);
+        $this->persistCurrency($portfolio, $position, $position);
 
         // happens in case of a import
         if (count($position->getTransactions()) > 0) {
-            $this->getDoctrine()->getManager()->persist($position);
-            $persistedTransactions = [];
-            foreach($position->getTransactions() as $transaction) {
-                $transactionCurrency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
-                if (null === $transactionCurrency) {
-                    $transactionCurrency = $transaction->getCurrency();
-                    $transactionCurrency->setPortfolio($portfolio);
-                    $this->getDoctrine()->getManager()->persist($transactionCurrency);
-                }
-                $transaction->setCurrency($transactionCurrency);
-
-                $transaction->setQuantity(abs($transaction->getQuantity()));
-                $transaction->setPosition($position);
-                $this->getDoctrine()->getManager()->persist($transaction);
-                $persistedTransactions[] = $transaction;
-            }
-            $position->setTransactions($persistedTransactions);
+            $this->persistTransactions($position, $portfolio);
         }
 
         $this->getDoctrine()->getManager()->persist($position);
@@ -151,30 +142,10 @@ class PositionController extends AbstractFOSRestController
      */
     public function createCashPosition(Request $request): View
     {
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
-        $serializer = SerializerBuilder::create()->build();
-        /** @var Position $position */
-        $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
-
-        $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
-        if (null === $bankAccount) {
-            throw new AccessDeniedException();
-        } else {
-            $position->setBankAccount($bankAccount);
-        }
-
-        $positionCurrency = $portfolio->getCurrencyByName($position->getCurrency()->getName());
-        if (null === $positionCurrency) {
-            $positionCurrency = $position->getCurrency();
-            $positionCurrency->setPortfolio($portfolio);
-            $this->getDoctrine()->getManager()->persist($positionCurrency);
-        }
-        $position->setCurrency($positionCurrency);
+        $position = $this->deserializePosition($request, $portfolio);
+        $this->persistCurrency($portfolio, $position, $position);
 
         // happens in case of a import
         if ($position->getShare()->getId() == 0) {
@@ -183,23 +154,7 @@ class PositionController extends AbstractFOSRestController
 
         // happens in case of a import
         if (count($position->getTransactions()) > 0) {
-            $this->getDoctrine()->getManager()->persist($position);
-            $persistedTransactions = [];
-            foreach($position->getTransactions() as $transaction) {
-                $transactionCurrency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
-                if (null === $transactionCurrency) {
-                    $transactionCurrency = $transaction->getCurrency();
-                    $transactionCurrency->setPortfolio($portfolio);
-                    $this->getDoctrine()->getManager()->persist($transactionCurrency);
-                }
-                $transaction->setCurrency($transactionCurrency);
-
-                $transaction->setQuantity(abs($transaction->getQuantity()));
-                $transaction->setPosition($position);
-                $this->getDoctrine()->getManager()->persist($transaction);
-                $persistedTransactions[] = $transaction;
-            }
-            $position->setTransactions($persistedTransactions);
+            $this->persistTransactions($position, $portfolio);
         }
 
         $this->getDoctrine()->getManager()->persist($position);
@@ -218,11 +173,7 @@ class PositionController extends AbstractFOSRestController
      */
     public function updatePosition(Request $request, int $positionId): View
     {
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -242,14 +193,7 @@ class PositionController extends AbstractFOSRestController
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
             $oldPosition->getShare()->setMarketplace($marketplace);
 
-            $currency = $portfolio->getCurrencyByName($newPosition->getCurrency()->getName());
-            if (null === $currency) {
-                $currency = $newPosition->getCurrency();
-                $currency->setPortfolio($portfolio);
-                $this->getDoctrine()->getManager()->persist($currency);
-            }
-            $oldPosition->setCurrency($currency);
-            $oldPosition->getShare()->setCurrency($currency);
+            $this->persistCurrency($portfolio, $newPosition, $oldPosition);
 
             $this->getDoctrine()->getManager()->persist($oldPosition);
             $this->getDoctrine()->getManager()->flush();
@@ -273,6 +217,114 @@ class PositionController extends AbstractFOSRestController
         $this->getDoctrine()->getManager()->flush();
 
         return new View("Position Delete Successfully", Response::HTTP_OK);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return Portfolio|mixed|object
+     */
+    private function getPortfolio(Request $request)
+    {
+        // todo: this has to be moved to the security implementation
+        $key = $request->headers->get('Authorization');
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            throw new AccessDeniedException();
+        }
+
+        return $portfolio;
+    }
+
+
+    /**
+     * @param Request $request
+     * @param $portfolio
+     * @return Position
+     */
+    private function deserializePosition(Request $request, $portfolio): Position
+    {
+        $serializer = SerializerBuilder::create()->build();
+        /** @var Position $position */
+        $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
+
+        $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
+        if (null === $bankAccount) {
+            throw new AccessDeniedException();
+        } else {
+            $position->setBankAccount($bankAccount);
+        }
+
+        return $position;
+    }
+
+
+    /**
+     * @param Position $position
+     * @param $portfolio
+     */
+    private function persistTransactions(Position $position, $portfolio): void
+    {
+        $this->getDoctrine()->getManager()->persist($position);
+        $persistedTransactions = [];
+        foreach ($position->getTransactions() as $transaction) {
+            $transactionCurrency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
+            if (null === $transactionCurrency) {
+                $transactionCurrency = $transaction->getCurrency();
+                $transactionCurrency->setPortfolio($portfolio);
+                $this->getDoctrine()->getManager()->persist($transactionCurrency);
+            }
+            $transaction->setCurrency($transactionCurrency);
+
+            $transaction->setQuantity(abs($transaction->getQuantity()));
+            $transaction->setPosition($position);
+            $this->getDoctrine()->getManager()->persist($transaction);
+            $persistedTransactions[] = $transaction;
+        }
+        $position->setTransactions($persistedTransactions);
+    }
+
+
+    /**
+     * @param $portfolio
+     * @param Position $position
+     */
+    private function persistShare($portfolio, Position $position): void
+    {
+        // todo: get share by isin is not enough. currency is missing
+        $share = $portfolio->getShareByIsin($position->getShare()->getIsin());
+        if (null === $share) {
+            $share = $position->getShare();
+            if (strlen($share->getShortname()) == 0) {
+                $share->setShortname(substr($share->getName(), 0, 15));
+            }
+            $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($share->getMarketplace()->getId());
+            $share->setMarketplace($marketplace);
+            $share->setPortfolio($portfolio);
+            $share->setType('stock');
+            $this->getDoctrine()->getManager()->persist($share);
+        }
+        $position->setShare($share);
+    }
+
+
+    /**
+     * @param $portfolio
+     * @param Position $sourcePosition
+     * @param Position $targetPosition
+     */
+    private function persistCurrency($portfolio, Position $sourcePosition, Position $targetPosition): void
+    {
+        $currency = $portfolio->getCurrencyByName($sourcePosition->getCurrency()->getName());
+        if (null === $currency) {
+            $currency = $sourcePosition->getCurrency();
+            $currency->setPortfolio($portfolio);
+            $this->getDoctrine()->getManager()->persist($currency);
+        }
+        $targetPosition->setCurrency($currency);
+        if (null !== $targetPosition->getShare()) {
+            $targetPosition->getShare()->setCurrency($currency);
+        }
     }
 
 }
