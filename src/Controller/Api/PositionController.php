@@ -101,6 +101,7 @@ class PositionController extends AbstractFOSRestController
                 $this->persistTransactions($position, $portfolio);
             }
             $this->getDoctrine()->getManager()->persist($position);
+            $position->setBankAccount(null);
         }
         $this->getDoctrine()->getManager()->flush();
 
@@ -130,6 +131,7 @@ class PositionController extends AbstractFOSRestController
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->flush();
 
+        $position->setBankAccount(null);
         return View::create($position, Response::HTTP_OK);
     }
 
@@ -160,6 +162,7 @@ class PositionController extends AbstractFOSRestController
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->flush();
 
+        $position->setBankAccount(null);
         return View::create($position, Response::HTTP_OK);
     }
 
@@ -199,6 +202,7 @@ class PositionController extends AbstractFOSRestController
             $this->getDoctrine()->getManager()->flush();
         }
 
+        $oldPosition->setBankAccount(null);
         return new View($oldPosition, Response::HTTP_OK);
     }
 
