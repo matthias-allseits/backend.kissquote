@@ -23,7 +23,13 @@ class CurrencyController extends AbstractFOSRestController
      */
     public function listCurrencies(Request $request): View
     {
-        $currencies = $this->getDoctrine()->getRepository(Currency::class)->findAll();
+        $key = $request->headers->get('Authorization');
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            throw new AccessDeniedException();
+        }
+
+        $currencies = $portfolio->getCurrencies();
 
         return View::create($currencies, Response::HTTP_CREATED);
     }

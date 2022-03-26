@@ -5,6 +5,8 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\MaxDepth;
 
 
 /**
@@ -55,6 +57,7 @@ class Portfolio
 
     /**
      * @var Collection|Share[]
+     * @Serializer\Exclude()
      *
      * @ORM\OneToMany(targetEntity="App\Entity\Share", mappedBy="portfolio", cascade={"remove"})
      */
@@ -62,6 +65,7 @@ class Portfolio
 
     /**
      * @var Collection|Currency[]
+     * @Serializer\Exclude()
      *
      * @ORM\OneToMany(targetEntity="App\Entity\Currency", mappedBy="portfolio", cascade={"remove"})
      */
