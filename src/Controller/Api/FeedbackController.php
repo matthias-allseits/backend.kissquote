@@ -46,6 +46,7 @@ class FeedbackController extends AbstractFOSRestController
         /** @var Feedback $feedback */
         $feedback = $serializer->deserialize($request->getContent(), Feedback::class, 'json');
         $feedback->setPortfolio($portfolio);
+        $feedback->setDateTime(new \DateTime());
 
         $this->getDoctrine()->getManager()->persist($feedback);
         $this->getDoctrine()->getManager()->flush();

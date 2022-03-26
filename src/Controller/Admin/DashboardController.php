@@ -7,6 +7,7 @@ use App\Entity\Currency;
 use App\Entity\Dividend;
 use App\Entity\Feedback;
 use App\Entity\FeedbackProposal;
+use App\Entity\LogEntry;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
@@ -55,6 +56,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
         yield MenuItem::linkToCrud('Feedback Proposals', 'fas fa-list', FeedbackProposal::class);
         yield MenuItem::linkToCrud('Feedbacks', 'fas fa-list', Feedback::class);
+        yield MenuItem::linkToCrud('LogEntries', 'fas fa-list', LogEntry::class);
     }
 
 }

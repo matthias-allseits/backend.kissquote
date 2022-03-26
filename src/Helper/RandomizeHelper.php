@@ -10,7 +10,7 @@ class RandomizeHelper
 
     static function getRandomUserName(): string
     {
-        $popularNames = ['anton', 'willi', 'gustav', 'erich', 'hans', 'alfred'];
+        $popularNames = ['anton', 'willi', 'gustav', 'erich', 'hans', 'alfred', 'susi', 'elfriede', 'erika', 'elma', 'babsi', 'ute', 'anna'];
         shuffle($popularNames);
 
         $randomInt = random_int(0, 2000);

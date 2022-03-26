@@ -8,12 +8,12 @@ use JMS\Serializer\Annotation as Serializer;
 
 
 /**
- * Currency
+ * LogEntry
  *
- * @ORM\Table(name="feedback")
+ * @ORM\Table(name="log_entry")
  * @ORM\Entity
  */
-class Feedback
+class LogEntry
 {
 
 	/**
@@ -40,17 +40,25 @@ class Feedback
      * @var string
      * @Serializer\Type("string")
      *
-     * @ORM\Column(name="mood", type="string", length=64, nullable=false)
+     * @ORM\Column(name="action", type="string", length=32, nullable=false)
      */
-    private $mood;
+    private $action;
 
     /**
      * @var string
      * @Serializer\Type("string")
      *
-     * @ORM\Column(name="feedback", type="text", nullable=true)
+     * @ORM\Column(name="result", type="string", length=256, nullable=false)
      */
-    private $feedback;
+    private $result;
+
+    /**
+     * @var bool
+     * @Serializer\Type("boolean")
+     *
+     * @ORM\Column(name="failed", type="string", type="boolean", nullable=false)
+     */
+    private $failed;
 
     /**
      * @var DateTime
@@ -64,7 +72,15 @@ class Feedback
 
     public function __construct()
     {
+        $this->action = '';
+        $this->result = '';
+        $this->failed = false;
         $this->dateTime = new DateTime();
+    }
+
+    public function __toString()
+    {
+        return (string) $this->action;
     }
 
     /**
@@ -94,33 +110,49 @@ class Feedback
     /**
      * @return string
      */
-    public function getMood(): ?string
+    public function getAction(): string
     {
-        return $this->mood;
+        return $this->action;
     }
 
     /**
-     * @param string $mood
+     * @param string $action
      */
-    public function setMood(string $mood): void
+    public function setAction(string $action): void
     {
-        $this->mood = $mood;
+        $this->action = $action;
     }
 
     /**
      * @return string
      */
-    public function getFeedback(): ?string
+    public function getResult(): string
     {
-        return $this->feedback;
+        return $this->result;
     }
 
     /**
-     * @param string $feedback
+     * @param string $result
      */
-    public function setFeedback(string $feedback): void
+    public function setResult(string $result): void
     {
-        $this->feedback = $feedback;
+        $this->result = $result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFailed(): bool
+    {
+        return $this->failed;
+    }
+
+    /**
+     * @param bool $failed
+     */
+    public function setFailed(bool $failed): void
+    {
+        $this->failed = $failed;
     }
 
     /**
