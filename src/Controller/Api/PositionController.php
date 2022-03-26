@@ -76,34 +76,45 @@ class PositionController extends AbstractFOSRestController
         $portfolio = $this->getPortfolio($request);
 
         $serializer = SerializerBuilder::create()->build();
-        $rawPositions = $request->getContent();
+        $rawPositions = json_decode($request->getContent());
         $bankAccount = null;
         /** @var Position[] $positions */
         $positions = [];
         foreach($rawPositions as $rawPosition) {
-            $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
-            if (null === $bankAccount) {
+            $position = $serializer->deserialize(json_encode($rawPosition), Position::class, 'json');
+            if (null !== $position->getBankAccount()) {
+                $portfolio = $this->getPortfolio($request); // do it again
                 $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
                 if (null === $bankAccount) {
                     throw new AccessDeniedException();
                 }
+                $position->setBankAccount($bankAccount);
+
+                $this->persistShare($portfolio, $position);
+                $this->persistCurrency($portfolio, $position, $position);
+
+                // happens in case of a import
+                if (count($position->getTransactions()) > 0) {
+                    $this->persistTransactions($position, $portfolio);
+                }
+                $this->getDoctrine()->getManager()->persist($position);
+                $this->getDoctrine()->getManager()->flush();
+                $this->getDoctrine()->getManager()->clear();
             }
-            $position->setBankAccount($bankAccount);
-            $positions[] = $position;
         }
 
-        foreach($positions as $position) {
-            $this->persistShare($portfolio, $position);
-            $this->persistCurrency($portfolio, $position, $position);
-
-            // happens in case of a import
-            if (count($position->getTransactions()) > 0) {
-                $this->persistTransactions($position, $portfolio);
-            }
-            $this->getDoctrine()->getManager()->persist($position);
-            $position->setBankAccount(null);
-        }
-        $this->getDoctrine()->getManager()->flush();
+//        foreach($positions as $position) {
+//            $this->persistShare($portfolio, $position);
+//            $this->persistCurrency($portfolio, $position, $position);
+//
+//            // happens in case of a import
+//            if (count($position->getTransactions()) > 0) {
+//                $this->persistTransactions($position, $portfolio);
+//            }
+//            $this->getDoctrine()->getManager()->persist($position);
+//            $this->getDoctrine()->getManager()->flush();
+//            $this->getDoctrine()->getManager()->clear();
+//        }
 
         return View::create($positions, Response::HTTP_CREATED);
     }
