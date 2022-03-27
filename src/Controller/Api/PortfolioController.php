@@ -78,7 +78,15 @@ class PortfolioController extends BaseController
      */
     public function restorePortfolio(Request $request, BalanceService $balanceService): View
     {
-        $portfolio = $this->getPortfolio($request);
+        // todo: implement a better solution
+        $content = json_decode($request->getContent());
+
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $content->hashKey]);
+        if (null === $portfolio) {
+            throw new AccessDeniedException();
+        } else {
+            $this->portfolio = $portfolio;
+        }
 
         foreach($portfolio->getBankAccounts() as $bankAccount) {
             foreach($bankAccount->getPositions() as $position) {
@@ -102,7 +110,7 @@ class PortfolioController extends BaseController
         $randomUserName = RandomizeHelper::getRandomUserName();
         $randomHashKey = RandomizeHelper::getRandomHashKey();
 
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 102]);
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 147]);
 
         $demoPortfolio = clone $portfolio;
         $demoPortfolio->setUserName($randomUserName);
