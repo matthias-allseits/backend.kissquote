@@ -27,6 +27,7 @@ class PositionController extends BaseController
      */
     public function getPosition(Request $request, int $positionId, BalanceService $balanceService): View
     {
+        $portfolio = $this->getPortfolio($request);
 
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $position->setBankAccount(null);
@@ -48,11 +49,7 @@ class PositionController extends BaseController
      */
     public function listPositions(Request $request): View
     {
-        $hashKey = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $hashKey]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
         $positions = $portfolio->getAllPositions();
         foreach($positions as $position) {

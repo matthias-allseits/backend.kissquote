@@ -78,16 +78,7 @@ class PortfolioController extends BaseController
      */
     public function restorePortfolio(Request $request, BalanceService $balanceService): View
     {
-
-        // todo: implement a better solution
-        $content = json_decode($request->getContent());
-
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $content->hashKey]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        } else {
-            $this->portfolio = $portfolio;
-        }
+        $portfolio = $this->getPortfolio($request);
 
         foreach($portfolio->getBankAccounts() as $bankAccount) {
             foreach($bankAccount->getPositions() as $position) {

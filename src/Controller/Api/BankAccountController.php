@@ -21,26 +21,21 @@ class BankAccountController extends BaseController
      */
     public function createBankAccount(Request $request): View
     {
+        $portfolio = $this->getPortfolio($request);
+
         // todo: implement a better solution
-        // todo: check the authorization
         $content = json_decode($request->getContent());
-        $key = $request->headers->get('Authorization');
 
         $bankAccount = null;
-        if (isset($content->name) && strlen($key) > 0) {
-            $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-            $this->portfolio = $portfolio;
+        if (isset($content->name)) {
+            $bankAccount = new BankAccount();
+            $bankAccount->setName($content->name);
+            $bankAccount->setPortfolio($portfolio);
+            $this->getDoctrine()->getManager()->persist($bankAccount);
 
-            if (null !== $portfolio) {
-                $bankAccount = new BankAccount();
-                $bankAccount->setName($content->name);
-                $bankAccount->setPortfolio($portfolio);
-                $this->getDoctrine()->getManager()->persist($bankAccount);
+            $this->makeLogEntry('create new bank-account', $bankAccount);
 
-                $this->makeLogEntry('create new bank-account', $bankAccount);
-
-                $this->getDoctrine()->getManager()->flush();
-            }
+            $this->getDoctrine()->getManager()->flush();
         }
 
         return View::create($bankAccount, Response::HTTP_OK);
@@ -55,14 +50,15 @@ class BankAccountController extends BaseController
      */
     public function updateBankAccount(Request $request, int $accountId): View
     {
-        // todo: check the authorization
+        $portfolio = $this->getPortfolio($request);
+
         // todo: implement a better solution
         $content = json_decode($request->getContent());
 
         /** @var BankAccount $bankAccount */
         $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
-        $oldName = $bankAccount->getName();
         if (null !== $bankAccount) {
+            $oldName = $bankAccount->getName();
             $this->portfolio = $bankAccount->getPortfolio();
             $bankAccount->setName($content->name);
 
@@ -85,9 +81,9 @@ class BankAccountController extends BaseController
      */
     public function deleteBankAccount(Request $request, int $accountId): View
     {
-        // todo: check the authorization
+        $portfolio = $this->getPortfolio($request);
+
         $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
-        $this->portfolio = $bankAccount->getPortfolio();
         $this->getDoctrine()->getManager()->remove($bankAccount);
 
         $this->makeLogEntry('delete bank-account', $bankAccount);
