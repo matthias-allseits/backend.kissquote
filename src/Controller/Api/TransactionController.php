@@ -2,9 +2,10 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\LogEntry;
 use App\Entity\Portfolio;
+use App\Entity\Position;
 use App\Entity\Transaction;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 
-class TransactionController extends AbstractFOSRestController
+class TransactionController extends BaseController
 {
 
     /**
@@ -24,6 +25,7 @@ class TransactionController extends AbstractFOSRestController
      */
     public function getTransaction(Request $request, int $transactionId): View
     {
+        $portfolio = $this->getPortfolio($request);
 
         $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
         $transaction->setPosition(null);
@@ -40,11 +42,7 @@ class TransactionController extends AbstractFOSRestController
      */
     public function createTransaction(Request $request): View
     {
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
         $serializer = SerializerBuilder::create()->build();
         /** @var Transaction $transaction */
@@ -64,8 +62,32 @@ class TransactionController extends AbstractFOSRestController
         $currency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
         $transaction->setCurrency($currency);
 
+        $cashPosition = $position->getBankAccount()->getCashPositionByCurrency($currency);
+        if (null === $cashPosition) {
+            $cashPosition = new Position();
+            $cashPosition->setBankAccount($position->getBankAccount());
+            $cashPosition->setActiveFrom($transaction->getDate());
+            $cashPosition->setCurrency($currency);
+            $cashPosition->setIsCash(true);
+            $this->getDoctrine()->getManager()->persist($cashPosition);
+
+            $this->makeLogEntry('forced creation of new cash-position', $cashPosition);
+        }
+        $cashTransaction = new Transaction();
+        $cashTransaction->setPosition($cashPosition);
+        $cashTransaction->setCurrency($cashPosition->getCurrency());
+        $cashTransaction->setQuantity(1);
+        $cashTransaction->setDate($transaction->getDate());
+        $cashTransaction->setTitle($transaction->getTitle());
+        $cashTransaction->setRate($transaction->calculateTransactionCostsGross());
+        $this->getDoctrine()->getManager()->persist($cashTransaction);
+        $this->makeLogEntry('forced new cash-transaction', $cashTransaction);
+
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->persist($transaction);
+
+        $this->makeLogEntry('create new transaction', $transaction);
+
         $this->getDoctrine()->getManager()->flush();
 
         $transaction->setPosition(null);
@@ -82,11 +104,7 @@ class TransactionController extends AbstractFOSRestController
      */
     public function updateTransaction(Request $request, int $transactionId): View
     {
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
         $existingTransaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
         if (null === $existingTransaction) {
@@ -119,6 +137,9 @@ class TransactionController extends AbstractFOSRestController
 
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->persist($existingTransaction);
+
+        $this->makeLogEntry('update transaction', $existingTransaction);
+
         $this->getDoctrine()->getManager()->flush();
 
         $updatedTransaction->setPosition(null);
@@ -134,6 +155,8 @@ class TransactionController extends AbstractFOSRestController
      */
     public function deleteTransaction(Request $request, int $transactionId): View
     {
+        $portfolio = $this->getPortfolio($request);
+
         $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
         $this->getDoctrine()->getManager()->remove($transaction);
         $this->getDoctrine()->getManager()->flush();

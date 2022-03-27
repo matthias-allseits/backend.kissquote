@@ -2,11 +2,11 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\LogEntry;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Service\BalanceService;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
-class PositionController extends AbstractFOSRestController
+class PositionController extends BaseController
 {
 
     /**
@@ -99,22 +99,12 @@ class PositionController extends AbstractFOSRestController
                 }
                 $this->getDoctrine()->getManager()->persist($position);
                 $this->getDoctrine()->getManager()->flush();
-                $this->getDoctrine()->getManager()->clear();
             }
         }
 
-//        foreach($positions as $position) {
-//            $this->persistShare($portfolio, $position);
-//            $this->persistCurrency($portfolio, $position, $position);
-//
-//            // happens in case of a import
-//            if (count($position->getTransactions()) > 0) {
-//                $this->persistTransactions($position, $portfolio);
-//            }
-//            $this->getDoctrine()->getManager()->persist($position);
-//            $this->getDoctrine()->getManager()->flush();
-//            $this->getDoctrine()->getManager()->clear();
-//        }
+        $this->makeLogEntry('persist a bunch of positions', 'bunch-persisting: there will be more than one');
+
+        $this->getDoctrine()->getManager()->flush();
 
         return View::create($positions, Response::HTTP_CREATED);
     }
@@ -135,11 +125,15 @@ class PositionController extends AbstractFOSRestController
         $this->persistCurrency($portfolio, $position, $position);
 
         // happens in case of a import
+        // todo: probably useless?
         if (count($position->getTransactions()) > 0) {
             $this->persistTransactions($position, $portfolio);
         }
 
         $this->getDoctrine()->getManager()->persist($position);
+
+        $this->makeLogEntry('create new position', $position);
+
         $this->getDoctrine()->getManager()->flush();
 
         $position->setBankAccount(null);
@@ -166,6 +160,7 @@ class PositionController extends AbstractFOSRestController
         }
 
         // happens in case of a import
+        // todo: probably useless?
         if (count($position->getTransactions()) > 0) {
             $this->persistTransactions($position, $portfolio);
         }
@@ -210,6 +205,9 @@ class PositionController extends AbstractFOSRestController
             $this->persistCurrency($portfolio, $newPosition, $oldPosition);
 
             $this->getDoctrine()->getManager()->persist($oldPosition);
+
+            $this->makeLogEntry('update position', $oldPosition);
+
             $this->getDoctrine()->getManager()->flush();
         }
 
@@ -226,29 +224,16 @@ class PositionController extends AbstractFOSRestController
      */
     public function deletePosition(Request $request, int $positionId): View
     {
-        // todo: security check!!!
+        $portfolio = $this->getPortfolio($request);
+
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $this->getDoctrine()->getManager()->remove($position);
+
+        $this->makeLogEntry('delete position', $position);
+
         $this->getDoctrine()->getManager()->flush();
 
         return new View("Position Delete Successfully", Response::HTTP_OK);
-    }
-
-
-    /**
-     * @param Request $request
-     * @return Portfolio|mixed|object
-     */
-    private function getPortfolio(Request $request)
-    {
-        // todo: this has to be moved to the security implementation
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
-
-        return $portfolio;
     }
 
 

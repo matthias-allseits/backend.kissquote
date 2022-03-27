@@ -115,16 +115,8 @@ class Portfolio
         $filteredPositions = [];
         /** @var Position $position */
         foreach($positions as $position) {
-//            if (false === $position->isCash()) {
                 $filteredPositions[] = $position;
-//            }
         }
-        /** @var Position $position */
-//        foreach($filteredPositions as $position) {
-//            $position->setTransactions(null);
-//            $position->setBankAccount(null);
-//            $position->setCurrency(null);
-//        }
 
         return $filteredPositions;
     }

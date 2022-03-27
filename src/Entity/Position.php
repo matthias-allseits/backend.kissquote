@@ -163,7 +163,7 @@ class Position
             return $this->getShare()->getName() . ' (' . $this->id . ')';
         } else {
 
-            return (string) $this->id;
+            return $this->getCurrency()->getName() . ' (' . $this->id . ')';
         }
     }
 

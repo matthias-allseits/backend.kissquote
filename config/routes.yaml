@@ -10,6 +10,10 @@ app_feedbacks:
     path: /feedbacks
     controller: App\Controller\HomeController::feedbacks
 
+app_log:
+    path: /log
+    controller: App\Controller\HomeController::log
+
 app_portfolio_delete:
     path: /portfolio/{portfolioId}/delete
     controller: App\Controller\HomeController::deletePortfolio

@@ -68,6 +68,19 @@ class BankAccount
     private $positions;
 
 
+    public function getCashPositionByCurrency(Currency $currency): ?Position
+    {
+        foreach($this->getPositions() as $position) {
+            if ($position->isCash() && $position->getCurrency()->getId() == $currency->getId()) {
+
+                return $position;
+            }
+        }
+
+        return null;
+    }
+
+
     public function __clone() {
         $this->id = null;
         $newPositions = [];

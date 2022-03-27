@@ -3,8 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Entity\Currency;
+use App\Entity\LogEntry;
 use App\Entity\Portfolio;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
-class CurrencyController extends AbstractFOSRestController
+class CurrencyController extends BaseController
 {
 
     /**
@@ -23,11 +23,7 @@ class CurrencyController extends AbstractFOSRestController
      */
     public function listCurrencies(Request $request): View
     {
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
         $currencies = $portfolio->getCurrencies();
 
@@ -36,17 +32,14 @@ class CurrencyController extends AbstractFOSRestController
 
 
     /**
+     * todo: probably useless?
      * @Rest\Post("/currency", name="create_currency")
      * @param Request $request
      * @return View
      */
-    public function createPosition(Request $request): View
+    public function createCurrency(Request $request): View
     {
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -61,7 +54,7 @@ class CurrencyController extends AbstractFOSRestController
             $this->getDoctrine()->getManager()->flush();
         }
 
-        return new View("Currency Update Successfully", Response::HTTP_OK);
+        return new View("Currency Creation Successfully", Response::HTTP_OK);
     }
 
 
@@ -71,13 +64,9 @@ class CurrencyController extends AbstractFOSRestController
      * @param int $currencyId
      * @return View
      */
-    public function updatePosition(Request $request, int $currencyId): View
+    public function updateCurrency(Request $request, int $currencyId): View
     {
-        $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        }
+        $portfolio = $this->getPortfolio($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -94,6 +83,9 @@ class CurrencyController extends AbstractFOSRestController
             $existingCurrency->setRate($puttedCurrency->getRate());
 
             $this->getDoctrine()->getManager()->persist($existingCurrency);
+
+            $this->makeLogEntry('update currency', $existingCurrency->getName() . ' new rate: ' . $existingCurrency->getRate());
+
             $this->getDoctrine()->getManager()->flush();
 
             return new View("Currency Update Successfully", Response::HTTP_OK);

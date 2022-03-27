@@ -4,10 +4,10 @@ namespace App\Controller\Api;
 
 use App\Entity\BankAccount;
 use App\Entity\Currency;
+use App\Entity\LogEntry;
 use App\Entity\Portfolio;
 use App\Helper\RandomizeHelper;
 use App\Service\BalanceService;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
-class PortfolioController extends AbstractFOSRestController
+class PortfolioController extends BaseController
 {
 
     /**
@@ -38,6 +38,7 @@ class PortfolioController extends AbstractFOSRestController
         $bankAccount->setName('Meine Bank A');
         $bankAccount->setPortfolio($portfolio);
         $portfolio->addBankAccount($bankAccount);
+        $this->portfolio = $portfolio;
 
         $this->getDoctrine()->getManager()->persist($portfolio);
         $this->getDoctrine()->getManager()->persist($bankAccount);
@@ -62,6 +63,8 @@ class PortfolioController extends AbstractFOSRestController
             $this->getDoctrine()->getManager()->persist($baseCurrency);
         }
 
+        $this->makeLogEntry('create new portfolio', $portfolio);
+
         $this->getDoctrine()->getManager()->flush();
 
         return View::create($portfolio, Response::HTTP_CREATED);
@@ -82,6 +85,8 @@ class PortfolioController extends AbstractFOSRestController
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $content->hashKey]);
         if (null === $portfolio) {
             throw new AccessDeniedException();
+        } else {
+            $this->portfolio = $portfolio;
         }
 
         foreach($portfolio->getBankAccounts() as $bankAccount) {
@@ -112,6 +117,9 @@ class PortfolioController extends AbstractFOSRestController
         $demoPortfolio->setUserName($randomUserName);
         $demoPortfolio->setHashKey($randomHashKey);
         $demoPortfolio->setStartDate(new \DateTime());
+        $this->portfolio = $demoPortfolio;
+
+        $this->makeLogEntry('create demo portfolio', $demoPortfolio);
 
         $this->getDoctrine()->getManager()->persist($demoPortfolio);
         $this->getDoctrine()->getManager()->flush();

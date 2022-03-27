@@ -40,7 +40,7 @@ class LogEntry
      * @var string
      * @Serializer\Type("string")
      *
-     * @ORM\Column(name="action", type="string", length=32, nullable=false)
+     * @ORM\Column(name="action", type="string", length=64, nullable=false)
      */
     private $action;
 

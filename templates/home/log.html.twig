@@ -1,0 +1,29 @@
+{% set activePage = 'log' %}
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Bunte Webseite fürs Backoffice</h1>
+
+    <h3>The Log</h3>
+    <table class="table table-striped table-sm">
+        <tr>
+            <th>Date</th>
+            <th>Portfolio</th>
+            <th>Action</th>
+            <th>Result</th>
+            <th>Failed</th>
+{#            <th></th>#}
+        </tr>
+        {% for entry in logEntries %}
+            <tr>
+                <td>{{ entry.dateTime|date('d.m.Y H:i:s') }}</td>
+                <td>{{ entry.portfolio }}</td>
+                <td>{{ entry.action }}</td>
+                <td>{{ entry.result }}</td>
+                <td>{% if entry.failed %}x{% endif %}</td>
+{#                <td><a href="" type="button" class="btn btn-sm btn-outline-primary">Löschen</a></td>#}
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

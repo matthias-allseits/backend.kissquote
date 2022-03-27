@@ -3,15 +3,15 @@
 namespace App\Controller\Api;
 
 use App\Entity\BankAccount;
+use App\Entity\LogEntry;
 use App\Entity\Portfolio;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 
-class BankAccountController extends AbstractFOSRestController
+class BankAccountController extends BaseController
 {
 
     /**
@@ -22,18 +22,23 @@ class BankAccountController extends AbstractFOSRestController
     public function createBankAccount(Request $request): View
     {
         // todo: implement a better solution
+        // todo: check the authorization
         $content = json_decode($request->getContent());
         $key = $request->headers->get('Authorization');
 
         $bankAccount = null;
         if (isset($content->name) && strlen($key) > 0) {
             $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+            $this->portfolio = $portfolio;
 
             if (null !== $portfolio) {
                 $bankAccount = new BankAccount();
                 $bankAccount->setName($content->name);
                 $bankAccount->setPortfolio($portfolio);
                 $this->getDoctrine()->getManager()->persist($bankAccount);
+
+                $this->makeLogEntry('create new bank-account', $bankAccount);
+
                 $this->getDoctrine()->getManager()->flush();
             }
         }
@@ -50,13 +55,19 @@ class BankAccountController extends AbstractFOSRestController
      */
     public function updateBankAccount(Request $request, int $accountId): View
     {
+        // todo: check the authorization
         // todo: implement a better solution
         $content = json_decode($request->getContent());
 
         /** @var BankAccount $bankAccount */
         $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
+        $oldName = $bankAccount->getName();
         if (null !== $bankAccount) {
+            $this->portfolio = $bankAccount->getPortfolio();
             $bankAccount->setName($content->name);
+
+            $this->makeLogEntry('update bank-account', $oldName . ' -> ' . $content->name);
+
             $this->getDoctrine()->getManager()->flush();
         } else {
             return View::create(null, Response::HTTP_NOT_FOUND);
@@ -72,10 +83,15 @@ class BankAccountController extends AbstractFOSRestController
      * @param int $accountId
      * @return View
      */
-    public function deletePosition(Request $request, int $accountId): View
+    public function deleteBankAccount(Request $request, int $accountId): View
     {
+        // todo: check the authorization
         $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
+        $this->portfolio = $bankAccount->getPortfolio();
         $this->getDoctrine()->getManager()->remove($bankAccount);
+
+        $this->makeLogEntry('delete bank-account', $bankAccount);
+
         $this->getDoctrine()->getManager()->flush();
 
         return new View("Bank-Account Delete Successfully", Response::HTTP_OK);

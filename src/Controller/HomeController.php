@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Feedback;
+use App\Entity\LogEntry;
 use App\Entity\Portfolio;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +34,16 @@ class HomeController extends AbstractController
 
         return $this->render('home/feedback.html.twig', [
             'feedbacks' => $feedbacks,
+        ]);
+    }
+
+
+    public function log(): Response
+    {
+        $logEntries = $this->getDoctrine()->getRepository(LogEntry::class)->findBy([], ['dateTime' => 'DESC']);
+
+        return $this->render('home/log.html.twig', [
+            'logEntries' => $logEntries,
         ]);
     }
 
