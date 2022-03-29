@@ -79,7 +79,7 @@ class TransactionController extends BaseController
         $cashTransaction->setQuantity(1);
         $cashTransaction->setDate($transaction->getDate());
         $cashTransaction->setTitle($transaction->getTitle());
-        $cashTransaction->setRate($transaction->calculateTransactionCostsGross());
+        $cashTransaction->setRate($transaction->calculateCashValueNet());
         $this->getDoctrine()->getManager()->persist($cashTransaction);
         $this->makeLogEntry('forced new cash-transaction', $cashTransaction);
 

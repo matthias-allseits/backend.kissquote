@@ -13,6 +13,10 @@ use JMS\Serializer\Annotation as Serializer;
  */
 class Transaction
 {
+
+    const TITLES_POSITIVE = ['Einzahlung', 'Vergütung', 'Verkauf', 'Forex-Gutschrift', 'Fx-Gutschrift Comp.', 'Dividende', 'Kapitalrückzahlung', 'Capital Gain', 'Korrekturbuchung'];
+    const TITLES_NEGATIVE = ['Auszahlung', 'Kauf', 'Depotgebühren', 'Forex-Belastung', 'Fx-Belastung Comp.', 'Zins']; // todo: negativzinsen will not last forever!
+
 	/**
 	 * @var integer
      * @Serializer\Type("integer")
@@ -109,6 +113,27 @@ class Transaction
         return $this->getRate() * $this->getQuantity();
     }
 
+
+    public function calculateCashValueNet(): float
+    {
+        if ($this->isPositive()) {
+            return ($this->getRate() * $this->getQuantity()) - $this->getFee();
+        } elseif ($this->isNegative()) {
+            return ($this->getRate() * $this->getQuantity()) + $this->getFee();
+        }
+
+        return 0;
+    }
+
+    public function isPositive(): bool
+    {
+        return in_array($this->title, self::TITLES_POSITIVE);
+    }
+
+    public function isNegative(): bool
+    {
+        return in_array($this->title, self::TITLES_NEGATIVE);
+    }
 
     /**
      * @return int
