@@ -28,7 +28,7 @@ class Share
     /**
      * @var Currency
      *
-     * @ORM\ManyToOne(targetEntity="Currency", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Currency")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="currency_id", referencedColumnName="id")
      * })
@@ -155,9 +155,9 @@ class Share
     }
 
     /**
-     * @param Currency $currency
+     * @param Currency|null $currency
      */
-    public function setCurrency(Currency $currency): void
+    public function setCurrency(?Currency $currency): void
     {
         $this->currency = $currency;
     }
