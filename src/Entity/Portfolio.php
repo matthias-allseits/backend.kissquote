@@ -84,7 +84,7 @@ class Portfolio
             }
         }
         foreach($this->getCurrencies() as $currency) {
-            $currency->setPortfolioId($this);
+            $currency->setPortfolioId($this->id);
         }
     }
 

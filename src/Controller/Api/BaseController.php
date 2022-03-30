@@ -2,16 +2,11 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Feedback;
-use App\Entity\FeedbackProposal;
+use App\Entity\Currency;
 use App\Entity\LogEntry;
 use App\Entity\Portfolio;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
@@ -45,6 +40,8 @@ class BaseController extends AbstractFOSRestController
         if (null === $portfolio) {
             throw new AccessDeniedException();
         } else {
+            $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $portfolio->setCurrencies($currencies);
             $this->portfolio = $portfolio;
         }
 
