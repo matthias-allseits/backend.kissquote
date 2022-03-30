@@ -26,15 +26,11 @@ class Currency
 	private $id;
 
     /**
-     * @var Portfolio
-     * @Serializer\Exclude()
+     * @var int
      *
-     * @ORM\ManyToOne(targetEntity="Portfolio")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="portfolio_id", type="integer", nullable=true)
      */
-    private $portfolio;
+    private $portfolioId;
 
     /**
      * @var string
@@ -73,19 +69,19 @@ class Currency
     }
 
     /**
-     * @return Portfolio|null
+     * @return int|null
      */
-    public function getPortfolio(): ?Portfolio
+    public function getPortfolioId(): ?int
     {
-        return $this->portfolio;
+        return $this->portfolioId;
     }
 
     /**
-     * @param Portfolio $portfolio
+     * @param int $portfolioId
      */
-    public function setPortfolio(Portfolio $portfolio): void
+    public function setPortfolioId(int $portfolioId): void
     {
-        $this->portfolio = $portfolio;
+        $this->portfolioId = $portfolioId;
     }
 
     /**

@@ -48,7 +48,7 @@ class CurrencyController extends BaseController
 
         $existingCurrency = $portfolio->getCurrencyByName($postedCurrency->getName());
         if (null === $existingCurrency) {
-            $postedCurrency->setPortfolio($portfolio);
+            $postedCurrency->setPortfolioId($portfolio->getId());
 
             $this->getDoctrine()->getManager()->persist($postedCurrency);
             $this->getDoctrine()->getManager()->flush();

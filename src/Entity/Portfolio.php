@@ -56,18 +56,14 @@ class Portfolio
     private $bankAccounts;
 
     /**
-     * @var Collection|Share[]
+     * @var Share[]
      * @Serializer\Exclude()
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Share", mappedBy="portfolio", cascade={"remove"})
      */
     private $shares;
 
     /**
-     * @var Collection|Currency[]
+     * @var Currency[]
      * @Serializer\Exclude()
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Currency", mappedBy="portfolio", cascade={"remove"})
      */
     private $currencies;
 
@@ -84,11 +80,11 @@ class Portfolio
         $this->setBankAccounts($newAccounts);
         foreach($this->getAllPositions() as $position) {
             if (null !== $position->getShare()) {
-                $position->getShare()->setPortfolio($this);
+                $position->getShare()->setPortfolioId($this->id);
             }
         }
         foreach($this->getCurrencies() as $currency) {
-            $currency->setPortfolio($this);
+            $currency->setPortfolioId($this);
         }
     }
 

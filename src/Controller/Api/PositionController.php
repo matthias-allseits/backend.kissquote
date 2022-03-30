@@ -258,9 +258,9 @@ class PositionController extends BaseController
 
     /**
      * @param Position $position
-     * @param $portfolio
+     * @param Portfolio $portfolio
      */
-    private function persistTransactions(Position $position, $portfolio): void
+    private function persistTransactions(Position $position, Portfolio $portfolio): void
     {
         $this->getDoctrine()->getManager()->persist($position);
         $persistedTransactions = [];
@@ -268,7 +268,7 @@ class PositionController extends BaseController
             $transactionCurrency = $portfolio->getCurrencyByName($transaction->getCurrency()->getName());
             if (null === $transactionCurrency) {
                 $transactionCurrency = $transaction->getCurrency();
-                $transactionCurrency->setPortfolio($portfolio);
+                $transactionCurrency->setPortfolioId($portfolio->getId());
                 $this->getDoctrine()->getManager()->persist($transactionCurrency);
             }
             $transaction->setCurrency($transactionCurrency);
@@ -283,10 +283,10 @@ class PositionController extends BaseController
 
 
     /**
-     * @param $portfolio
+     * @param Portfolio $portfolio
      * @param Position $position
      */
-    private function persistShare($portfolio, Position $position): void
+    private function persistShare(Portfolio $portfolio, Position $position): void
     {
         // todo: get share by isin is not enough. currency is missing
         $share = $portfolio->getShareByIsin($position->getShare()->getIsin());
@@ -297,7 +297,7 @@ class PositionController extends BaseController
             }
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($share->getMarketplace()->getId());
             $share->setMarketplace($marketplace);
-            $share->setPortfolio($portfolio);
+            $share->setPortfolioId($portfolio->getId());
             $share->setType('stock');
             $this->getDoctrine()->getManager()->persist($share);
         }
@@ -306,16 +306,16 @@ class PositionController extends BaseController
 
 
     /**
-     * @param $portfolio
+     * @param Portfolio $portfolio
      * @param Position $sourcePosition
      * @param Position $targetPosition
      */
-    private function persistCurrency($portfolio, Position $sourcePosition, Position $targetPosition): void
+    private function persistCurrency(Portfolio $portfolio, Position $sourcePosition, Position $targetPosition): void
     {
         $currency = $portfolio->getCurrencyByName($sourcePosition->getCurrency()->getName());
         if (null === $currency) {
             $currency = $sourcePosition->getCurrency();
-            $currency->setPortfolio($portfolio);
+            $currency->setPortfolioId($portfolio->getId());
             $this->getDoctrine()->getManager()->persist($currency);
         }
         $targetPosition->setCurrency($currency);

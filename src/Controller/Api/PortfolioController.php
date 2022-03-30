@@ -57,7 +57,7 @@ class PortfolioController extends BaseController
         ];
         foreach($currencies as $currency) {
             $baseCurrency = new Currency();
-            $baseCurrency->setPortfolio($portfolio);
+            $baseCurrency->setPortfolioId($portfolio->getId());
             $baseCurrency->setName($currency[0]);
             $baseCurrency->setRate($currency[1]);
             $this->getDoctrine()->getManager()->persist($baseCurrency);
