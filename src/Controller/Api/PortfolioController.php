@@ -94,24 +94,37 @@ class PortfolioController extends BaseController
         $randomUserName = RandomizeHelper::getRandomUserName();
         $randomHashKey = RandomizeHelper::getRandomHashKey();
 
-        $demoPortfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 122]);
+        $demoPortfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 164]);
+        $demoCurrencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
+        $demoPortfolio->setCurrencies($demoCurrencies);
+        $demoShares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
+        $demoPortfolio->setShares($demoShares);
 
 //        $newPortfolio = clone $demoPortfolio;
         $newPortfolio = new Portfolio();
         $newPortfolio->setUserName($randomUserName);
         $newPortfolio->setHashKey($randomHashKey);
         $newPortfolio->setStartDate(new \DateTime());
+        $this->getDoctrine()->getManager()->persist($newPortfolio);
+        $this->getDoctrine()->getManager()->flush();
         $this->portfolio = $newPortfolio;
 
         $newCurrencies = $this->persistDefaultCurrencies($newPortfolio);
         $newPortfolio->setCurrencies($newCurrencies);
 
         $newShares = [];
-        foreach($demoPortfolio->getShares()->toArray() as $share) {
-            $newShare = clone $share;
+        foreach($demoPortfolio->getShares() as $share) {
+            $newShare = new Share();
+            $newShare->setName($share->getName());
+            $newShare->setIsin($share->getIsin());
+            $newShare->setMarketplace($share->getMarketplace());
+            $newShare->setBranche($share->getBranche());
+            $newShare->setHeadquarter($share->getHeadquarter());
+            $newShare->setValor($share->getValor());
+            $newShare->setShortname($share->getShortname());
             $currency = $newPortfolio->getCurrencyByName($share->getCurrency()->getName());
             $newShare->setCurrency($currency);
-            $newShare->setPortfolio($newPortfolio);
+            $newShare->setPortfolioId($newPortfolio->getId());
             $this->getDoctrine()->getManager()->persist($newShare);
             $newShares[] = $newShare;
         }
@@ -126,21 +139,26 @@ class PortfolioController extends BaseController
 
             $newPositions = [];
             foreach($account->getPositions() as $position) {
-                $newPosition = clone $position;
+                $newPosition = new Position();
                 $newPosition->setBankAccount($newAccount);
                 $newPosition->setTransactions([]);
+                $newPosition->setActive($position->isActive());
+                $newPosition->setActiveFrom($position->getActiveFrom());
+                $newPosition->setActiveUntil($position->getActiveUntil());
+                $newPosition->setShareheadId($position->getShareheadId());
+                $newPosition->setDividendPeriodicity($position->getDividendPeriodicity());
+                $newPosition->setIsCash($position->isCash());
                 $this->getDoctrine()->getManager()->persist($newPosition);
 
                 $share = null;
                 if (null !== $position->getShare()) {
                     $share = $newPortfolio->getShareByIsin($position->getShare()->getIsin());
-                    $share->setCurrency(null);
+                    $sharesCurrency = $newPortfolio->getCurrencyByName($share->getCurrency()->getName());
+                    $share->setCurrency($sharesCurrency);
                 }
                 $newPosition->setShare($share);
-//                $newPosition->setShare(null);
                 $currency = $newPortfolio->getCurrencyByName($position->getCurrency()->getName());
                 $newPosition->setCurrency($currency);
-//                $newPosition->setCurrency(null);
                 $newPositions[] = $newPosition;
             }
             $newAccount->setPositions($newPositions);
@@ -149,7 +167,6 @@ class PortfolioController extends BaseController
         }
         $newPortfolio->setBankAccounts($newAccounts);
 
-        $this->getDoctrine()->getManager()->persist($newPortfolio);
         $this->makeLogEntry('create demo portfolio', $newPortfolio);
 
         $this->getDoctrine()->getManager()->flush();
@@ -180,7 +197,7 @@ class PortfolioController extends BaseController
         ];
         foreach ($currencies as $currency) {
             $baseCurrency = new Currency();
-            $baseCurrency->setPortfolio($portfolio);
+            $baseCurrency->setPortfolioId($portfolio->getId());
             $baseCurrency->setName($currency[0]);
             $baseCurrency->setRate($currency[1]);
             $this->getDoctrine()->getManager()->persist($baseCurrency);

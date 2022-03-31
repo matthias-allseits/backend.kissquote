@@ -141,12 +141,12 @@ class Position
     {
         $this->id = null;
         $newTransactions = [];
-        foreach($this->getTransactions() as $transaction) {
-            $newTransaction = clone $transaction;
-            $newTransaction->setPosition($this);
-            $newTransaction->setCurrency(null);
-            $newTransactions[] = $newTransaction;
-        }
+//        foreach($this->getTransactions() as $transaction) {
+//            $newTransaction = clone $transaction;
+//            $newTransaction->setPosition($this);
+//            $newTransaction->setCurrency(null);
+//            $newTransactions[] = $newTransaction;
+//        }
         $this->setTransactions($newTransactions);
     }
 

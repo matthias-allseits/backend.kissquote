@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Currency;
 use App\Entity\Feedback;
 use App\Entity\LogEntry;
 use App\Entity\Portfolio;
+use App\Entity\Share;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,6 +23,12 @@ class HomeController extends AbstractController
     public function portfolios(): Response
     {
         $portfolios = $this->getDoctrine()->getRepository(Portfolio::class)->findAll();
+        foreach($portfolios as $portfolio) {
+            $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $portfolio->setCurrencies($currencies);
+            $shares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $portfolio->setShares($shares);
+        }
 
         return $this->render('home/home.html.twig', [
             'portfolios' => $portfolios,
@@ -60,6 +68,16 @@ class HomeController extends AbstractController
             }
             $this->getDoctrine()->getManager()->remove($position);
             $this->getDoctrine()->getManager()->flush();
+        }
+
+        $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
+        foreach($currencies as $currency) {
+            $this->getDoctrine()->getManager()->remove($currency);
+        }
+
+        $shares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
+        foreach($shares as $share) {
+            $this->getDoctrine()->getManager()->remove($share);
         }
 
         $this->getDoctrine()->getManager()->remove($portfolio);

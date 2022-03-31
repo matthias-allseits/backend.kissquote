@@ -117,8 +117,6 @@ class Share
     public function __clone()
     {
         $this->id = null;
-        $newCurrency = clone $this->getCurrency();
-        $this->setCurrency($newCurrency);
     }
 
 
@@ -144,9 +142,9 @@ class Share
     }
 
     /**
-     * @return Currency
+     * @return Currency|null
      */
-    public function getCurrency(): Currency
+    public function getCurrency(): ?Currency
     {
         return $this->currency;
     }
@@ -224,17 +222,17 @@ class Share
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getValor(): int
+    public function getValor(): ?int
     {
         return $this->valor;
     }
 
     /**
-     * @param int $valor
+     * @param int|null $valor
      */
-    public function setValor(int $valor): void
+    public function setValor(?int $valor): void
     {
         $this->valor = $valor;
     }
@@ -272,17 +270,17 @@ class Share
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBranche(): string
+    public function getBranche(): ?string
     {
         return $this->branche;
     }
 
     /**
-     * @param string $branche
+     * @param string|null $branche
      */
-    public function setBranche(string $branche): void
+    public function setBranche(?string $branche): void
     {
         $this->branche = $branche;
     }
