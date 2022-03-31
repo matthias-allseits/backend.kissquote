@@ -8,6 +8,7 @@ use App\Entity\LogEntry;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Share;
+use App\Entity\Transaction;
 use App\Helper\RandomizeHelper;
 use App\Service\BalanceService;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -159,6 +160,21 @@ class PortfolioController extends BaseController
                 $newPosition->setShare($share);
                 $currency = $newPortfolio->getCurrencyByName($position->getCurrency()->getName());
                 $newPosition->setCurrency($currency);
+
+                $newTransactions = [];
+                foreach($position->getTransactions() as $transaction) {
+                    $newTransaction = new Transaction();
+                    $newTransaction->setPosition($newPosition);
+                    $newTransaction->setDate($transaction->getDate());
+                    $newTransaction->setTitle($transaction->getTitle());
+                    $newTransaction->setQuantity($transaction->getQuantity());
+                    $newTransaction->setRate($transaction->getRate());
+                    $newTransaction->setFee($transaction->getFee());
+                    $transactionCurrency = $newPortfolio->getCurrencyByName($transaction->getCurrency()->getName());
+                    $newTransaction->setCurrency($transactionCurrency);
+                    $newTransactions[] = $newTransaction;
+                }
+                $newPosition->setTransactions($newTransactions);
                 $newPositions[] = $newPosition;
             }
             $newAccount->setPositions($newPositions);
