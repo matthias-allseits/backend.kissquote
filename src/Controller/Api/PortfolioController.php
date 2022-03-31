@@ -6,6 +6,8 @@ use App\Entity\BankAccount;
 use App\Entity\Currency;
 use App\Entity\LogEntry;
 use App\Entity\Portfolio;
+use App\Entity\Position;
+use App\Entity\Share;
 use App\Helper\RandomizeHelper;
 use App\Service\BalanceService;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -43,25 +45,7 @@ class PortfolioController extends BaseController
         $this->getDoctrine()->getManager()->persist($portfolio);
         $this->getDoctrine()->getManager()->persist($bankAccount);
 
-        $currencies = [
-            ['CHF', 1],
-            ['EUR', 1.05],
-            ['USD', 0.92],
-            ['GBP', 1.25],
-            ['DKK', 0.14],
-            ['NOK', 0.11],
-            ['SEK', 0.1],
-            ['PLN', 0.25],
-            ['CZK', 0.04],
-            ['not defined', 1],
-        ];
-        foreach($currencies as $currency) {
-            $baseCurrency = new Currency();
-            $baseCurrency->setPortfolioId($portfolio->getId());
-            $baseCurrency->setName($currency[0]);
-            $baseCurrency->setRate($currency[1]);
-            $this->getDoctrine()->getManager()->persist($baseCurrency);
-        }
+        $this->persistDefaultCurrencies($portfolio);
 
         $this->makeLogEntry('create new portfolio', $portfolio);
 
@@ -110,20 +94,100 @@ class PortfolioController extends BaseController
         $randomUserName = RandomizeHelper::getRandomUserName();
         $randomHashKey = RandomizeHelper::getRandomHashKey();
 
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 147]);
+        $demoPortfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 122]);
 
-        $demoPortfolio = clone $portfolio;
-        $demoPortfolio->setUserName($randomUserName);
-        $demoPortfolio->setHashKey($randomHashKey);
-        $demoPortfolio->setStartDate(new \DateTime());
-        $this->portfolio = $demoPortfolio;
+//        $newPortfolio = clone $demoPortfolio;
+        $newPortfolio = new Portfolio();
+        $newPortfolio->setUserName($randomUserName);
+        $newPortfolio->setHashKey($randomHashKey);
+        $newPortfolio->setStartDate(new \DateTime());
+        $this->portfolio = $newPortfolio;
 
-        $this->makeLogEntry('create demo portfolio', $demoPortfolio);
+        $newCurrencies = $this->persistDefaultCurrencies($newPortfolio);
+        $newPortfolio->setCurrencies($newCurrencies);
 
-        $this->getDoctrine()->getManager()->persist($demoPortfolio);
+        $newShares = [];
+        foreach($demoPortfolio->getShares()->toArray() as $share) {
+            $newShare = clone $share;
+            $currency = $newPortfolio->getCurrencyByName($share->getCurrency()->getName());
+            $newShare->setCurrency($currency);
+            $newShare->setPortfolio($newPortfolio);
+            $this->getDoctrine()->getManager()->persist($newShare);
+            $newShares[] = $newShare;
+        }
+        $newPortfolio->setShares($newShares);
+
+        $newAccounts = [];
+        foreach($demoPortfolio->getBankAccounts() as $account) {
+            $newAccount = new BankAccount();
+            $newAccount->setPortfolio($newPortfolio);
+            $newAccount->setName($account->getName());
+            $this->getDoctrine()->getManager()->persist($newAccount);
+
+            $newPositions = [];
+            foreach($account->getPositions() as $position) {
+                $newPosition = clone $position;
+                $newPosition->setBankAccount($newAccount);
+                $newPosition->setTransactions([]);
+                $this->getDoctrine()->getManager()->persist($newPosition);
+
+                $share = null;
+                if (null !== $position->getShare()) {
+                    $share = $newPortfolio->getShareByIsin($position->getShare()->getIsin());
+                    $share->setCurrency(null);
+                }
+                $newPosition->setShare($share);
+//                $newPosition->setShare(null);
+                $currency = $newPortfolio->getCurrencyByName($position->getCurrency()->getName());
+                $newPosition->setCurrency($currency);
+//                $newPosition->setCurrency(null);
+                $newPositions[] = $newPosition;
+            }
+            $newAccount->setPositions($newPositions);
+
+            $newAccounts[] = $newAccount;
+        }
+        $newPortfolio->setBankAccounts($newAccounts);
+
+        $this->getDoctrine()->getManager()->persist($newPortfolio);
+        $this->makeLogEntry('create demo portfolio', $newPortfolio);
+
         $this->getDoctrine()->getManager()->flush();
 
-        return View::create($demoPortfolio, Response::HTTP_CREATED);
+        return View::create($newPortfolio, Response::HTTP_CREATED);
+    }
+
+
+    /**
+     * @param Portfolio $portfolio
+     * @return Currency[]
+     */
+    private function persistDefaultCurrencies(Portfolio $portfolio): array
+    {
+        $newCurrencies = [];
+
+        $currencies = [
+            ['CHF', 1],
+            ['EUR', 1.05],
+            ['USD', 0.92],
+            ['GBP', 1.25],
+            ['DKK', 0.14],
+            ['NOK', 0.11],
+            ['SEK', 0.1],
+            ['PLN', 0.25],
+            ['CZK', 0.04],
+            ['not defined', 1],
+        ];
+        foreach ($currencies as $currency) {
+            $baseCurrency = new Currency();
+            $baseCurrency->setPortfolio($portfolio);
+            $baseCurrency->setName($currency[0]);
+            $baseCurrency->setRate($currency[1]);
+            $this->getDoctrine()->getManager()->persist($baseCurrency);
+            $newCurrencies[] = $baseCurrency;
+        }
+
+        return $newCurrencies;
     }
 
 }
