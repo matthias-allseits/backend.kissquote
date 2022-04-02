@@ -52,12 +52,15 @@ class ShareRatesCrawler extends Command
         }
 //        $output->writeln($date->format('d.m.Y'));
 
+        /** @var Share[] $allShares */
         $allShares = $this->entityManager->getRepository(Share::class)->findAll();
         $filteredShares = [];
+        $doubleCheck = [];
         foreach($allShares as $share) {
             $dbCheck = $this->entityManager->getRepository(Stockrate::class)->findBy(['isin' => $share->getIsin(), 'marketplace' => $share->getMarketplace(), 'currencyName' => $share->getCurrency()->getName(), 'date' => $date]);
-            if (count($dbCheck) == 0) {
+            if (count($dbCheck) == 0 && $share->hasActivePosition() && !in_array($share->getSwissquoteUrl(), $doubleCheck)) {
                 $filteredShares[] = $share;
+                $doubleCheck[] = $share->getSwissquoteUrl();
             }
         }
 
@@ -67,12 +70,9 @@ class ShareRatesCrawler extends Command
         foreach($filteredShares as $share) {
             $output->writeln($share);
 
+            $url = '';
             try {
-                $currency = $share->getCurrency()->getName();
-                if ($currency == 'GBP') { // island apes...
-                    $currency = 'GBX';
-                }
-                $url = 'https://www.swissquote.ch/sq_mi/public/market/Detail.action?s=' . $share->getIsin() . '_' . $share->getMarketplace()->getUrlKey() . '_' . $currency;
+                $url = $share->getSwissquoteUrl();
                 $rate = $this->getRateBySwissquoteUrl($url, $share);
             } catch (\Exception $e) {
                 $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');

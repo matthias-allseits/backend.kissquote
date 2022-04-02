@@ -107,7 +107,7 @@ class Share
     private $headquarter;
 
     /**
-     * @var Collection
+     * @var Collection|Position[]
      *
      * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="share", cascade={"remove"})
      */
@@ -123,6 +123,29 @@ class Share
 	public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    public function hasActivePosition(): bool
+    {
+        foreach($this->getPositions() as $position) {
+            if ($position->isActive()) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getSwissquoteUrl(): string
+    {
+        $currency = $this->getCurrency()->getName();
+        if ($currency == 'GBP') { // island apes...
+            $currency = 'GBX';
+        }
+        $url = 'https://www.swissquote.ch/sq_mi/public/market/Detail.action?s=' . $this->getIsin() . '_' . $this->getMarketplace()->getUrlKey() . '_' . $currency;
+
+        return $url;
     }
 
     /**
@@ -299,6 +322,24 @@ class Share
     public function setHeadquarter(?string $headquarter): void
     {
         $this->headquarter = $headquarter;
+    }
+
+    /**
+     * @return Position[]
+     */
+    public function getPositions(): array
+    {
+        $positions = $this->positions->toArray();
+
+        return $positions;
+    }
+
+    /**
+     * @param Position[] $positions
+     */
+    public function setPositions(array $positions): void
+    {
+        $this->positions = $positions;
     }
 
 }
