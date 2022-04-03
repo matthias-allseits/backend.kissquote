@@ -73,15 +73,17 @@ class TransactionController extends BaseController
 
             $this->makeLogEntry('forced creation of new cash-position', $cashPosition);
         }
-        $cashTransaction = new Transaction();
-        $cashTransaction->setPosition($cashPosition);
-        $cashTransaction->setCurrency($cashPosition->getCurrency());
-        $cashTransaction->setQuantity(1);
-        $cashTransaction->setDate($transaction->getDate());
-        $cashTransaction->setTitle($transaction->getTitle());
-        $cashTransaction->setRate($transaction->calculateCashValueNet());
-        $this->getDoctrine()->getManager()->persist($cashTransaction);
-        $this->makeLogEntry('forced new cash-transaction', $cashTransaction);
+        if (false === $transaction->getPosition()->isCash()) {
+            $cashTransaction = new Transaction();
+            $cashTransaction->setPosition($cashPosition);
+            $cashTransaction->setCurrency($cashPosition->getCurrency());
+            $cashTransaction->setQuantity(1);
+            $cashTransaction->setDate($transaction->getDate());
+            $cashTransaction->setTitle($transaction->getTitle());
+            $cashTransaction->setRate($transaction->calculateCashValueNet());
+            $this->getDoctrine()->getManager()->persist($cashTransaction);
+            $this->makeLogEntry('forced new cash-transaction', $cashTransaction);
+        }
 
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->persist($transaction);
