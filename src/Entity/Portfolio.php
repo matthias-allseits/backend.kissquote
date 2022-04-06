@@ -149,9 +149,11 @@ class Portfolio
     public function getShareByIsin(string $isin): ?Share
     {
         $hit = null;
-        foreach ($this->shares as $share) {
-            if ($share->getIsin() == $isin) {
-                $hit = $share;
+        if (is_array($this->shares)) {
+            foreach ($this->shares as $share) {
+                if ($share->getIsin() == $isin) {
+                    $hit = $share;
+                }
             }
         }
 
