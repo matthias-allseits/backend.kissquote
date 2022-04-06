@@ -33,6 +33,7 @@ class ShareRatesCrawler extends Command
             ->setDescription('Crawls for last rates for every user-share')
             ->setHelp('Crawls for last rates for every user-share')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Forces the flush')
+            ->addOption('update', null, InputOption::VALUE_NONE, 'Executes but before removes the stock-rates from this day')
         ;
     }
 
@@ -43,6 +44,21 @@ class ShareRatesCrawler extends Command
         } else {
             $force = false;
         }
+
+        if ($input->getOption('update')) {
+            $update = true;
+        } else {
+            $update = false;
+        }
+
+        if ($update) {
+            $stockRatesToday = $this->entityManager->getRepository(Stockrate::class)->findBy(['date' => new \DateTime()]);
+            foreach ($stockRatesToday as $stockrate) {
+                $this->entityManager->remove($stockrate);
+            }
+            $this->entityManager->flush();
+        }
+
         $this->output = $output;
         $date = new \DateTime();
         if ($date->format('N') == 7) {
