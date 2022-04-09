@@ -8,6 +8,7 @@ use App\Entity\LogEntry;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Share;
+use App\Entity\ShareheadShare;
 use App\Entity\Transaction;
 use App\Helper\RandomizeHelper;
 use App\Service\BalanceService;
@@ -77,6 +78,12 @@ class PortfolioController extends BaseController
             foreach($bankAccount->getPositions() as $position) {
                 $balance = $balanceService->getBalanceForPosition($position);
                 $position->setBalance($balance);
+            }
+        }
+        foreach($portfolio->getWatchlistEntries() as $entry) {
+            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+            if (null !== $shareheadShare) {
+                $entry->setTitle($shareheadShare->getName());
             }
         }
 

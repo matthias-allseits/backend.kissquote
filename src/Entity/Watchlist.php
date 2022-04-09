@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use DateTime;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -51,6 +50,12 @@ class Watchlist
      * @ORM\Column(name="start_date", type="date", nullable=false)
      */
     private $startDate;
+
+
+    /**
+     * @var string|null
+     */
+    private $title;
 
 
     public function __construct()
@@ -118,6 +123,22 @@ class Watchlist
     public function setStartDate(DateTime $startDate): void
     {
         $this->startDate = $startDate;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string|null $title
+     */
+    public function setTitle(?string $title): void
+    {
+        $this->title = $title;
     }
 
 }

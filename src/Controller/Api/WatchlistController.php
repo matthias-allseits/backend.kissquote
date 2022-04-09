@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\ShareheadShare;
 use App\Entity\Watchlist;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -15,30 +16,39 @@ class WatchlistController extends BaseController
 
 
     /**
-     * @Rest\Post("/watchlist/{shareheadId}", name="create_watchlist_entry")
+     * @Rest\Post("/watchlist", name="create_watchlist_entry")
      * @param Request $request
-     * @param int $shareheadId
      * @return View
      */
-    public function createWatchlistEntry(Request $request, int $shareheadId): View
+    public function createWatchlistEntry(Request $request): View
     {
         $portfolio = $this->getPortfolio($request);
 
         $serializer = SerializerBuilder::create()->build();
 
-        $shareheadId = $request->request->get('shareheadId');
+        // todo: implement a better solution
+        $content = json_decode($request->getContent());
+        $shareheadId = $content->shareheadId;
 
         $watchlistEntry = new Watchlist();
         $watchlistEntry->setPortfolio($portfolio);
         $watchlistEntry->setStartDate(new \DateTime());
-        $watchlistEntry->setStartDate($shareheadId);
+        $watchlistEntry->setShareheadId($shareheadId);
 
         $this->getDoctrine()->getManager()->persist($watchlistEntry);
         $this->getDoctrine()->getManager()->flush();
 
         $this->makeLogEntry('add watchlist-entry', $watchlistEntry);
 
-        return new View("Watchlist Entry Successfully", Response::HTTP_OK);
+        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio]);
+        foreach($watchlist as $entry) {
+            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+            if (null !== $shareheadShare) {
+                $entry->setTitle($shareheadShare->getName());
+            }
+        }
+
+        return new View($watchlist, Response::HTTP_CREATED);
     }
 
 
@@ -58,7 +68,15 @@ class WatchlistController extends BaseController
 
         $this->makeLogEntry('remove watchlist-entry', $watchlistEntry);
 
-        return new View("Bank-Account Delete Successfully", Response::HTTP_OK);
+        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio]);
+        foreach($watchlist as $entry) {
+            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+            if (null !== $shareheadShare) {
+                $entry->setTitle($shareheadShare->getName());
+            }
+        }
+
+        return new View($watchlist, Response::HTTP_OK);
     }
 
 }
