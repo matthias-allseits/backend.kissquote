@@ -56,6 +56,13 @@ class Portfolio
     private $bankAccounts;
 
     /**
+     * @var Collection|Watchlist[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Watchlist", mappedBy="portfolio")
+     */
+    private $watchlistEntries;
+
+    /**
      * @var Share[]
      * @Serializer\Exclude()
      */
@@ -273,6 +280,22 @@ class Portfolio
     public function getBankAccounts(): Collection
     {
         return $this->bankAccounts;
+    }
+
+    /**
+     * @return Watchlist[]|Collection
+     */
+    public function getWatchlistEntries()
+    {
+        return $this->watchlistEntries;
+    }
+
+    /**
+     * @param Watchlist[]|Collection $watchlistEntries
+     */
+    public function setWatchlistEntries($watchlistEntries): void
+    {
+        $this->watchlistEntries = $watchlistEntries;
     }
 
     /**

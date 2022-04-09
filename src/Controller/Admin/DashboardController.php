@@ -16,6 +16,7 @@ use App\Entity\ShareheadShare;
 use App\Entity\Transaction;
 use App\Entity\Translation;
 use App\Entity\Stockrate;
+use App\Entity\Watchlist;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -56,6 +57,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
         yield MenuItem::linkToCrud('Feedback Proposals', 'fas fa-list', FeedbackProposal::class);
         yield MenuItem::linkToCrud('Feedbacks', 'fas fa-list', Feedback::class);
+        yield MenuItem::linkToCrud('Watchlist Entries', 'fas fa-list', Watchlist::class);
         yield MenuItem::linkToCrud('LogEntries', 'fas fa-list', LogEntry::class);
     }
 
