@@ -14,6 +14,26 @@ use Symfony\Component\HttpFoundation\Response;
 class WatchlistController extends BaseController
 {
 
+    /**
+     * @Rest\Get ("/watchlist", name="list_watchlist")
+     * @param Request $request
+     * @return View
+     */
+    public function listWatchlistEntries(Request $request): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        $entries = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio]);
+        foreach($entries as $entry) {
+            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+            if (null !== $shareheadShare) {
+                $entry->setTitle($shareheadShare->getName());
+            }
+        }
+
+        return View::create($entries, Response::HTTP_CREATED);
+    }
+
 
     /**
      * @Rest\Post("/watchlist", name="create_watchlist_entry")
