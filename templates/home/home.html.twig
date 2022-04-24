@@ -11,6 +11,7 @@
         <tr>
             <th>Name</th>
             <th>Key</th>
+            <th>Started</th>
             <th>Bank-Accounts</th>
             <th>Positions</th>
             <th>Currencies
@@ -20,6 +21,7 @@
             <tr>
                 <td>{{ portfolio }}</td>
                 <td>{{ portfolio.hashKey }}</td>
+                <td>{{ portfolio.startDate|date('d.m.Y') }}</td>
                 <td>{{ portfolio.bankAccounts|length }}</td>
                 <td>{{ portfolio.allPositions|length }}</td>
                 <td>{{ portfolio.currencies|length }}</td>

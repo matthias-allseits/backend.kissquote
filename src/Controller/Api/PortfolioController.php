@@ -46,6 +46,7 @@ class PortfolioController extends BaseController
 
         $this->getDoctrine()->getManager()->persist($portfolio);
         $this->getDoctrine()->getManager()->persist($bankAccount);
+        $this->getDoctrine()->getManager()->flush();
 
         $this->persistDefaultCurrencies($portfolio);
 
