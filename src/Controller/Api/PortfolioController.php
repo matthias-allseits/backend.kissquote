@@ -103,7 +103,7 @@ class PortfolioController extends BaseController
         $randomUserName = RandomizeHelper::getRandomUserName();
         $randomHashKey = RandomizeHelper::getRandomHashKey();
 
-        $demoPortfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 164]);
+        $demoPortfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 169]);
         $demoCurrencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
         $demoPortfolio->setCurrencies($demoCurrencies);
         $demoShares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
