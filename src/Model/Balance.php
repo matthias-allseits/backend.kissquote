@@ -64,7 +64,7 @@ class Balance
         $this->collectedDividends = $position->getCollectedDividends();
         $this->collectedDividendsCurrency = $position->getCollectedDividendsCurrency();
         $this->projectedNextDividendPayment = $position->calculateNextDividendPayment();
-        $this->projectedNextDividendCurrency = $position->getLastDividendTransaction() ? $position->getLastDividendTransaction()->getCurrency()->getName() : null;
+        $this->projectedNextDividendCurrency = $position->getLastDividendTransactionByDate() ? $position->getLastDividendTransactionByDate()->getCurrency()->getName() : null;
         if (false === $position->isActive()) {
             $this->closedResult = $position->getSummedInvestmentGross() * -1;
             // automatic setting active-until

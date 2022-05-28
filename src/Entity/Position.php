@@ -307,7 +307,7 @@ class Position
     }
 
 
-    public function getLastDividendTransaction(DateTime $startDate = null): ?Transaction
+    public function getLastDividendTransactionByDate(DateTime $startDate = null): ?Transaction
     {
         $hit = null;
         if (null !== $this->transactions) {
@@ -342,13 +342,13 @@ class Position
     public function calculateNextDividendPayment(): int
     {
         $value = 0;
-        $lastDividendTransaction = $this->getLastDividendTransaction();
+        $lastDividendTransaction = $this->getLastDividendTransactionByDate();
         if (null !== $lastDividendTransaction) {
             $amountAtLastPayment = $this->getCountOfSharesByDate($lastDividendTransaction->getDate());
             if ($amountAtLastPayment > 0) {
                 $dividendByShare = $lastDividendTransaction->getRate() / $amountAtLastPayment;
                 if ($this->getDividendPeriodicity() == 'half-yearly') {
-                    $nextTolastDividendTransaction = $this->getLastDividendTransaction($lastDividendTransaction->getDate());
+                    $nextTolastDividendTransaction = $this->getLastDividendTransactionByDate($lastDividendTransaction->getDate());
                     if (null !== $nextTolastDividendTransaction) {
                         $amountAtNextToLastPayment = $this->getCountOfSharesByDate($nextTolastDividendTransaction->getDate());
                         if ($amountAtNextToLastPayment > 0) {
