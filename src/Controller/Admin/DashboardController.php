@@ -8,6 +8,7 @@ use App\Entity\Dividend;
 use App\Entity\Feedback;
 use App\Entity\FeedbackProposal;
 use App\Entity\LogEntry;
+use App\Entity\ManualDividend;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
@@ -54,6 +55,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Marketplaces', 'fas fa-list', Marketplace::class);
         yield MenuItem::linkToCrud('Sharehead Shares', 'fas fa-list', ShareheadShare::class);
         yield MenuItem::linkToCrud('StockRates', 'fas fa-list', Stockrate::class);
+        yield MenuItem::linkToCrud('Manual dividends', 'fas fa-list', ManualDividend::class);
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
         yield MenuItem::linkToCrud('Feedback Proposals', 'fas fa-list', FeedbackProposal::class);
         yield MenuItem::linkToCrud('Feedbacks', 'fas fa-list', Feedback::class);

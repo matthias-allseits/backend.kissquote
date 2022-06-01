@@ -113,6 +113,13 @@ class Share
      */
     private $positions;
 
+    /**
+     * @var Collection|ManualDividend[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\ManualDividend", mappedBy="share", cascade={"remove"})
+     */
+    private $manualDividends;
+
 
     public function __clone()
     {
@@ -340,6 +347,22 @@ class Share
     public function setPositions(array $positions): void
     {
         $this->positions = $positions;
+    }
+
+    /**
+     * @return ManualDividend[]|Collection
+     */
+    public function getManualDividends()
+    {
+        return $this->manualDividends;
+    }
+
+    /**
+     * @param ManualDividend[]|Collection $manualDividends
+     */
+    public function setManualDividends($manualDividends): void
+    {
+        $this->manualDividends = $manualDividends;
     }
 
 }
