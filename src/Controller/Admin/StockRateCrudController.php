@@ -31,6 +31,8 @@ class StockRateCrudController extends AbstractCrudController
             TextField::new('currencyName'),
             DateField::new('date'),
             NumberField::new('rate'),
+            NumberField::new('high'),
+            NumberField::new('low'),
         ];
     }
 

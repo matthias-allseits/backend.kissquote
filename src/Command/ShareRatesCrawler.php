@@ -143,8 +143,13 @@ class ShareRatesCrawler extends Command
         $rateCell = trim($rateCell);
         $rateCell = str_replace('\'', '', $rateCell);
 
-        $currency = substr($rateCell, -3);
+        $highCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(2)->text();
+        $lowCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(3)->text();
+
         $rate = (float) substr($rateCell, strpos($rateCell, ' '));
+        $high = (float) $highCell;
+        $low = (float) $lowCell;
+        $currency = substr($rateCell, -3);
         if ($currency == 'GBX') { // island apes...
             $currency = 'GBP';
             $rate /= 100;
@@ -160,6 +165,8 @@ class ShareRatesCrawler extends Command
         $stockRate->setMarketplace($share->getMarketplace());
         $stockRate->setCurrencyName($currency);
         $stockRate->setRate($rate);
+        $stockRate->setHigh($high);
+        $stockRate->setLow($low);
         $stockRate->setDate($date);
 
         return $stockRate;
