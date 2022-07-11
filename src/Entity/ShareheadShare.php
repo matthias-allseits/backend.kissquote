@@ -128,9 +128,9 @@ class ShareheadShare
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getShareheadId(): int
+    public function getShareheadId(): ?int
     {
         return $this->shareheadId;
     }
