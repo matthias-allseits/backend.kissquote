@@ -23,7 +23,7 @@ class WatchlistController extends BaseController
     {
         $portfolio = $this->getPortfolio($request);
 
-        $entries = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio]);
+        $entries = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
         foreach($entries as $entry) {
             $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
             if (null !== $shareheadShare) {
@@ -60,7 +60,8 @@ class WatchlistController extends BaseController
 
         $this->makeLogEntry('add watchlist-entry', $watchlistEntry);
 
-        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio]);
+        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
+        $sortArray = [];
         foreach($watchlist as $entry) {
             $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
             if (null !== $shareheadShare) {
@@ -88,7 +89,7 @@ class WatchlistController extends BaseController
 
         $this->makeLogEntry('remove watchlist-entry', $watchlistEntry);
 
-        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio]);
+        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
         foreach($watchlist as $entry) {
             $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
             if (null !== $shareheadShare) {
