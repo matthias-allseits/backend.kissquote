@@ -77,7 +77,7 @@ class Stockrate
 
     public function __toString()
     {
-        return $this->isin . ' has a rate of ' . $this->rate . ' in ' . $this->currencyName . ' at ' . $this->date->format('d.m.Y') . '(high: ' . $this->high . ', low: ' . $this->low . ')';
+        return $this->isin . ' has a rate of ' . $this->rate . ' in ' . $this->currencyName . ' at ' . $this->date->format('d.m.Y') . ' (high: ' . $this->high . ', low: ' . $this->low . ')';
     }
 
 

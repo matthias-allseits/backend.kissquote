@@ -133,6 +133,10 @@ class ShareRatesCrawler extends Command
         sleep($this->sleep);
         $crawler = new Crawler($content);
         $rateCell = $crawler->filter('td.FullquoteTable__body--highlighted')->eq(0)->text();
+        if ($share->getMarketplace()->getName() == 'Swiss DOTS') {
+            $currency = substr($rateCell, -3);
+            $rateCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow td')->eq(2)->text();
+        }
         if (strpos($rateCell, 'Off-ex') > -1) {
             $rateCell = substr($rateCell, 0, strpos($rateCell, 'Off-ex'));
         }
@@ -149,7 +153,9 @@ class ShareRatesCrawler extends Command
         $rate = (float) substr($rateCell, strpos($rateCell, ' '));
         $high = (float) $highCell;
         $low = (float) $lowCell;
-        $currency = substr($rateCell, -3);
+        if (!isset($currency)) {
+            $currency = substr($rateCell, -3);
+        }
         if ($currency == 'GBX') { // island apes...
             $currency = 'GBP';
             $rate /= 100;
