@@ -41,21 +41,19 @@ class ShareheadImporter extends Command
             $force = false;
         }
 
+        /** @var ShareheadShare[] $allExistingShares */
+        $allExistingShares = $this->entityManager->getRepository(ShareheadShare::class)->findAll();
+        $allExistingPointer = [];
+        foreach($allExistingShares as $share) {
+            $allExistingPointer[$share->getShareheadId()] = $share;
+        }
 
-
-
-        // todo: this must work as a updater!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
+        // sharehead data
         $servername = "localhost";
-        $username = "stathead";
+        $username = "root";
         $password = "halvar";
-
         // Create connection
         $conn = new mysqli($servername, $username, $password);
-
         $currencies = [];
         $result = $conn->query("SELECT * FROM sharehead.currency;");
         foreach($result as $row) {
@@ -64,19 +62,27 @@ class ShareheadImporter extends Command
 
         $result = $conn->query("SELECT * FROM sharehead.share;");
         foreach ($result as $row) {
-            $output->writeln("id = " . $row['id'] . ", symbol = " . $row['symbol']);
-            $dbCheck = $this->entityManager->getRepository(ShareheadShare::class)->findBy(['isin' => $row['isin']]);
-            if (count($dbCheck) > 0) {
-                $output->writeln('<info>already existing in kissquote-db</info>');
-                continue;
+            $output->writeln("id = " . $row['id'] . ", name = " . $row['name']);
+            $share = $this->entityManager->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $row['id']]);
+            if (null !== $share) {
+                $output->writeln('<info>already existing in kissquote-db. update it</info>');
+            } else {
+                $output->writeln('<comment>new entry to create</comment>');
+                $share = new ShareheadShare();
             }
-            $share = new ShareheadShare();
             $share->setShareheadId($row['id']);
             $share->setName($row['name']);
             $share->setShortname($row['symbol'] !== null ? $row['symbol'] : '');
             $share->setIsin($row['isin']);
             $share->setCurrency($currencies[$row['currency_id']]);
             $this->entityManager->persist($share);
+
+            unset($allExistingPointer[$row['id']]);
+        }
+        $output->writeln('---------------------------------');
+        foreach($allExistingPointer as $toDelete) {
+            $output->writeln('<comment>obsolete entry found:</comment>');
+            $output->writeln($toDelete);
         }
 
         if ($force) {

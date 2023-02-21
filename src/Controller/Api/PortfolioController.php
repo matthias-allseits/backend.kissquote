@@ -217,6 +217,9 @@ class PortfolioController extends BaseController
             ['SEK', 0.1],
             ['PLN', 0.25],
             ['CZK', 0.04],
+            ['AUD', 0.67],
+            ['HKD', 0.12],
+            ['CNY', 0.14],
             ['not defined', 1],
         ];
         foreach ($currencies as $currency) {
