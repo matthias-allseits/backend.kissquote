@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\Marketplace;
 use App\Entity\ShareheadShare;
 use App\Entity\Stockrate;
+use App\Helper\SpiderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,12 +18,14 @@ class ShareheadMigrator extends Command
 {
     protected static $defaultName = 'kissquote:sharehead-migrator';
     private $entityManager;
+    private $spiderHelper;
     private $output;
     private $sleep = 5;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, SpiderHelper $spiderHelper)
     {
         $this->entityManager = $entityManager;
+        $this->spiderHelper = $spiderHelper;
 
         parent::__construct();
     }
@@ -121,7 +124,7 @@ class ShareheadMigrator extends Command
 
     private function getRateBySwissquoteUrl(string $url, ShareheadShare $share): ?Stockrate
     {
-        $content = file_get_contents($url);
+        $content = $this->spiderHelper->curlAction($url);
         sleep($this->sleep);
         $crawler = new Crawler($content);
         $rateCell = $crawler->filter('td.FullquoteTable__body--highlighted')->eq(0)->text();

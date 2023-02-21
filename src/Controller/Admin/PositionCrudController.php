@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Position;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -31,6 +32,14 @@ class PositionCrudController extends AbstractCrudController
             BooleanField::new('active'),
             BooleanField::new('isCash'),
         ];
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('bankAccount')
+            ->add('share')
+            ;
     }
 
 }

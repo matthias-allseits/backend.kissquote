@@ -60,10 +60,24 @@ class Stockrate
      */
     private $rate;
 
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="high", type="float", precision=10, scale=3, nullable=true)
+     */
+    private $high;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="low", type="float", precision=10, scale=3, nullable=true)
+     */
+    private $low;
+
 
     public function __toString()
     {
-        return $this->isin . ' has a rate of ' . $this->rate . ' in ' . $this->currencyName . ' at ' . $this->date->format('d.m.Y');
+        return $this->isin . ' has a rate of ' . $this->rate . ' in ' . $this->currencyName . ' at ' . $this->date->format('d.m.Y') . ' (high: ' . $this->high . ', low: ' . $this->low . ')';
     }
 
 
@@ -89,9 +103,9 @@ class Stockrate
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCurrencyName(): string
+    public function getCurrencyName(): ?string
     {
         return $this->currencyName;
     }
@@ -105,9 +119,9 @@ class Stockrate
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getIsin(): string
+    public function getIsin(): ?string
     {
         return $this->isin;
     }
@@ -121,9 +135,9 @@ class Stockrate
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getDate(): \DateTime
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
@@ -137,9 +151,9 @@ class Stockrate
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getRate(): float
+    public function getRate(): ?float
     {
         return $this->rate;
     }
@@ -150,6 +164,38 @@ class Stockrate
     public function setRate(float $rate): void
     {
         $this->rate = $rate;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getHigh(): ?float
+    {
+        return $this->high;
+    }
+
+    /**
+     * @param float $high
+     */
+    public function setHigh(float $high): void
+    {
+        $this->high = $high;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getLow(): ?float
+    {
+        return $this->low;
+    }
+
+    /**
+     * @param float $low
+     */
+    public function setLow(float $low): void
+    {
+        $this->low = $low;
     }
 
 }
