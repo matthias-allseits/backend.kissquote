@@ -39,6 +39,7 @@ class StockRateCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
+            ->add(TextFilter::new('isin'))
             ->add(DateTimeFilter::new('date'))
             ->add(TextFilter::new('currencyName'))
             ;

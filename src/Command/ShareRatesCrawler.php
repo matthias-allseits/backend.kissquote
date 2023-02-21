@@ -19,6 +19,7 @@ class ShareRatesCrawler extends Command
     protected static $defaultName = 'kissquote:rates-crawler';
     private $entityManager;
     private $spiderHelper;
+    /** @var OutputInterface $output */
     private $output;
     private $sleep = 5;
 
@@ -73,6 +74,10 @@ class ShareRatesCrawler extends Command
 
         /** @var Share[] $allShares */
         $allShares = $this->entityManager->getRepository(Share::class)->findAll();
+
+//        $allShares = [];
+//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(2251);
+
         $filteredShares = [];
         $doubleCheck = [];
         foreach($allShares as $share) {
@@ -159,6 +164,9 @@ class ShareRatesCrawler extends Command
         if ($currency == 'GBX') { // island apes...
             $currency = 'GBP';
             $rate /= 100;
+        }
+        if (strpos($currency, '%') > -1) { // brc handling
+            $currency = 'CHF';
         }
 
         $dateCell = $crawler->filter('tr.FullquoteTable__body td')->eq(0)->text();
