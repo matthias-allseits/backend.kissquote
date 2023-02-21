@@ -167,6 +167,7 @@ class ShareRatesCrawler extends Command
         }
         if (strpos($currency, '%') > -1) { // brc handling
             $currency = 'CHF';
+            $rate *= 10;
         }
 
         $dateCell = $crawler->filter('tr.FullquoteTable__body td')->eq(0)->text();
