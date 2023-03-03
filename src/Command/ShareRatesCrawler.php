@@ -165,6 +165,9 @@ class ShareRatesCrawler extends Command
         $dateCell = trim($dateCell);
         $explDate = explode('-', $dateCell);
         $date = new \DateTime($explDate[2] . '-' . $explDate[1] . '-' . $explDate[0]);
+        if (strpos($content, 'Basiswerte') > -1) { // freestyle hack for barrier reverse convertibles
+            $date = new \DateTime();
+        }
 
         $stockRate = new Stockrate();
         $stockRate->setIsin($share->getIsin());
