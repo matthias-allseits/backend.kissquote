@@ -189,9 +189,13 @@ class PositionController extends BaseController
         /** @var Position $newPosition */
         $newPosition = $serializer->deserialize(json_encode($content), Position::class, 'json');
 
+        /** @var Position $oldPosition */
         $oldPosition = $this->getDoctrine()->getRepository(Position::class)->find($newPosition->getId());
         if (null !== $oldPosition) {
             $oldPosition->setDividendPeriodicity($newPosition->getDividendPeriodicity());
+            $oldPosition->setActiveFrom($newPosition->getActiveFrom());
+            $oldPosition->setActiveUntil($newPosition->getActiveUntil());
+            $oldPosition->setActive($newPosition->isActive());
             $oldPosition->setShareheadId($newPosition->getShareheadId());
             $oldPosition->getShare()->setName($newPosition->getShare()->getName());
             $oldPosition->getShare()->setIsin($newPosition->getShare()->getIsin());

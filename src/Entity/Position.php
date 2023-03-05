@@ -84,7 +84,7 @@ class Position
     private $activeFrom;
 
     /**
-     * @var DateTime
+     * @var DateTime|null
      * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
      * @Serializer\SerializedName("activeUntil")
      *
