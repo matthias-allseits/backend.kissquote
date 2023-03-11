@@ -199,6 +199,7 @@ class PositionController extends BaseController
             $oldPosition->setShareheadId($newPosition->getShareheadId());
             $oldPosition->getShare()->setName($newPosition->getShare()->getName());
             $oldPosition->getShare()->setIsin($newPosition->getShare()->getIsin());
+            $oldPosition->setManualDrawdown($newPosition->getManualDrawdown());
 
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
             $oldPosition->getShare()->setMarketplace($marketplace);

@@ -119,6 +119,15 @@ class Position
     private $dividendPeriodicity;
 
     /**
+     * @var int|null
+     * @Serializer\Type("integer")
+     * @Serializer\SerializedName("manualDrawdown")
+     *
+     * @ORM\Column(name="manual_drawdown", type="smallint", nullable=true)
+     */
+    private $manualDrawdown;
+
+    /**
      * @var integer|null
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("shareheadId")
@@ -562,6 +571,22 @@ class Position
     public function setDividendPeriodicity(?string $dividendPeriodicity): void
     {
         $this->dividendPeriodicity = $dividendPeriodicity;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getManualDrawdown(): ?int
+    {
+        return $this->manualDrawdown;
+    }
+
+    /**
+     * @param int|null $manualDrawdown
+     */
+    public function setManualDrawdown(?int $manualDrawdown): void
+    {
+        $this->manualDrawdown = $manualDrawdown;
     }
 
     /**
