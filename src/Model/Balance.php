@@ -39,6 +39,12 @@ class Balance
     /** @var string */
     private $projectedNextDividendCurrency;
 
+    /** @var int */
+    private $collectedInterest;
+
+    /** @var int */
+    private $collectedCoupons;
+
     /** @var Stockrate|null */
     private $lastRate;
 
@@ -65,6 +71,8 @@ class Balance
         $this->collectedDividendsCurrency = $position->getCollectedDividendsCurrency();
         $this->projectedNextDividendPayment = $position->calculateNextDividendPayment();
         $this->projectedNextDividendCurrency = $position->getLastDividendTransactionByDate() ? $position->getLastDividendTransactionByDate()->getCurrency()->getName() : null;
+        $this->collectedInterest = $position->getCollectedInterest();
+        $this->collectedCoupons = $position->getCollectedCoupons();
         if (false === $position->isActive()) {
             $this->closedResult = $position->getSummedInvestmentGross() * -1;
             // automatic setting active-until

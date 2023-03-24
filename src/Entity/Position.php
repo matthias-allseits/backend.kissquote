@@ -21,6 +21,8 @@ class Position
 
     const TITLES_TRANSACTION = ['Kauf', 'Verkauf'];
     const TITLES_DIVIDEND = ['Dividende', 'Capital Gain', 'Kapitalrückzahlung'];
+    const TITLES_INTEREST = ['Zins'];
+    const TITLES_COUPON = ['Coupon'];
 
 	/**
 	 * @var integer
@@ -240,6 +242,8 @@ class Position
                 } elseif ($transaction->getTitle() == 'Verkauf') {
                     $value -= $transaction->calculateTransactionCostsNet();
                     $value += $transaction->getFee();
+                } elseif (in_array($transaction->getTitle(), ['Zins', 'Coupon'])) {
+                    $value -= $transaction->getRate();
                 }
             }
         }
@@ -257,6 +261,8 @@ class Position
                     $value += $transaction->calculateTransactionCostsNet();
                 } elseif ($transaction->getTitle() == 'Verkauf') {
                     $value -= $transaction->calculateTransactionCostsNet();
+                } elseif (in_array($transaction->getTitle(), ['Zins', 'Coupon'])) {
+                    $value -= $transaction->getRate();
                 }
             }
         }
@@ -313,6 +319,36 @@ class Position
         }
 
         return $result;
+    }
+
+
+    public function getCollectedInterest(): int
+    {
+        $value = 0;
+        if (null !== $this->transactions) {
+            foreach($this->getTransactions() as $transaction) {
+                if (in_array($transaction->getTitle(), self::TITLES_INTEREST)) {
+                    $value += $transaction->getRate();
+                }
+            }
+        }
+
+        return round($value);
+    }
+
+
+    public function getCollectedCoupons(): int
+    {
+        $value = 0;
+        if (null !== $this->transactions) {
+            foreach($this->getTransactions() as $transaction) {
+                if (in_array($transaction->getTitle(), self::TITLES_COUPON)) {
+                    $value += $transaction->getRate();
+                }
+            }
+        }
+
+        return round($value);
     }
 
 
