@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\BankAccount;
 use App\Entity\Currency;
 use App\Entity\LogEntry;
+use App\Entity\ManualDividend;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Share;
@@ -134,6 +135,17 @@ class PortfolioController extends BaseController
             $currency = $newPortfolio->getCurrencyByName($share->getCurrency()->getName());
             $newShare->setCurrency($currency);
             $newShare->setPortfolioId($newPortfolio->getId());
+
+            $newManualDividends = [];
+            foreach($share->getManualDividends() as $manualDividend) {
+                $newManualDividend = new ManualDividend();
+                $newManualDividend->setShare($newShare);
+                $newManualDividend->setAmount($manualDividend->getAmount());
+                $newManualDividend->setYear($manualDividend->getYear());
+                $newManualDividends[] = $newManualDividend;
+            }
+            $newShare->setManualDividends($newManualDividends);
+
             $this->getDoctrine()->getManager()->persist($newShare);
             $newShares[] = $newShare;
         }
@@ -183,6 +195,7 @@ class PortfolioController extends BaseController
                     $newTransactions[] = $newTransaction;
                 }
                 $newPosition->setTransactions($newTransactions);
+
                 $newPositions[] = $newPosition;
             }
             $newAccount->setPositions($newPositions);

@@ -116,7 +116,7 @@ class Share
     /**
      * @var Collection|ManualDividend[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\ManualDividend", mappedBy="share", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\ManualDividend", mappedBy="share", cascade={"remove", "persist"})
      */
     private $manualDividends;
 
