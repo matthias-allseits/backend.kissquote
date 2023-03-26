@@ -58,7 +58,7 @@ class Portfolio
     /**
      * @var Collection|Watchlist[]
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Watchlist", mappedBy="portfolio")
+     * @ORM\OneToMany(targetEntity="App\Entity\Watchlist", mappedBy="portfolio", cascade={"remove", "persist"})
      */
     private $watchlistEntries;
 

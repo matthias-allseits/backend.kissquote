@@ -11,6 +11,7 @@ use App\Entity\Position;
 use App\Entity\Share;
 use App\Entity\ShareheadShare;
 use App\Entity\Transaction;
+use App\Entity\Watchlist;
 use App\Helper\RandomizeHelper;
 use App\Service\BalanceService;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -104,6 +105,7 @@ class PortfolioController extends BaseController
         $randomUserName = RandomizeHelper::getRandomUserName();
         $randomHashKey = RandomizeHelper::getRandomHashKey();
 
+        /** @var Portfolio $demoPortfolio */
         $demoPortfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['id' => 169]);
         $demoCurrencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
         $demoPortfolio->setCurrencies($demoCurrencies);
@@ -203,6 +205,17 @@ class PortfolioController extends BaseController
             $newAccounts[] = $newAccount;
         }
         $newPortfolio->setBankAccounts($newAccounts);
+
+        $newWatchlistEntries = [];
+        foreach($demoPortfolio->getWatchlistEntries() as $entry) {
+            $newEntry = new Watchlist();
+            $newEntry->setPortfolio($newPortfolio);
+            $newEntry->setTitle($entry->getTitle());
+            $newEntry->setShareheadId($entry->getShareheadId());
+            $newEntry->setStartDate($entry->getStartDate());
+            $this->getDoctrine()->getManager()->persist($newEntry);
+        }
+        $newPortfolio->setWatchlistEntries($newWatchlistEntries);
 
         $this->makeLogEntry('create demo portfolio', $newPortfolio);
 
