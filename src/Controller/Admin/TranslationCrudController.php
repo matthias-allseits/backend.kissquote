@@ -3,9 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Translation;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
 
 class TranslationCrudController extends AbstractCrudController
@@ -25,4 +27,15 @@ class TranslationCrudController extends AbstractCrudController
             TextField::new('fr'),
         ];
     }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(TextFilter::new('key'))
+            ->add(TextFilter::new('de'))
+            ->add(TextFilter::new('en'))
+            ->add(TextFilter::new('fr'))
+            ;
+    }
+
 }
