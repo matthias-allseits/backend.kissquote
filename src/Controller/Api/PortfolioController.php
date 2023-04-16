@@ -153,11 +153,12 @@ class PortfolioController extends BaseController
         }
         $newPortfolio->setShares($newShares);
 
+        $accountNames = ['Konto A', 'Konto B'];
         $newAccounts = [];
-        foreach($demoPortfolio->getBankAccounts() as $account) {
+        foreach($demoPortfolio->getBankAccounts() as $i => $account) {
             $newAccount = new BankAccount();
             $newAccount->setPortfolio($newPortfolio);
-            $newAccount->setName($account->getName());
+            $newAccount->setName($accountNames[$i]);
             $this->getDoctrine()->getManager()->persist($newAccount);
 
             $newPositions = [];
