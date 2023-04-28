@@ -1,0 +1,113 @@
+<?php
+
+namespace App\Controller\Api;
+
+use App\Entity\Label;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use JMS\Serializer\SerializerBuilder;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+
+class LabelController extends BaseController
+{
+
+    /**
+     * @Rest\Get ("/label", name="list_labels")
+     * @param Request $request
+     * @return View
+     */
+    public function listLabels(Request $request): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+//        $labels = $portfolio->getLabels();
+
+        $labels = [];
+
+        $label = new Label();
+        $label->setName('Cashcow');
+        $labels[] = $label;
+
+        $label = new Label();
+        $label->setName('Trading');
+        $labels[] = $label;
+
+        $label = new Label();
+        $label->setName('Turnaround');
+        $labels[] = $label;
+
+        $label = new Label();
+        $label->setName('Crap');
+        $labels[] = $label;
+
+        return View::create($labels, Response::HTTP_CREATED);
+    }
+
+
+    /**
+     * @Rest\Post("/label", name="create_label")
+     * @param Request $request
+     * @return View
+     */
+    public function createLabel(Request $request): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        $serializer = SerializerBuilder::create()->build();
+        $content = json_decode($request->getContent());
+        /** @var Label $postedLabel */
+        $postedLabel = $serializer->deserialize(json_encode($content), Label::class, 'json');
+
+        $existingLabel = $portfolio->getLabelByName($postedLabel->getName());
+        if (null === $existingLabel) {
+            $postedLabel->setPortfolioId($portfolio->getId());
+
+            $this->getDoctrine()->getManager()->persist($postedLabel);
+            $this->getDoctrine()->getManager()->flush();
+        }
+
+        return new View("Label Creation Successfully", Response::HTTP_OK);
+    }
+
+
+    /**
+     * @Rest\Put("/label/{labelId}", name="update_label")
+     * @param Request $request
+     * @param int $labelId
+     * @return View
+     */
+    public function updateLabel(Request $request, int $labelId): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        $serializer = SerializerBuilder::create()->build();
+        $content = json_decode($request->getContent());
+//        unset($content->balance);
+//        unset($content->transactions);
+//        var_dump($content);
+        /** @var Label $puttedLabel */
+        $puttedLabel = $serializer->deserialize(json_encode($content), Label::class, 'json');
+
+        $existingLabel = $portfolio->getLabelById($puttedLabel->getId());
+
+        if (null !== $existingLabel && $puttedLabel->getId() == $existingLabel->getId()) {
+            $existingLabel->setName($puttedLabel->getName());
+
+            $this->getDoctrine()->getManager()->persist($existingLabel);
+
+            $this->makeLogEntry('update label', $existingLabel->getName());
+
+            $this->getDoctrine()->getManager()->flush();
+
+            return new View("Label Update Successfully", Response::HTTP_OK);
+        } else {
+
+            throw new AccessDeniedException();
+        }
+
+    }
+
+}
