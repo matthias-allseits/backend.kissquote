@@ -7,6 +7,7 @@ use App\Entity\Currency;
 use App\Entity\Dividend;
 use App\Entity\Feedback;
 use App\Entity\FeedbackProposal;
+use App\Entity\Label;
 use App\Entity\LogEntry;
 use App\Entity\ManualDividend;
 use App\Entity\Marketplace;
@@ -52,6 +53,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Transactions', 'fas fa-list', Transaction::class);
         yield MenuItem::linkToCrud('Dividends', 'fas fa-list', Dividend::class);
         yield MenuItem::linkToCrud('Currencies', 'fas fa-list', Currency::class);
+        yield MenuItem::linkToCrud('Labels', 'fas fa-list', Label::class);
         yield MenuItem::linkToCrud('Marketplaces', 'fas fa-list', Marketplace::class);
         yield MenuItem::linkToCrud('Sharehead Shares', 'fas fa-list', ShareheadShare::class);
         yield MenuItem::linkToCrud('StockRates', 'fas fa-list', Stockrate::class);

@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Currency;
+use App\Entity\Label;
 use App\Entity\LogEntry;
 use App\Entity\Portfolio;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -42,6 +43,8 @@ class BaseController extends AbstractFOSRestController
         } else {
             $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setCurrencies($currencies);
+            $labels = $this->getDoctrine()->getRepository(Label::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $portfolio->setLabels($labels);
             $this->portfolio = $portfolio;
         }
 

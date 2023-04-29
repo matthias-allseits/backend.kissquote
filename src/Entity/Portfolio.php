@@ -74,6 +74,12 @@ class Portfolio
      */
     private $currencies;
 
+    /**
+     * @var Label[]
+     * @Serializer\Exclude()
+     */
+    private $labels;
+
 
     public function __clone() {
         $this->id = null;
@@ -187,6 +193,34 @@ class Portfolio
         foreach ($this->currencies as $currency) {
             if ($currency->getId() == $id) {
                 $hit = $currency;
+            }
+        }
+
+        return $hit;
+    }
+
+
+    public function getLabelByName(string $name): ?Label
+    {
+        $hit = null;
+        if ($this->labels) {
+            foreach ($this->labels as $label) {
+                if ($label->getName() == $name) {
+                    $hit = $label;
+                }
+            }
+        }
+
+        return $hit;
+    }
+
+
+    public function getLabelById(int $id): ?Label
+    {
+        $hit = null;
+        foreach ($this->labels as $label) {
+            if ($label->getId() == $id) {
+                $hit = $label;
             }
         }
 
@@ -328,6 +362,22 @@ class Portfolio
     public function setCurrencies($currencies): void
     {
         $this->currencies = $currencies;
+    }
+
+    /**
+     * @return Label[]|Collection
+     */
+    public function getLabels(): array
+    {
+        return $this->labels;
+    }
+
+    /**
+     * @param Label[]|Collection $labels
+     */
+    public function setLabels(array $labels): void
+    {
+        $this->labels = $labels;
     }
 
 }

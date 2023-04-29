@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\BankAccount;
 use App\Entity\Currency;
+use App\Entity\Label;
 use App\Entity\LogEntry;
 use App\Entity\ManualDividend;
 use App\Entity\Portfolio;
@@ -51,6 +52,7 @@ class PortfolioController extends BaseController
         $this->getDoctrine()->getManager()->flush();
 
         $this->persistDefaultCurrencies($portfolio);
+        $this->persistDefaultLabels($portfolio);
 
         $this->makeLogEntry('create new portfolio', $portfolio);
 
@@ -123,6 +125,8 @@ class PortfolioController extends BaseController
 
         $newCurrencies = $this->persistDefaultCurrencies($newPortfolio);
         $newPortfolio->setCurrencies($newCurrencies);
+        $newLabels = $this->persistDefaultLabels($newPortfolio);
+        $newPortfolio->setLabels($newLabels);
 
         $newShares = [];
         foreach($demoPortfolio->getShares() as $share) {
@@ -260,6 +264,27 @@ class PortfolioController extends BaseController
         }
 
         return $newCurrencies;
+    }
+
+
+    /**
+     * @param Portfolio $portfolio
+     * @return Label[]
+     */
+    private function persistDefaultLabels(Portfolio $portfolio): array
+    {
+        $newLabels = [];
+
+        $labels = ['Strategisch', 'Taktisch', 'Zykliker', 'Turnaround', 'Trading'];
+        foreach ($labels as $label) {
+            $baseLabel = new Label();
+            $baseLabel->setPortfolioId($portfolio->getId());
+            $baseLabel->setName($label[0]);
+            $this->getDoctrine()->getManager()->persist($baseLabel);
+            $newLabels[] = $baseLabel;
+        }
+
+        return $newLabels;
     }
 
 }

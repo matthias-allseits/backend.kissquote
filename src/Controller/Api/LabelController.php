@@ -23,25 +23,7 @@ class LabelController extends BaseController
     {
         $portfolio = $this->getPortfolio($request);
 
-//        $labels = $portfolio->getLabels();
-
-        $labels = [];
-
-        $label = new Label();
-        $label->setName('Cashcow');
-        $labels[] = $label;
-
-        $label = new Label();
-        $label->setName('Trading');
-        $labels[] = $label;
-
-        $label = new Label();
-        $label->setName('Turnaround');
-        $labels[] = $label;
-
-        $label = new Label();
-        $label->setName('Crap');
-        $labels[] = $label;
+        $labels = $portfolio->getLabels();
 
         return View::create($labels, Response::HTTP_CREATED);
     }
@@ -108,6 +90,27 @@ class LabelController extends BaseController
             throw new AccessDeniedException();
         }
 
+    }
+
+
+    /**
+     * @Rest\Delete("/label/{labelId}", name="delete_label")
+     * @param Request $request
+     * @param int $labelId
+     * @return View
+     */
+    public function deleteLabel(Request $request, int $labelId): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        $label = $this->getDoctrine()->getRepository(Label::class)->find($labelId);
+        $this->getDoctrine()->getManager()->remove($label);
+
+        $this->makeLogEntry('delete label', $label);
+
+        $this->getDoctrine()->getManager()->flush();
+
+        return new View("Label Delete Successfully", Response::HTTP_OK);
     }
 
 }
