@@ -40,6 +40,14 @@ class Label
      */
     private $name;
 
+    /**
+     * @var string|null
+     * @Serializer\Type("string")
+     *
+     * @ORM\Column(name="color", type="string", length=16, nullable=true)
+     */
+    private $color;
+
 
     public function __clone()
     {
@@ -90,6 +98,22 @@ class Label
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param string|null $color
+     */
+    public function setColor(?string $color): void
+    {
+        $this->color = $color;
     }
 
 }

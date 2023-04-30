@@ -23,6 +23,7 @@ class LabelCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
             IntegerField::new('portfolioId'),
             TextField::new('name'),
+            TextField::new('color'),
         ];
     }
 

@@ -77,6 +77,7 @@ class LabelController extends BaseController
 
         if (null !== $existingLabel && $puttedLabel->getId() == $existingLabel->getId()) {
             $existingLabel->setName($puttedLabel->getName());
+            $existingLabel->setColor($puttedLabel->getColor());
 
             $this->getDoctrine()->getManager()->persist($existingLabel);
 
