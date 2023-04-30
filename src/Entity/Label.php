@@ -44,7 +44,7 @@ class Label
      * @var string|null
      * @Serializer\Type("string")
      *
-     * @ORM\Column(name="color", type="string", length=16, nullable=true)
+     * @ORM\Column(name="color", type="string", length=64, nullable=true)
      */
     private $color;
 
