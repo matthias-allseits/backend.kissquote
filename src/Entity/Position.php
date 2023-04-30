@@ -138,6 +138,17 @@ class Position
      */
     private $shareheadId;
 
+    /**
+     * Many Positions have Many Labels.
+     * @ORM\ManyToMany(targetEntity="Label")
+     * @ORM\JoinTable(name="position_label",
+     *      joinColumns={@ORM\JoinColumn(name="position_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="label_id", referencedColumnName="id")}
+     *      )
+     * @var Collection<int, Label>
+     */
+    private $labels;
+
 
 // todo: add annotations
 //    private $rates;
@@ -164,10 +175,10 @@ class Position
 
     public function __construct()
     {
+        $this->labels = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-
-	public function __toString()
+    public function __toString()
     {
         if (null !== $this->getShare()) {
 
@@ -639,6 +650,38 @@ class Position
     public function setShareheadId(?int $shareheadId): void
     {
         $this->shareheadId = $shareheadId;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getLabels(): Collection
+    {
+        return $this->labels;
+    }
+
+    /**
+     * @param Collection $labels
+     */
+    public function setLabels(Collection $labels): void
+    {
+        $this->labels = $labels;
+    }
+
+    /**
+     * @param Label $label
+     */
+    public function addLabel(Label $label): void
+    {
+        $this->labels[] = $label;
+    }
+
+    /**
+     * @param Label $label
+     */
+    public function removeLabel(Label $label)
+    {
+        $this->labels->removeElement($label);
     }
 
     /**

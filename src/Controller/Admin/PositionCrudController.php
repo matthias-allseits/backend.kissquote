@@ -30,6 +30,7 @@ class PositionCrudController extends AbstractCrudController
             DateField::new('activeUntil'),
             NumberField::new('shareheadId'),
             NumberField::new('manualDrawdown')->hideOnIndex(),
+            AssociationField::new('labels')->hideOnIndex(),
             BooleanField::new('active'),
             BooleanField::new('isCash'),
         ];
@@ -40,6 +41,7 @@ class PositionCrudController extends AbstractCrudController
         return $filters
             ->add('bankAccount')
             ->add('share')
+            ->add('active')
             ;
     }
 

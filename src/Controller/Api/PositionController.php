@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Label;
 use App\Entity\LogEntry;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
@@ -236,6 +237,56 @@ class PositionController extends BaseController
         $this->getDoctrine()->getManager()->flush();
 
         return new View("Position Delete Successfully", Response::HTTP_OK);
+    }
+
+
+    /**
+     * @Rest\Get("/position/{positionId}/label/{labelId}", name="add_position_label")
+     * @param Request $request
+     * @param int $positionId
+     * @param int $labelId
+     * @return View
+     */
+    public function addPositionLabel(Request $request, int $positionId, int $labelId): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        /** @var Position $position */
+        $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
+        $label = $this->getDoctrine()->getRepository(Label::class)->find($labelId);
+        $position->addLabel($label);
+        $this->getDoctrine()->getManager()->persist($position);
+
+        $this->makeLogEntry('add label', $position);
+
+        $this->getDoctrine()->getManager()->flush();
+
+        return new View("Label Removed Successfully", Response::HTTP_OK);
+    }
+
+
+    /**
+     * @Rest\Delete("/position/{positionId}/label/{labelId}", name="delete_position_label")
+     * @param Request $request
+     * @param int $positionId
+     * @param int $labelId
+     * @return View
+     */
+    public function deletePositionLabel(Request $request, int $positionId, int $labelId): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        /** @var Position $position */
+        $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
+        $label = $this->getDoctrine()->getRepository(Label::class)->find($labelId);
+        $position->removeLabel($label);
+        $this->getDoctrine()->getManager()->persist($position);
+
+        $this->makeLogEntry('removed label', $position);
+
+        $this->getDoctrine()->getManager()->flush();
+
+        return new View("Label Removed Successfully", Response::HTTP_OK);
     }
 
 
