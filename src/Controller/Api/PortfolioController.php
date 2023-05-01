@@ -125,7 +125,16 @@ class PortfolioController extends BaseController
 
         $newCurrencies = $this->persistDefaultCurrencies($newPortfolio);
         $newPortfolio->setCurrencies($newCurrencies);
-        $newLabels = $this->persistDefaultLabels($newPortfolio);
+
+        /** @var Label[] $demoLabels */
+        $demoLabels = $this->getDoctrine()->getRepository(Label::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
+        $newLabels = [];
+        foreach($demoLabels as $demoLabel) {
+            $newLabel = clone $demoLabel;
+            $newLabel->setPortfolioId($newPortfolio->getId());
+            $this->getDoctrine()->getManager()->persist($newLabel);
+            $newLabels[] = $newLabel;
+        }
         $newPortfolio->setLabels($newLabels);
 
         $newShares = [];
@@ -203,6 +212,11 @@ class PortfolioController extends BaseController
                 }
                 $newPosition->setTransactions($newTransactions);
 
+                foreach($position->getLabels() as $label) {
+                    $label = $newPortfolio->getLabelByName($label->getName());
+                    $newPosition->addLabel($label);
+                }
+
                 $newPositions[] = $newPosition;
             }
             $newAccount->setPositions($newPositions);
@@ -279,7 +293,7 @@ class PortfolioController extends BaseController
         foreach ($labels as $label) {
             $baseLabel = new Label();
             $baseLabel->setPortfolioId($portfolio->getId());
-            $baseLabel->setName($label[0]);
+            $baseLabel->setName($label);
             $this->getDoctrine()->getManager()->persist($baseLabel);
             $newLabels[] = $baseLabel;
         }
