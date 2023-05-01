@@ -146,6 +146,7 @@ class Position
      *      inverseJoinColumns={@ORM\JoinColumn(name="label_id", referencedColumnName="id")}
      *      )
      * @var Collection<int, Label>
+     * @Serializer\Type("ArrayCollection<App\Entity\Label>")
      */
     private $labels;
 
