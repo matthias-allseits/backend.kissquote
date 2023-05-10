@@ -6,6 +6,7 @@ use App\Entity\Currency;
 use App\Entity\Label;
 use App\Entity\LogEntry;
 use App\Entity\Portfolio;
+use App\Entity\Sector;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -43,6 +44,8 @@ class BaseController extends AbstractFOSRestController
         } else {
             $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setCurrencies($currencies);
+            $sectors = $this->getDoctrine()->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $portfolio->setSectors($sectors);
             $labels = $this->getDoctrine()->getRepository(Label::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setLabels($labels);
             $this->portfolio = $portfolio;

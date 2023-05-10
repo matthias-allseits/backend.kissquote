@@ -69,6 +69,17 @@ class Position
     private $currency;
 
     /**
+     * @var Sector|null
+     * @Serializer\Type("App\Entity\Sector")
+     *
+     * @ORM\ManyToOne(targetEntity="Sector")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="sector_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $sector;
+
+    /**
      * @var boolean
      * @Serializer\Type("boolean")
      *
@@ -511,6 +522,22 @@ class Position
     public function setCurrency(?Currency $currency): void
     {
         $this->currency = $currency;
+    }
+
+    /**
+     * @return Sector|null
+     */
+    public function getSector(): ?Sector
+    {
+        return $this->sector;
+    }
+
+    /**
+     * @param Sector|null $sector
+     */
+    public function setSector(?Sector $sector): void
+    {
+        $this->sector = $sector;
     }
 
     /**

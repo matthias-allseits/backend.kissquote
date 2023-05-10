@@ -75,6 +75,12 @@ class Portfolio
     private $currencies;
 
     /**
+     * @var Sector[]
+     * @Serializer\Exclude()
+     */
+    private $sectors;
+
+    /**
      * @var Label[]
      * @Serializer\Exclude()
      */
@@ -187,12 +193,38 @@ class Portfolio
     }
 
 
+    public function getSectorByName(string $name): ?Sector
+    {
+        $hit = null;
+        foreach ($this->sectors as $sector) {
+            if ($sector->getName() == $name) {
+                $hit = $sector;
+            }
+        }
+
+        return $hit;
+    }
+
+
     public function getCurrencyById(int $id): ?Currency
     {
         $hit = null;
         foreach ($this->currencies as $currency) {
             if ($currency->getId() == $id) {
                 $hit = $currency;
+            }
+        }
+
+        return $hit;
+    }
+
+
+    public function getSectorById(int $id): ?Sector
+    {
+        $hit = null;
+        foreach ($this->sectors as $sector) {
+            if ($sector->getId() == $id) {
+                $hit = $sector;
             }
         }
 
@@ -362,6 +394,22 @@ class Portfolio
     public function setCurrencies($currencies): void
     {
         $this->currencies = $currencies;
+    }
+
+    /**
+     * @return Sector[]|Collection
+     */
+    public function getSectors(): array
+    {
+        return $this->sectors;
+    }
+
+    /**
+     * @param Sector[]|Collection $sectors
+     */
+    public function setSectors($sectors): void
+    {
+        $this->sectors = $sectors;
     }
 
     /**

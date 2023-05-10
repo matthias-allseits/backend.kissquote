@@ -6,6 +6,7 @@ use App\Entity\Currency;
 use App\Entity\Feedback;
 use App\Entity\LogEntry;
 use App\Entity\Portfolio;
+use App\Entity\Sector;
 use App\Entity\Share;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,8 @@ class HomeController extends AbstractController
         foreach($portfolios as $portfolio) {
             $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setCurrencies($currencies);
+            $sectors = $this->getDoctrine()->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $portfolio->setSectors($sectors);
             $shares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setShares($shares);
         }
