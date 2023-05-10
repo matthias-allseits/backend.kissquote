@@ -7,6 +7,7 @@ use App\Entity\LogEntry;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
+use App\Entity\Sector;
 use App\Service\BalanceService;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -204,6 +205,12 @@ class PositionController extends BaseController
 
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
             $oldPosition->getShare()->setMarketplace($marketplace);
+
+            $sector = null;
+            if ($newPosition->getSector()) {
+                $sector = $this->getDoctrine()->getRepository(Sector::class)->find($newPosition->getSector()->getId());
+            }
+            $oldPosition->setSector($sector);
 
             $this->persistCurrency($portfolio, $newPosition, $oldPosition);
 

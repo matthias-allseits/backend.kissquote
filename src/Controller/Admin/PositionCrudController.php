@@ -26,6 +26,7 @@ class PositionCrudController extends AbstractCrudController
             AssociationField::new('bankAccount'),
             AssociationField::new('share'),
             AssociationField::new('currency'),
+            AssociationField::new('sector'),
             DateField::new('activeFrom'),
             DateField::new('activeUntil'),
             NumberField::new('shareheadId'),
@@ -41,6 +42,8 @@ class PositionCrudController extends AbstractCrudController
         return $filters
             ->add('bankAccount')
             ->add('share')
+            ->add('currency')
+            ->add('sector')
             ->add('active')
             ;
     }
