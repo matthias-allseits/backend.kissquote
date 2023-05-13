@@ -9,6 +9,7 @@ use App\Entity\LogEntry;
 use App\Entity\ManualDividend;
 use App\Entity\Portfolio;
 use App\Entity\Position;
+use App\Entity\Sector;
 use App\Entity\Share;
 use App\Entity\ShareheadShare;
 use App\Entity\Transaction;
@@ -53,6 +54,7 @@ class PortfolioController extends BaseController
 
         $this->persistDefaultCurrencies($portfolio);
         $this->persistDefaultLabels($portfolio);
+        $this->persistDefaultSectors($portfolio);
 
         $this->makeLogEntry('create new portfolio', $portfolio);
 
@@ -137,6 +139,17 @@ class PortfolioController extends BaseController
         }
         $newPortfolio->setLabels($newLabels);
 
+        /** @var Sector[] $demoSectors */
+        $demoSectors = $this->getDoctrine()->getRepository(Sector::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
+        $newSectors = [];
+        foreach($demoSectors as $sector) {
+            $newSector = clone $sector;
+            $newSector->setPortfolioId($newPortfolio->getId());
+            $this->getDoctrine()->getManager()->persist($newSector);
+            $newSectors[] = $newSector;
+        }
+        $newPortfolio->setSectors($newSectors);
+
         $newShares = [];
         foreach($demoPortfolio->getShares() as $share) {
             $newShare = new Share();
@@ -211,6 +224,12 @@ class PortfolioController extends BaseController
                     $newTransactions[] = $newTransaction;
                 }
                 $newPosition->setTransactions($newTransactions);
+
+                $sector = null;
+                if (null !== $position->getSector()) {
+                    $sector = $newPortfolio->getSectorByName($position->getSector()->getName());
+                }
+                $newPosition->setSector($sector);
 
                 foreach($position->getLabels() as $label) {
                     $label = $newPortfolio->getLabelByName($label->getName());
@@ -299,6 +318,27 @@ class PortfolioController extends BaseController
         }
 
         return $newLabels;
+    }
+
+
+    /**
+     * @param Portfolio $portfolio
+     * @return Label[]
+     */
+    private function persistDefaultSectors(Portfolio $portfolio): array
+    {
+        $newSectors = [];
+
+        $sectors = ['Technologie', 'Industrie', 'Pharma', 'Rohstoffe', 'Banken', 'Versicherungen'];
+        foreach ($sectors as $sector) {
+            $baseSector = new Sector();
+            $baseSector->setPortfolioId($portfolio->getId());
+            $baseSector->setName($sector);
+            $this->getDoctrine()->getManager()->persist($baseSector);
+            $newSectors[] = $baseSector;
+        }
+
+        return $newSectors;
     }
 
 }

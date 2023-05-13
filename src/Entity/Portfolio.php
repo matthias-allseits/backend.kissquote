@@ -196,9 +196,11 @@ class Portfolio
     public function getSectorByName(string $name): ?Sector
     {
         $hit = null;
-        foreach ($this->sectors as $sector) {
-            if ($sector->getName() == $name) {
-                $hit = $sector;
+        if (is_array($this->sectors)) {
+            foreach ($this->sectors as $sector) {
+                if ($sector->getName() == $name) {
+                    $hit = $sector;
+                }
             }
         }
 
