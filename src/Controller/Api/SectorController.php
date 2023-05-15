@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Position;
 use App\Entity\Sector;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -99,6 +100,12 @@ class SectorController extends BaseController
     public function deleteSector(Request $request, int $sectorId): View
     {
         $portfolio = $this->getPortfolio($request);
+
+        $affectedPositions = $this->getDoctrine()->getRepository(Position::class)->findBy(['sector' => $sectorId]);
+        foreach($affectedPositions as $position) {
+            $position->setSector(null);
+            $this->getDoctrine()->getManager()->persist($position);
+        }
 
         $sector = $this->getDoctrine()->getRepository(Sector::class)->find($sectorId);
         $this->getDoctrine()->getManager()->remove($sector);

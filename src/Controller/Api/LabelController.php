@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Label;
+use App\Entity\Position;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -105,6 +106,22 @@ class LabelController extends BaseController
         $portfolio = $this->getPortfolio($request);
 
         $label = $this->getDoctrine()->getRepository(Label::class)->find($labelId);
+
+        $query = $this->getDoctrine()->getManager()->createQuery(
+            'SELECT p FROM App\Entity\Position p
+                JOIN p.labels l
+                WHERE l.id = :labelId
+                ORDER BY p.id ASC'
+        )
+            ->setParameter('labelId', $labelId)
+        ;
+        /** @var Position[] $positions */
+        $positions = $query->getResult();
+        foreach($positions as $position) {
+            $position->removeLabel($label);
+            $this->getDoctrine()->getManager()->persist($position);
+        }
+
         $this->getDoctrine()->getManager()->remove($label);
 
         $this->makeLogEntry('delete label', $label);
