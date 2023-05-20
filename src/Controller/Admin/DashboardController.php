@@ -13,6 +13,7 @@ use App\Entity\ManualDividend;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
+use App\Entity\PositionLog;
 use App\Entity\Sector;
 use App\Entity\Share;
 use App\Entity\ShareheadShare;
@@ -64,6 +65,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Feedback Proposals', 'fas fa-list', FeedbackProposal::class);
         yield MenuItem::linkToCrud('Feedbacks', 'fas fa-list', Feedback::class);
         yield MenuItem::linkToCrud('Watchlist Entries', 'fas fa-list', Watchlist::class);
+        yield MenuItem::linkToCrud('PositionLog', 'fas fa-list', PositionLog::class);
         yield MenuItem::linkToCrud('LogEntries', 'fas fa-list', LogEntry::class);
     }
 

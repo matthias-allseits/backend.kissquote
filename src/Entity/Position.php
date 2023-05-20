@@ -114,6 +114,14 @@ class Position
     private $transactions;
 
     /**
+     * @var Collection
+     * @Serializer\Type("ArrayCollection<App\Entity\PositionLog>")
+     *
+     * @ORM\OneToMany(targetEntity="PositionLog", mappedBy="position", cascade={"remove", "persist"})
+     */
+    private $logEntries;
+
+    /**
      * @var boolean
      * @Serializer\Type("boolean")
      * @Serializer\SerializedName("isCash")
@@ -614,6 +622,22 @@ class Position
     public function setTransactions(?array $transactions): void
     {
         $this->transactions = $transactions;
+    }
+
+    /**
+     * @return Collection|PositionLog[]
+     */
+    public function getLogEntries(): Collection
+    {
+        return $this->logEntries;
+    }
+
+    /**
+     * @param Collection|null $logEntries
+     */
+    public function setLogEntries(?Collection $logEntries): void
+    {
+        $this->logEntries = $logEntries;
     }
 
     /**
