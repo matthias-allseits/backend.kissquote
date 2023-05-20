@@ -6,6 +6,8 @@ use App\Entity\Currency;
 use App\Entity\Label;
 use App\Entity\LogEntry;
 use App\Entity\Portfolio;
+use App\Entity\Position;
+use App\Entity\PositionLog;
 use App\Entity\Sector;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +28,18 @@ class BaseController extends AbstractFOSRestController
         $logEntry->setDateTime(new \DateTime());
         $logEntry->setAction($action);
         $logEntry->setResult($object);
+        $this->getDoctrine()->getManager()->persist($logEntry);
+        $this->getDoctrine()->getManager()->flush();
+    }
+
+
+    protected function addPositionLogEntry(string $log, Position $position): void
+    {
+        $logEntry = new PositionLog();
+        $logEntry->setPosition($position);
+        $logEntry->setDate(new \DateTime());
+        $logEntry->setLog($log);
+        $logEntry->setEmoticon('neutral');
         $this->getDoctrine()->getManager()->persist($logEntry);
         $this->getDoctrine()->getManager()->flush();
     }

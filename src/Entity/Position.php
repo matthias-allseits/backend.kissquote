@@ -633,9 +633,9 @@ class Position
     }
 
     /**
-     * @param Collection|null $logEntries
+     * @param $logEntries
      */
-    public function setLogEntries(?Collection $logEntries): void
+    public function setLogEntries($logEntries): void
     {
         $this->logEntries = $logEntries;
     }

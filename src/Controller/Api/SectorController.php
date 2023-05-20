@@ -101,13 +101,14 @@ class SectorController extends BaseController
     {
         $portfolio = $this->getPortfolio($request);
 
+        $sector = $this->getDoctrine()->getRepository(Sector::class)->find($sectorId);
+
         $affectedPositions = $this->getDoctrine()->getRepository(Position::class)->findBy(['sector' => $sectorId]);
         foreach($affectedPositions as $position) {
             $position->setSector(null);
             $this->getDoctrine()->getManager()->persist($position);
+            $this->addPositionLogEntry('Entferne gelöschten Sektor: ' . $sector->getName(), $position);
         }
-
-        $sector = $this->getDoctrine()->getRepository(Sector::class)->find($sectorId);
         $this->getDoctrine()->getManager()->remove($sector);
 
         $this->makeLogEntry('delete sector', $sector);

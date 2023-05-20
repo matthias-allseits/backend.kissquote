@@ -9,6 +9,7 @@ use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Sector;
 use App\Service\BalanceService;
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -38,6 +39,8 @@ class PositionController extends BaseController
             $balance = $balanceService->getBalanceForPosition($position);
             $position->setBalance($balance);
         }
+        $position->setLogEntries(new ArrayCollection(array_reverse($position->getLogEntries()->toArray())));
+//        $position->setTransactions(array_reverse($position->getTransactions()));
 
         return View::create($position, Response::HTTP_CREATED);
     }
@@ -201,6 +204,13 @@ class PositionController extends BaseController
             $oldPosition->setShareheadId($newPosition->getShareheadId());
             $oldPosition->getShare()->setName($newPosition->getShare()->getName());
             $oldPosition->getShare()->setIsin($newPosition->getShare()->getIsin());
+            if ($oldPosition->getManualDrawdown() != $newPosition->getManualDrawdown()) {
+                if ($newPosition->getManualDrawdown() > 0) {
+                    $this->addPositionLogEntry('Setze manuellen Drawdown auf: ' . $newPosition->getManualDrawdown() . '%', $oldPosition);
+                } else {
+                    $this->addPositionLogEntry('Entferne manuellen Drawdown', $oldPosition);
+                }
+            }
             $oldPosition->setManualDrawdown($newPosition->getManualDrawdown());
 
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
@@ -209,6 +219,13 @@ class PositionController extends BaseController
             $sector = null;
             if ($newPosition->getSector()) {
                 $sector = $this->getDoctrine()->getRepository(Sector::class)->find($newPosition->getSector()->getId());
+            }
+            if ($oldPosition->getSector() != $sector) {
+                if (null === $sector && null !== $oldPosition->getSector()) {
+                    $this->addPositionLogEntry('Entferne zugewiesenen Sektor: ' . $oldPosition->getSector()->getName(), $oldPosition);
+                } elseif (null !== $sector) {
+                    $this->addPositionLogEntry('Ändere den zugewiesenen Sektor auf: ' . $sector->getName(), $oldPosition);
+                }
             }
             $oldPosition->setSector($sector);
 
@@ -268,6 +285,8 @@ class PositionController extends BaseController
 
         $this->getDoctrine()->getManager()->flush();
 
+        $this->addPositionLogEntry('Füge Label hinzu: ' . $label->getName(), $position);
+
         return new View("Label Removed Successfully", Response::HTTP_OK);
     }
 
@@ -292,6 +311,8 @@ class PositionController extends BaseController
         $this->makeLogEntry('removed label', $position);
 
         $this->getDoctrine()->getManager()->flush();
+
+        $this->addPositionLogEntry('Entferne Label: ' . $label->getName(), $position);
 
         return new View("Label Removed Successfully", Response::HTTP_OK);
     }

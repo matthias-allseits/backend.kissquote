@@ -9,6 +9,7 @@ use App\Entity\LogEntry;
 use App\Entity\ManualDividend;
 use App\Entity\Portfolio;
 use App\Entity\Position;
+use App\Entity\PositionLog;
 use App\Entity\Sector;
 use App\Entity\Share;
 use App\Entity\ShareheadShare;
@@ -224,6 +225,17 @@ class PortfolioController extends BaseController
                     $newTransactions[] = $newTransaction;
                 }
                 $newPosition->setTransactions($newTransactions);
+
+                $newLogEntries = [];
+                foreach($position->getLogEntries() as $logEntry) {
+                    $newLogEntry = new PositionLog();
+                    $newLogEntry->setPosition($newPosition);
+                    $newLogEntry->setDate($logEntry->getDate());
+                    $newLogEntry->setLog($logEntry->getLog());
+                    $newLogEntry->setEmoticon($logEntry->getEmoticon());
+                    $newLogEntries[] = $newLogEntry;
+                }
+                $newPosition->setLogEntries($newLogEntries);
 
                 $sector = null;
                 if (null !== $position->getSector()) {
