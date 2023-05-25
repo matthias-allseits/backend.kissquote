@@ -41,7 +41,7 @@ class BalanceService
                 $yesterday = new \DateTime();
                 $yesterday->sub(new \DateInterval('P1D'));
                 $oneWeekAgo = new \DateTime();
-                $oneWeekAgo->sub(new \DateInterval('P1D'));
+                $oneWeekAgo->sub(new \DateInterval('P7D'));
                 $oneMonthAgo = new \DateTime();
                 $oneMonthAgo->sub(new \DateInterval('P1M'));
                 $threeMonthsAgo = new \DateTime();
@@ -50,11 +50,13 @@ class BalanceService
                 $sixMonthsAgo->sub(new \DateInterval('P6M'));
                 $oneYearAgo = new \DateTime();
                 $oneYearAgo->sub(new \DateInterval('P1Y'));
-                $performanceDates = [$yesterday, $oneWeekAgo, $oneMonthAgo, $threeMonthsAgo, $sixMonthsAgo, $oneYearAgo];
+                $threeYearAgo = new \DateTime();
+                $threeYearAgo->sub(new \DateInterval('P3Y'));
+                $performanceDates = [$yesterday, $oneWeekAgo, $oneMonthAgo, $threeMonthsAgo, $sixMonthsAgo, $oneYearAgo, $threeYearAgo];
                 foreach($performanceDates as $date) {
                     $rate = $this->getRateByDate($date, $position);
                     if (null !== $rate) {
-                        $value = round((100 / $lastRate->getRate() * $rate->getRate()) - 100);
+                        $value = round((100 / $rate->getRate() * $lastRate->getRate()) - 100, 1);
                         $performance[] = $value;
                     }
                 }
