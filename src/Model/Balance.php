@@ -54,6 +54,9 @@ class Balance
     /** @var int */
     private $closedResult;
 
+    /** @var float[] */
+    private $performance = [];
+
 
     public function __construct(Position $position)
     {
@@ -86,6 +89,7 @@ class Balance
                 }
             }
         }
+        $this->performance = [];
 
         $this->lastRate = null;
     }
@@ -96,6 +100,14 @@ class Balance
     public function setLastRate(?Stockrate $lastRate): void
     {
         $this->lastRate = $lastRate;
+    }
+
+    /**
+     * @param array $performance
+     */
+    public function setPerformanceData(array $performance): void
+    {
+        $this->performance = $performance;
     }
 
 }
