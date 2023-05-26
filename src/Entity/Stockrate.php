@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Stockrate
  *
  * @ORM\Table(name="stockrate")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\StockrateRepository")
  */
 class Stockrate
 {
