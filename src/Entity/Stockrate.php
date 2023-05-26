@@ -8,7 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Stockrate
  *
- * @ORM\Table(name="stockrate")
+ * @ORM\Table(name="stockrate",indexes={
+ *     @ORM\Index(name="isin_idx", columns={"isin"})
+ * })
  * @ORM\Entity(repositoryClass="App\Repository\StockrateRepository")
  */
 class Stockrate
