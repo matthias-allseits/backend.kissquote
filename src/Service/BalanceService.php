@@ -76,19 +76,7 @@ class BalanceService
     private function getRateByDate(\DateTime $date, Position $position): ?Stockrate
     {
         $currencyName = $position->getCurrency()->getName();
-//        /** @var Stockrate $rate */
-//        $allRates = $this->em->getRepository(Stockrate::class)->findBy(
-//            ['isin' => $position->getShare()->getIsin(), 'marketplace' => $position->getShare()->getMarketplace(), 'currencyName' => $currencyName],
-//            ['date' => 'DESC']
-//        );
-//        $hit = null;
-//        foreach($allRates as $rate) {
-//            if ($rate->getDate() <= $date) {
-//                $hit = $rate;
-//                break;
-//            }
-//        }
-//        /** @var StockrateRepository $repos */
+        /** @var StockrateRepository $repos */
         $repos = $this->em->getRepository(Stockrate::class);
         $hit = $repos->getLastRateByIsinAndMarketAndCurrencyNameAndDate($position->getShare()->getIsin(), $position->getShare()->getMarketplace(), $currencyName, $date);
 

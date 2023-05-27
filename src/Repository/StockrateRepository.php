@@ -34,7 +34,7 @@ class StockrateRepository extends ServiceEntityRepository
             ->setParameter('isin', $isin)
             ->setParameter('market', $market)
             ->setParameter('currencyName', $currencyName)
-            ->setParameter('date', $date)
+            ->setParameter('date', $date->format('Y-m-d'))
         ;
         /** @var Stockrate[] $results */
         $results = $query->getResult();
