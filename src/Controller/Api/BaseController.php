@@ -39,7 +39,7 @@ class BaseController extends AbstractFOSRestController
         $logEntry->setPosition($position);
         $logEntry->setDate(new \DateTime());
         $logEntry->setLog($log);
-        $logEntry->setEmoticon('neutral');
+        $logEntry->setEmoticon('😑');
         $this->getDoctrine()->getManager()->persist($logEntry);
         $this->getDoctrine()->getManager()->flush();
     }
