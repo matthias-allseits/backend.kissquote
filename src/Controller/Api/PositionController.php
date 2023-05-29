@@ -213,6 +213,15 @@ class PositionController extends BaseController
             }
             $oldPosition->setManualDrawdown($newPosition->getManualDrawdown());
 
+            if ($oldPosition->getManualDividendDrop() !== $newPosition->getManualDividendDrop()) {
+                if (is_int($newPosition->getManualDividendDrop()) > 0) {
+                    $this->addPositionLogEntry('Setze manuellen Dividend Drop auf: ' . $newPosition->getManualDividendDrop() . '%', $oldPosition);
+                } else {
+                    $this->addPositionLogEntry('Entferne manuellen Dividend Drop', $oldPosition);
+                }
+            }
+            $oldPosition->setManualDividendDrop($newPosition->getManualDividendDrop());
+
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
             $oldPosition->getShare()->setMarketplace($marketplace);
 

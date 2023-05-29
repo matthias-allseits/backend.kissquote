@@ -149,6 +149,15 @@ class Position
     private $manualDrawdown;
 
     /**
+     * @var int|null
+     * @Serializer\Type("integer")
+     * @Serializer\SerializedName("manualDividendDrop")
+     *
+     * @ORM\Column(name="manual_dividend_drop", type="smallint", nullable=true)
+     */
+    private $manualDividendDrop;
+
+    /**
      * @var integer|null
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("shareheadId")
@@ -686,6 +695,22 @@ class Position
     public function setManualDrawdown(?int $manualDrawdown): void
     {
         $this->manualDrawdown = $manualDrawdown;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getManualDividendDrop(): ?int
+    {
+        return $this->manualDividendDrop;
+    }
+
+    /**
+     * @param int|null $manualDividendDrop
+     */
+    public function setManualDividendDrop(?int $manualDividendDrop): void
+    {
+        $this->manualDividendDrop = $manualDividendDrop;
     }
 
     /**
