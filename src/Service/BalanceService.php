@@ -40,7 +40,11 @@ class BalanceService
 
                 if ($position->isActive()) {
                     $yesterday = new \DateTime();
-                    $yesterday->sub(new \DateInterval('P1D'));
+                    if ((int) $yesterday->format('H') <= 18) {
+                        $yesterday->sub(new \DateInterval('P2D'));
+                    } else {
+                        $yesterday->sub(new \DateInterval('P1D'));
+                    }
                     $oneWeekAgo = new \DateTime();
                     $oneWeekAgo->sub(new \DateInterval('P7D'));
                     $oneMonthAgo = new \DateTime();
