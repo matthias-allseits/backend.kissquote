@@ -22,7 +22,7 @@ class PositionController extends BaseController
 {
 
     /**
-     * @Rest\Get ("/position/{positionId}", name="get_position")
+     * @Rest\Get ("/position/{positionId}", name="get_position", requirements={"positionId"="\d+"})
      * @param Request $request
      * @param int $positionId
      * @param BalanceService $balanceService
@@ -64,6 +64,31 @@ class PositionController extends BaseController
         }
 
         return View::create($positions, Response::HTTP_CREATED);
+    }
+
+
+    /**
+     * @Rest\Get ("/position/active", name="list_active_positions")
+     * @param Request $request
+     * @return View
+     * @throws \Exception
+     */
+    public function listActivePositions(Request $request): View
+    {
+        $portfolio = $this->getPortfolio($request);
+
+        $positions = $portfolio->getAllPositions();
+        $activePositions = [];
+        foreach($positions as $position) {
+            if ($position->isActive()) {
+                $position->setBankAccount(null);
+                $position->setShare(null);
+                $position->setCurrency(null);
+                $activePositions[] = $position;
+            }
+        }
+
+        return View::create($activePositions, Response::HTTP_CREATED);
     }
 
 
