@@ -22,6 +22,7 @@ class ShareRatesCrawler extends Command
     /** @var OutputInterface $output */
     private $output;
     private $sleep = 5;
+    private $verbose;
 
     public function __construct(EntityManagerInterface $entityManager, SpiderHelper $spiderHelper)
     {
@@ -43,6 +44,7 @@ class ShareRatesCrawler extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->verbose = $input->getOption('verbose');
         if ($input->getOption('force')) {
             $force = true;
         } else {
@@ -76,7 +78,7 @@ class ShareRatesCrawler extends Command
         $allShares = $this->entityManager->getRepository(Share::class)->findAll();
 
 //        $allShares = [];
-//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(2251);
+//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3303);
 
         $filteredShares = [];
         $doubleCheck = [];
@@ -98,7 +100,13 @@ class ShareRatesCrawler extends Command
             try {
                 $url = $share->getSwissquoteUrl();
                 $rate = $this->getRateBySwissquoteUrl($url, $share);
+                if ($this->verbose) {
+                    $this->output->writeln('rate: ' . $rate);
+                }
             } catch (\Exception $e) {
+                if ($this->verbose) {
+                    $this->output->writeln($e);
+                }
                 $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
                 $rate = null;
             }
@@ -148,6 +156,12 @@ class ShareRatesCrawler extends Command
         if (strpos($rateCell, 'Estim:') > -1) {
             $rateCell = substr($rateCell, 0, strpos($rateCell, 'Estim:'));
         }
+        if (strpos($rateCell, 'Referenzpreis:') > -1) {
+            $rateCell = substr($rateCell, strpos($rateCell, 'Referenzpreis:') + 15, 6);
+        }
+        if ($this->verbose) {
+            $this->output->writeln('rateCell: ' .  $rateCell);
+        }
         $rateCell = str_replace('&nbsp;', ' ', $rateCell);
         $rateCell = trim($rateCell);
         $rateCell = str_replace('\'', '', $rateCell);
@@ -165,16 +179,25 @@ class ShareRatesCrawler extends Command
             $currency = 'GBP';
             $rate /= 100;
         }
-        if (strpos($currency, '%') > -1) { // brc handling
-            $currency = 'CHF';
+
+        if ($this->verbose) {
+            $this->output->writeln('currency: ' .  $currency);
+        }
+        if (strpos($share->getName(), 'BRC') > -1) { // brc handling
+            if (strpos($content, 'CHF') > -1) {
+                $currency = 'CHF';
+            } elseif (strpos($content, 'USD') > -1) {
+                $currency = 'USD';
+            }
             $rate *= 10;
         }
 
         $dateCell = $crawler->filter('tr.FullquoteTable__body td')->eq(0)->text();
         $dateCell = trim($dateCell);
         $explDate = explode('-', $dateCell);
-        $date = new \DateTime($explDate[2] . '-' . $explDate[1] . '-' . $explDate[0]);
-        if (strpos($content, 'Basiswerte') > -1) { // freestyle hack for barrier reverse convertibles
+        if (count($explDate) > 2) {
+            $date = new \DateTime($explDate[2] . '-' . $explDate[1] . '-' . $explDate[0]);
+        } else { // freestyle hack for barrier reverse convertibles
             $date = new \DateTime();
         }
 
