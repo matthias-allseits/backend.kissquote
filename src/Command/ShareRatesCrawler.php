@@ -195,7 +195,7 @@ class ShareRatesCrawler extends Command
         $dateCell = $crawler->filter('tr.FullquoteTable__body td')->eq(0)->text();
         $dateCell = trim($dateCell);
         $explDate = explode('-', $dateCell);
-        if (count($explDate) > 2) {
+        if (count($explDate) > 2 && strpos($share->getName(), 'BRC') == -1) {
             $date = new \DateTime($explDate[2] . '-' . $explDate[1] . '-' . $explDate[0]);
         } else { // freestyle hack for barrier reverse convertibles
             $date = new \DateTime();
