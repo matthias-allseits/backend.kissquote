@@ -40,7 +40,8 @@ class BalanceService
 
                 if ($position->isActive()) {
                     $yesterday = new \DateTime();
-                    if ((int) $yesterday->format('H') <= 18) {
+//                    var_dump($yesterday->format('Y-m-d H:i:s e'));
+                    if ((int) $yesterday->format('H') < 18) {
                         $yesterday->sub(new \DateInterval('P2D'));
                     } else {
                         $yesterday->sub(new \DateInterval('P1D'));
