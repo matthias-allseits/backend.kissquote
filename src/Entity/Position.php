@@ -167,6 +167,15 @@ class Position
     private $shareheadId;
 
     /**
+     * @var float|null
+     * @Serializer\Type("float")
+     * @Serializer\SerializedName("stopLoss")
+     *
+     * @ORM\Column(name="stop_loss", type="float", precision=10, scale=3, nullable=true)
+     */
+    private $stopLoss;
+
+    /**
      * Many Positions have Many Labels.
      * @ORM\ManyToMany(targetEntity="Label")
      * @ORM\JoinTable(name="position_label",
@@ -727,6 +736,22 @@ class Position
     public function setShareheadId(?int $shareheadId): void
     {
         $this->shareheadId = $shareheadId;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getStopLoss(): ?float
+    {
+        return $this->stopLoss;
+    }
+
+    /**
+     * @param float|null $stopLoss
+     */
+    public function setStopLoss(?float $stopLoss): void
+    {
+        $this->stopLoss = $stopLoss;
     }
 
     /**

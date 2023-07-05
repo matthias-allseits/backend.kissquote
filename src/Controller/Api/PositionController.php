@@ -247,6 +247,15 @@ class PositionController extends BaseController
             }
             $oldPosition->setManualDividendDrop($newPosition->getManualDividendDrop());
 
+            if ($oldPosition->getStopLoss() !== $newPosition->getStopLoss()) {
+                if ($newPosition->getStopLoss() > 0) {
+                    $this->addPositionLogEntry('Setze Stop-Loss auf: ' . $newPosition->getStopLoss(), $oldPosition);
+                } else {
+                    $this->addPositionLogEntry('Entferne Stop-Loss', $oldPosition);
+                }
+            }
+            $oldPosition->setStopLoss($newPosition->getStopLoss());
+
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
             $oldPosition->getShare()->setMarketplace($marketplace);
 
