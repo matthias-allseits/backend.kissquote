@@ -14,10 +14,12 @@ class BalanceService
 {
 
     private $em;
+    private $swissquoteService;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, SwissquoteService $swissquoteService)
     {
         $this->em = $em;
+        $this->swissquoteService = $swissquoteService;
     }
 
 
@@ -68,8 +70,6 @@ class BalanceService
                         }
                     }
                 }
-            } else {
-                // todo: get quote from swissquote on the fly
             }
             $balance->setPerformanceData($performance);
         }
@@ -80,6 +80,11 @@ class BalanceService
 
     private function getRateByDate(\DateTime $date, Position $position): ?Stockrate
     {
+
+        // todo: implement a swissquote-service
+        // todo: ask first the swissquote-service for the rate
+        // todo: implement a useful cache mecano: database-table or as file in /var
+
         $currencyName = $position->getCurrency()->getName();
         /** @var StockrateRepository $repos */
         $repos = $this->em->getRepository(Stockrate::class);
