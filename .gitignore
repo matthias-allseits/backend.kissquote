@@ -15,3 +15,5 @@
 ###< symfony/phpunit-bridge ###
 
 .idea
+
+quotesCache/*

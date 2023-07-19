@@ -88,39 +88,42 @@ class SwissquoteService
      */
     private function getRawQuotes(ShareheadShare $share)
     {
-        $timeToLive = 7 * 24 * 60 * 60;
-        $cachePath = __DIR__ . '/../../quotesCache/';
-        $fileName = $share->getId() . '.cache';
-
-        if (file_exists($cachePath . $fileName)) {
-            $lastChangeTime = filemtime($cachePath . $fileName);
-            echo 'lastChangeTime: ' . $lastChangeTime . "\n";
-            $gradJetzt = time();
-            echo 'gradJetzt: ' . $gradJetzt . "\n";
-            $timeToDie = $lastChangeTime + $timeToLive;
-            echo 'timeToDie: ' . $timeToDie . "\n";
-            if ($timeToDie > $gradJetzt) {
-                $content = file_get_contents($cachePath . $fileName);
-                $rawTicks = explode("\n", $content);
-
-                return $rawTicks;
-            }
-        }
-
-        $currencyString = $share->getCurrency();
-        if ($currencyString == 'GBP') {
-            $currencyString = 'GBX';
-        }
-        $swissquoteUrl = 'https://www.swissquote.ch/sqi_ws/HistoFromServlet?format=pipe&key=' . $share->getIsin() . '_' . $share->getMarketplace()->getUrlKey() . '_' . $currencyString . '&ftype=day&fvalue=1&ptype=a&pvalue=1';
-
         $rawTicks = [];
-        try {
-            $content = file_get_contents($swissquoteUrl);
-            file_put_contents($cachePath . $fileName, $content);
+        if (null !== $share->getMarketplace()) {
+            $timeToLive = 7 * 24 * 60 * 60;
+            $cachePath = __DIR__ . '/../../quotesCache/';
+            $fileName = $share->getId() . '.' . urlencode($share->getShortname());
 
-            $rawTicks = explode("\n", $content);
-        } catch (\Exception $e) {
-            echo $e->getMessage() . "\n";
+            if (file_exists($cachePath . $fileName)) {
+                $lastChangeTime = filemtime($cachePath . $fileName);
+//            echo 'lastChangeTime: ' . $lastChangeTime . "\n";
+                $gradJetzt = time();
+//            echo 'gradJetzt: ' . $gradJetzt . "\n";
+                $timeToDie = $lastChangeTime + $timeToLive;
+//            echo 'timeToDie: ' . $timeToDie . "\n";
+                if ($timeToDie > $gradJetzt) {
+                    $content = file_get_contents($cachePath . $fileName);
+                    $rawTicks = explode("\n", $content);
+
+                    return $rawTicks;
+                }
+            }
+
+            $currencyString = $share->getCurrency();
+            if ($currencyString == 'GBP') {
+                $currencyString = 'GBX';
+            }
+            $swissquoteUrl = 'https://www.swissquote.ch/sqi_ws/HistoFromServlet?format=pipe&key=' . $share->getIsin() . '_' . $share->getMarketplace()->getUrlKey() . '_' . $currencyString . '&ftype=day&fvalue=1&ptype=a&pvalue=1';
+
+            try {
+                $content = file_get_contents($swissquoteUrl);
+                file_put_contents($cachePath . $fileName, $content);
+
+                $rawTicks = explode("\n", $content);
+            } catch (\Exception $e) {
+                file_put_contents($cachePath . $fileName, '');
+//                echo $e->getMessage() . "\n";
+            }
         }
 
         return $rawTicks;

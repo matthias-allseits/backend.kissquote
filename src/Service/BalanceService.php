@@ -5,6 +5,7 @@ namespace App\Service;
 
 use App\Entity\Position;
 use App\Entity\Share;
+use App\Entity\ShareheadShare;
 use App\Entity\Stockrate;
 use App\Model\Balance;
 use App\Repository\StockrateRepository;
@@ -60,7 +61,11 @@ class BalanceService
                     $oneYearAgo->sub(new \DateInterval('P1Y'));
                     $threeYearAgo = new \DateTime();
                     $threeYearAgo->sub(new \DateInterval('P3Y'));
-                    $performanceDates = [$yesterday, $oneWeekAgo, $oneMonthAgo, $threeMonthsAgo, $sixMonthsAgo, $oneYearAgo, $threeYearAgo];
+                    $fiveYearAgo = new \DateTime();
+                    $fiveYearAgo->sub(new \DateInterval('P5Y'));
+                    $tenYearAgo = new \DateTime();
+                    $tenYearAgo->sub(new \DateInterval('P10Y'));
+                    $performanceDates = [$yesterday, $oneWeekAgo, $oneMonthAgo, $threeMonthsAgo, $sixMonthsAgo, $oneYearAgo, $threeYearAgo, $fiveYearAgo, $tenYearAgo];
                     foreach ($performanceDates as $date) {
                         $rate = $this->getRateByDate($date, $position);
 //                    $rate = null;
@@ -80,17 +85,23 @@ class BalanceService
 
     private function getRateByDate(\DateTime $date, Position $position): ?Stockrate
     {
+        $rate = null;
 
-        // todo: implement a swissquote-service
-        // todo: ask first the swissquote-service for the rate
-        // todo: implement a useful cache mecano: database-table or as file in /var
+        if ($date >= $position->getActiveFrom()) {
+            $currencyName = $position->getCurrency()->getName();
+            /** @var StockrateRepository $repos */
+            $repos = $this->em->getRepository(Stockrate::class);
+            $rate = $repos->getLastRateByIsinAndMarketAndCurrencyNameAndDate($position->getShare()->getIsin(), $position->getShare()->getMarketplace(), $currencyName, $date);
 
-        $currencyName = $position->getCurrency()->getName();
-        /** @var StockrateRepository $repos */
-        $repos = $this->em->getRepository(Stockrate::class);
-        $hit = $repos->getLastRateByIsinAndMarketAndCurrencyNameAndDate($position->getShare()->getIsin(), $position->getShare()->getMarketplace(), $currencyName, $date);
+            if (null === $rate) {
+                $shareheadShare = $this->em->getRepository(ShareheadShare::class)->findOneBy(['isin' => $position->getShare()->getIsin()]);
+                if (null !== $shareheadShare) {
+                    $rate = $this->swissquoteService->getLastQuoteByDate($shareheadShare, $date);
+                }
+            }
+        }
 
-        return $hit;
+        return $rate;
     }
 
 }
