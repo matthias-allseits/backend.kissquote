@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Marketplace;
+use App\Entity\Share;
 use App\Entity\ShareheadShare;
 use App\Entity\Stockrate;
 
@@ -9,11 +11,16 @@ use App\Entity\Stockrate;
 class SwissquoteService
 {
 
-    public function getLastQuoteByDate(ShareheadShare $share, \DateTime $date): ?Stockrate
+    public function getLastQuoteByDate(\DateTime $date, object $share): ?Stockrate
     {
         $result = null;
 
-        $allQuotes = $this->getQuotes($share);
+        $allQuotes = [];
+        if ($share instanceof ShareheadShare) {
+            $allQuotes = $this->getQuotesByShareheadShare($share);
+        } elseif ($share instanceof Share) {
+            $allQuotes = $this->getQuotesByShare($share);
+        }
         foreach($allQuotes as $quote) {
             if ($quote->getDate() <= $date) {
                 $result = $quote;
@@ -31,10 +38,33 @@ class SwissquoteService
      * @return Stockrate[]
      * @throws \Exception
      */
-    public function getQuotes(ShareheadShare $share): array
+    public function getQuotesByShareheadShare(ShareheadShare $share): array
     {
-        $rawQuotes = $this->getRawQuotes($share);
+        $rawQuotes = $this->getRawQuotes($share->getIsin(), $share->getCurrency(), $share->getMarketplace());
 
+        $quotes = $this->parseQuotes($rawQuotes, $share->getIsin(), $share->getCurrency());
+
+        return $quotes;
+    }
+
+
+    /**
+     * @param Share $share
+     * @return Stockrate[]
+     * @throws \Exception
+     */
+    public function getQuotesByShare(Share $share): array
+    {
+        $rawQuotes = $this->getRawQuotes($share->getIsin(), $share->getCurrency(), $share->getMarketplace());
+
+        $quotes = $this->parseQuotes($rawQuotes, $share->getIsin(), $share->getCurrency());
+
+        return $quotes;
+    }
+
+
+    private function parseQuotes(array $rawQuotes, string $isin, string $currency): array
+    {
         $startDate = new \DateTime();
         $startDate->sub(new \DateInterval('P20Y'));
 
@@ -47,7 +77,7 @@ class SwissquoteService
                 if ($date >= $startDate) {
 //                    echo $date->format('Y-m-d') . "\n";
 //                    echo $rawQuote . "\n";
-                    $quote = $this->createQuote($date, $splitQuote, $share);
+                    $quote = $this->createQuote($date, $splitQuote, $isin, $currency);
                     $quotes[] = $quote;
                 }
             }
@@ -60,15 +90,16 @@ class SwissquoteService
     /**
      * @param \DateTime $date
      * @param $splitQuote
-     * @param ShareheadShare $share
+     * @param string $isin
+     * @param string $currency
      * @return Stockrate
      */
-    private function createQuote(\DateTime $date, $splitQuote, ShareheadShare $share): Stockrate
+    private function createQuote(\DateTime $date, $splitQuote, string $isin, string $currency): Stockrate
     {
         $stockrate = new Stockrate();
-        $stockrate->setIsin($share->getIsin());
+        $stockrate->setIsin($isin);
         $stockrate->setDate($date);
-        if ($share->getCurrency() != 'GBP') {
+        if ($currency != 'GBP') {
             $stockrate->setRate($splitQuote[4]);
             $stockrate->setHigh($splitQuote[1]);
             $stockrate->setLow($splitQuote[2]);
@@ -83,16 +114,20 @@ class SwissquoteService
 
 
     /**
-     * @param ShareheadShare $share
      * @return false|string[]
      */
-    private function getRawQuotes(ShareheadShare $share)
+    private function getRawQuotes(string $isin, string $currencyString, ?Marketplace $marketplace = null)
     {
         $rawTicks = [];
-        if (null !== $share->getMarketplace()) {
+        if (null !== $marketplace) {
             $timeToLive = 7 * 24 * 60 * 60;
             $cachePath = __DIR__ . '/../../quotesCache/';
-            $fileName = $share->getId() . '.' . urlencode($share->getShortname());
+
+            if ($currencyString == 'GBP') {
+                $currencyString = 'GBX';
+            }
+            $combinedStrangeString = $isin . '_' . $marketplace->getUrlKey() . '_' . $currencyString;
+            $fileName = $combinedStrangeString;
 
             if (file_exists($cachePath . $fileName)) {
                 $lastChangeTime = filemtime($cachePath . $fileName);
@@ -108,12 +143,7 @@ class SwissquoteService
                     return $rawTicks;
                 }
             }
-
-            $currencyString = $share->getCurrency();
-            if ($currencyString == 'GBP') {
-                $currencyString = 'GBX';
-            }
-            $swissquoteUrl = 'https://www.swissquote.ch/sqi_ws/HistoFromServlet?format=pipe&key=' . $share->getIsin() . '_' . $share->getMarketplace()->getUrlKey() . '_' . $currencyString . '&ftype=day&fvalue=1&ptype=a&pvalue=1';
+            $swissquoteUrl = 'https://www.swissquote.ch/sqi_ws/HistoFromServlet?format=pipe&key=' . $combinedStrangeString . '&ftype=day&fvalue=1&ptype=a&pvalue=1';
 
             try {
                 $content = file_get_contents($swissquoteUrl);

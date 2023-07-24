@@ -94,9 +94,8 @@ class BalanceService
             $rate = $repos->getLastRateByIsinAndMarketAndCurrencyNameAndDate($position->getShare()->getIsin(), $position->getShare()->getMarketplace(), $currencyName, $date);
 
             if (null === $rate) {
-                $shareheadShare = $this->em->getRepository(ShareheadShare::class)->findOneBy(['isin' => $position->getShare()->getIsin()]);
-                if (null !== $shareheadShare) {
-                    $rate = $this->swissquoteService->getLastQuoteByDate($shareheadShare, $date);
+                if (null !== $position->getShare()) {
+                    $rate = $this->swissquoteService->getLastQuoteByDate($date, $position->getShare());
                 }
             }
         }
