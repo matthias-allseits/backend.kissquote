@@ -49,7 +49,7 @@ class BaseController extends AbstractFOSRestController
      * @param Request $request
      * @return Portfolio|mixed|object
      */
-    protected function getPortfolio(Request $request)
+    protected function getPortfolioByAuth(Request $request)
     {
         $key = $request->headers->get('Authorization');
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);

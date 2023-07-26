@@ -23,7 +23,7 @@ class ManualDividendController extends BaseController
      */
     public function createManualDividend(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
 
@@ -52,7 +52,7 @@ class ManualDividendController extends BaseController
      */
     public function deleteManualDividend(Request $request, int $dividendId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $manualDividend = $this->getDoctrine()->getRepository(ManualDividend::class)->find($dividendId);
         if ($manualDividend->getShare()->getPortfolioId() == $portfolio->getId()) {

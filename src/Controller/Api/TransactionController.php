@@ -25,7 +25,7 @@ class TransactionController extends BaseController
      */
     public function getTransaction(Request $request, int $transactionId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
         $transaction->setPosition(null);
@@ -42,7 +42,7 @@ class TransactionController extends BaseController
      */
     public function createTransaction(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         /** @var Transaction $transaction */
@@ -106,7 +106,7 @@ class TransactionController extends BaseController
      */
     public function updateTransaction(Request $request, int $transactionId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $existingTransaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
         if (null === $existingTransaction) {
@@ -157,7 +157,7 @@ class TransactionController extends BaseController
      */
     public function deleteTransaction(Request $request, int $transactionId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
         $this->getDoctrine()->getManager()->remove($transaction);

@@ -2,14 +2,12 @@
 
 namespace App\Service;
 
-
 use App\Entity\Position;
-use App\Entity\Share;
-use App\Entity\ShareheadShare;
 use App\Entity\Stockrate;
 use App\Model\Balance;
 use App\Repository\StockrateRepository;
 use Doctrine\ORM\EntityManagerInterface;
+
 
 class BalanceService
 {

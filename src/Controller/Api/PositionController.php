@@ -30,7 +30,7 @@ class PositionController extends BaseController
      */
     public function getPosition(Request $request, int $positionId, BalanceService $balanceService): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $position->setBankAccount(null);
@@ -54,7 +54,7 @@ class PositionController extends BaseController
      */
     public function listPositions(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $positions = $portfolio->getAllPositions();
         foreach($positions as $position) {
@@ -75,7 +75,7 @@ class PositionController extends BaseController
      */
     public function listActivePositions(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $positions = $portfolio->getAllPositions();
         $activePositions = [];
@@ -100,7 +100,7 @@ class PositionController extends BaseController
      */
     public function persistPositionsBunch(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $rawPositions = json_decode($request->getContent());
@@ -110,7 +110,7 @@ class PositionController extends BaseController
         foreach($rawPositions as $rawPosition) {
             $position = $serializer->deserialize(json_encode($rawPosition), Position::class, 'json');
             if (null !== $position->getBankAccount()) {
-                $portfolio = $this->getPortfolio($request); // do it again
+                $portfolio = $this->getPortfolioByAuth($request); // do it again
                 $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
                 if (null === $bankAccount) {
                     throw new AccessDeniedException();
@@ -145,7 +145,7 @@ class PositionController extends BaseController
      */
     public function createPosition(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $position = $this->deserializePosition($request, $portfolio);
         $this->persistShare($portfolio, $position);
@@ -176,7 +176,7 @@ class PositionController extends BaseController
      */
     public function createCashPosition(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $position = $this->deserializePosition($request, $portfolio);
         $this->persistCurrency($portfolio, $position, $position);
@@ -209,7 +209,7 @@ class PositionController extends BaseController
      */
     public function updatePosition(Request $request, int $positionId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -294,7 +294,7 @@ class PositionController extends BaseController
      */
     public function deletePosition(Request $request, int $positionId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $this->getDoctrine()->getManager()->remove($position);
@@ -316,7 +316,7 @@ class PositionController extends BaseController
      */
     public function addPositionLabel(Request $request, int $positionId, int $labelId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         /** @var Position $position */
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
@@ -343,7 +343,7 @@ class PositionController extends BaseController
      */
     public function deletePositionLabel(Request $request, int $positionId, int $labelId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         /** @var Position $position */
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
