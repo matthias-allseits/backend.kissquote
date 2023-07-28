@@ -68,32 +68,42 @@ class PortfolioController extends BaseController
     /**
      * @Rest\Post("/portfolio/restore", name="restore_portfolio")
      * @param Request $request
+     * @param BalanceService $balanceService
      * @return View
      */
     public function restorePortfolio(Request $request, BalanceService $balanceService): View
     {
-        // todo: implement a better solution
-        $content = json_decode($request->getContent());
+        $key = $request->headers->get('Authorization');
 
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $content->hashKey]);
-        if (null === $portfolio) {
-            throw new AccessDeniedException();
-        } else {
-            $this->portfolio = $portfolio;
-        }
+        $portfolio = $this->getPortfolioWithBalances($key, $balanceService);
 
-        foreach($portfolio->getBankAccounts() as $bankAccount) {
-            foreach($bankAccount->getPositions() as $position) {
-                $balance = $balanceService->getBalanceForPosition($position);
-                $position->setBalance($balance);
+        return View::create($portfolio, Response::HTTP_OK);
+    }
+
+
+    /**
+     * @Rest\Post("/portfolio/time-warp", name="timewarp_portfolio")
+     * @param Request $request
+     * @param BalanceService $balanceService
+     * @return View
+     */
+    public function timewarpedPortfolio(Request $request, BalanceService $balanceService): View
+    {
+        $key = $request->headers->get('Authorization');
+        $body = json_decode($request->getContent(), false);
+        $timeWarpDate = new \DateTime($body->date);
+
+        $portfolio = $this->getPortfolioWithBalances($key, $balanceService);
+        foreach($portfolio->getBankAccounts() as $account) {
+            foreach($account->getPositions() as $position) {
+                if ($position->getActiveFrom() > $timeWarpDate) {
+                    $account->removePosition($position);
+                }
             }
         }
-        foreach($portfolio->getWatchlistEntries() as $entry) {
-            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-            if (null !== $shareheadShare) {
-                $entry->setTitle($shareheadShare->getName());
-            }
-        }
+        // todo: loop over positions and remove all activeFrom after the given date
+        // todo: loop over positions and handle the activeUntil and isActive fields to make it real timewarped
+        // todo: loop over positions->transactions and remove all after the given date
 
         return View::create($portfolio, Response::HTTP_OK);
     }
@@ -351,6 +361,37 @@ class PortfolioController extends BaseController
         }
 
         return $newSectors;
+    }
+
+
+    /**
+     * @param string $key
+     * @param BalanceService $balanceService
+     * @return Portfolio
+     */
+    private function getPortfolioWithBalances(string $key, BalanceService $balanceService): Portfolio
+    {
+        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        if (null === $portfolio) {
+            throw new AccessDeniedException();
+        } else {
+            $this->portfolio = $portfolio;
+        }
+
+        foreach ($portfolio->getBankAccounts() as $bankAccount) {
+            foreach ($bankAccount->getPositions() as $position) {
+                $balance = $balanceService->getBalanceForPosition($position);
+                $position->setBalance($balance);
+            }
+        }
+        foreach ($portfolio->getWatchlistEntries() as $entry) {
+            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+            if (null !== $shareheadShare) {
+                $entry->setTitle($shareheadShare->getName());
+            }
+        }
+
+        return $portfolio;
     }
 
 }

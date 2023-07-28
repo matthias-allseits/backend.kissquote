@@ -23,7 +23,7 @@ class PositionLogController extends BaseController
      */
     public function getPositionLog(Request $request, int $logId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $positionLog = $this->getDoctrine()->getRepository(PositionLog::class)->find($logId);
         $positionLog->setPosition(null);
@@ -40,7 +40,7 @@ class PositionLogController extends BaseController
      */
     public function createPositionLog(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -76,7 +76,7 @@ class PositionLogController extends BaseController
      */
     public function updatePositionLog(Request $request, int $logId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         /** @var PositionLog $existingPositionLog */
         $existingPositionLog = $this->getDoctrine()->getRepository(PositionLog::class)->find($logId);
@@ -121,7 +121,7 @@ class PositionLogController extends BaseController
      */
     public function deletePositionLog(Request $request, int $logId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $positionLog = $this->getDoctrine()->getRepository(PositionLog::class)->find($logId);
         $this->getDoctrine()->getManager()->remove($positionLog);

@@ -21,7 +21,7 @@ class WatchlistController extends BaseController
      */
     public function listWatchlistEntries(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $entries = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
         foreach($entries as $entry) {
@@ -42,7 +42,7 @@ class WatchlistController extends BaseController
      */
     public function createWatchlistEntry(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
 
@@ -81,7 +81,7 @@ class WatchlistController extends BaseController
      */
     public function deleteWatchlistEntry(Request $request, int $shareheadId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $watchlistEntry = $this->getDoctrine()->getRepository(Watchlist::class)->findOneBy(['portfolio' => $portfolio, 'shareheadId' => $shareheadId]);
         $this->getDoctrine()->getManager()->remove($watchlistEntry);

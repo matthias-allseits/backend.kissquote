@@ -23,7 +23,7 @@ class CurrencyController extends BaseController
      */
     public function listCurrencies(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $currencies = $portfolio->getCurrencies();
 
@@ -39,7 +39,7 @@ class CurrencyController extends BaseController
      */
     public function createCurrency(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -66,7 +66,7 @@ class CurrencyController extends BaseController
      */
     public function updateCurrency(Request $request, int $currencyId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());

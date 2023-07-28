@@ -22,7 +22,7 @@ class LabelController extends BaseController
      */
     public function listLabels(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $labels = $portfolio->getLabels();
 
@@ -37,7 +37,7 @@ class LabelController extends BaseController
      */
     public function createLabel(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -64,7 +64,7 @@ class LabelController extends BaseController
      */
     public function updateLabel(Request $request, int $labelId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -103,7 +103,7 @@ class LabelController extends BaseController
      */
     public function deleteLabel(Request $request, int $labelId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $label = $this->getDoctrine()->getRepository(Label::class)->find($labelId);
 

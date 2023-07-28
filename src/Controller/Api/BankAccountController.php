@@ -21,7 +21,7 @@ class BankAccountController extends BaseController
      */
     public function createBankAccount(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
@@ -50,7 +50,7 @@ class BankAccountController extends BaseController
      */
     public function updateBankAccount(Request $request, int $accountId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
@@ -81,7 +81,7 @@ class BankAccountController extends BaseController
      */
     public function deleteBankAccount(Request $request, int $accountId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
         $this->getDoctrine()->getManager()->remove($bankAccount);

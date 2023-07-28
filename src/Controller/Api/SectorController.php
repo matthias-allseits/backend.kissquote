@@ -22,7 +22,7 @@ class SectorController extends BaseController
      */
     public function listSectors(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $sectors = $portfolio->getSectors();
 
@@ -37,7 +37,7 @@ class SectorController extends BaseController
      */
     public function createSector(Request $request): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -64,7 +64,7 @@ class SectorController extends BaseController
      */
     public function updateSector(Request $request, int $sectorId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -99,7 +99,7 @@ class SectorController extends BaseController
      */
     public function deleteSector(Request $request, int $sectorId): View
     {
-        $portfolio = $this->getPortfolio($request);
+        $portfolio = $this->getPortfolioByAuth($request);
 
         $sector = $this->getDoctrine()->getRepository(Sector::class)->find($sectorId);
 
