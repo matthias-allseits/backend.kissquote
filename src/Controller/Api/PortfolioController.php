@@ -94,6 +94,13 @@ class PortfolioController extends BaseController
         $timeWarpDate = new \DateTime($body->date);
 
         $portfolio = $this->getPortfolioWithBalances($key, $balanceService);
+        foreach($portfolio->getBankAccounts() as $account) {
+            foreach($account->getPositions() as $position) {
+                if ($position->getActiveFrom() > $timeWarpDate) {
+                    $account->removePosition($position);
+                }
+            }
+        }
         // todo: loop over positions and remove all activeFrom after the given date
         // todo: loop over positions and handle the activeUntil and isActive fields to make it real timewarped
         // todo: loop over positions->transactions and remove all after the given date
@@ -360,9 +367,9 @@ class PortfolioController extends BaseController
     /**
      * @param string $key
      * @param BalanceService $balanceService
-     * @return Portfolio|mixed|object
+     * @return Portfolio
      */
-    private function getPortfolioWithBalances(string $key, BalanceService $balanceService)
+    private function getPortfolioWithBalances(string $key, BalanceService $balanceService): Portfolio
     {
         $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
