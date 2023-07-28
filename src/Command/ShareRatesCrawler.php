@@ -150,6 +150,9 @@ class ShareRatesCrawler extends Command
             $currency = substr($rateCell, -3);
             $rateCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow td')->eq(2)->text();
         }
+        if ($this->verbose) {
+            $this->output->writeln('rateCell: ' .  $rateCell);
+        }
         if (strpos($rateCell, 'Off-ex') > -1) {
             $rateCell = substr($rateCell, 0, strpos($rateCell, 'Off-ex'));
         }
@@ -159,9 +162,6 @@ class ShareRatesCrawler extends Command
         if (strpos($rateCell, 'Referenzpreis:') > -1) {
             $rateCell = substr($rateCell, strpos($rateCell, 'Referenzpreis:') + 15, 6);
         }
-        if ($this->verbose) {
-            $this->output->writeln('rateCell: ' .  $rateCell);
-        }
         $rateCell = str_replace('&nbsp;', ' ', $rateCell);
         $rateCell = trim($rateCell);
         $rateCell = str_replace('\'', '', $rateCell);
@@ -169,6 +169,9 @@ class ShareRatesCrawler extends Command
         $highCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(2)->text();
         $lowCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(3)->text();
 
+        if ($this->verbose) {
+            $this->output->writeln('rateCell: ' .  $rateCell);
+        }
         $rate = (float) substr($rateCell, strpos($rateCell, ' '));
         $high = (float) $highCell;
         $low = (float) $lowCell;
@@ -180,6 +183,7 @@ class ShareRatesCrawler extends Command
             $rate /= 100;
         }
 
+        $currency = preg_replace("/[^A-Za-z0-9 ]/", '', $currency);
         if ($this->verbose) {
             $this->output->writeln('currency: ' .  $currency);
         }
