@@ -256,6 +256,17 @@ class PositionController extends BaseController
             }
             $oldPosition->setStopLoss($newPosition->getStopLoss());
 
+            if ($oldPosition->getTargetPrice() !== $newPosition->getTargetPrice() || $oldPosition->getTargetType() !== $newPosition->getTargetType()) {
+                if ($newPosition->getTargetPrice() > 0) {
+                    $this->addPositionLogEntry('Setze Target-Price (' . $newPosition->getTargetType() . ') auf: ' . $newPosition->getTargetPrice(), $oldPosition);
+                } else {
+                    $this->addPositionLogEntry('Entferne Target-Price', $oldPosition);
+                    $newPosition->setTargetType(null);
+                }
+            }
+            $oldPosition->setTargetPrice($newPosition->getTargetPrice());
+            $oldPosition->setTargetType($newPosition->getTargetType());
+
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
             $oldPosition->getShare()->setMarketplace($marketplace);
 

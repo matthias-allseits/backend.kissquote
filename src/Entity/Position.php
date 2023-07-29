@@ -176,6 +176,24 @@ class Position
     private $stopLoss;
 
     /**
+     * @var float|null
+     * @Serializer\Type("float")
+     * @Serializer\SerializedName("targetPrice")
+     *
+     * @ORM\Column(name="target_price", type="float", precision=10, scale=3, nullable=true)
+     */
+    private $targetPrice;
+
+    /**
+     * @var string|null
+     * @Serializer\Type("string")
+     * @Serializer\SerializedName("targetType")
+     *
+     * @ORM\Column(name="target_type", type="string", length=8, nullable=true)
+     */
+    private $targetType;
+
+    /**
      * Many Positions have Many Labels.
      * @ORM\ManyToMany(targetEntity="Label")
      * @ORM\JoinTable(name="position_label",
@@ -752,6 +770,38 @@ class Position
     public function setStopLoss(?float $stopLoss): void
     {
         $this->stopLoss = $stopLoss;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getTargetPrice(): ?float
+    {
+        return $this->targetPrice;
+    }
+
+    /**
+     * @param float|null $targetPrice
+     */
+    public function setTargetPrice(?float $targetPrice): void
+    {
+        $this->targetPrice = $targetPrice;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTargetType(): ?string
+    {
+        return $this->targetType;
+    }
+
+    /**
+     * @param string|null $targetType
+     */
+    public function setTargetType(?string $targetType): void
+    {
+        $this->targetType = $targetType;
     }
 
     /**
