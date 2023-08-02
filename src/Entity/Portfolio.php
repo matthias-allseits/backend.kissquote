@@ -255,7 +255,7 @@ class Portfolio
     }
 
 
-    public function getStrategyById(int $id): ?Sector
+    public function getStrategyById(int $id): ?Strategy
     {
         $hit = null;
         foreach ($this->strategies as $strategy) {
