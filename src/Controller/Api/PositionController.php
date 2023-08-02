@@ -8,6 +8,7 @@ use App\Entity\Marketplace;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Sector;
+use App\Entity\Strategy;
 use App\Service\BalanceService;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -282,6 +283,19 @@ class PositionController extends BaseController
                 }
             }
             $oldPosition->setSector($sector);
+
+            $strategy = null;
+            if ($newPosition->getStrategy()) {
+                $strategy = $this->getDoctrine()->getRepository(Strategy::class)->find($newPosition->getStrategy()->getId());
+            }
+            if ($oldPosition->getStrategy() != $strategy) {
+                if (null === $strategy && null !== $oldPosition->getStrategy()) {
+                    $this->addPositionLogEntry('Entferne zugewiesene Strategie: ' . $oldPosition->getStrategy()->getName(), $oldPosition);
+                } elseif (null !== $strategy) {
+                    $this->addPositionLogEntry('Ändere die zugewiesene Strategie auf: ' . $strategy->getName(), $oldPosition);
+                }
+            }
+            $oldPosition->setStrategy($strategy);
 
             $this->persistCurrency($portfolio, $newPosition, $oldPosition);
 

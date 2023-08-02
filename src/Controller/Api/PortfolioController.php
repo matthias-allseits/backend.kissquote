@@ -13,6 +13,7 @@ use App\Entity\PositionLog;
 use App\Entity\Sector;
 use App\Entity\Share;
 use App\Entity\ShareheadShare;
+use App\Entity\Strategy;
 use App\Entity\Transaction;
 use App\Entity\Watchlist;
 use App\Helper\RandomizeHelper;
@@ -161,6 +162,17 @@ class PortfolioController extends BaseController
         }
         $newPortfolio->setSectors($newSectors);
 
+        /** @var Strategy[] $demoStrategies */
+        $demoStrategies = $this->getDoctrine()->getRepository(Strategy::class)->findBy(['portfolioId' => $demoPortfolio->getId()]);
+        $newStrategies = [];
+        foreach($demoStrategies as $strategy) {
+            $newStrategy = clone $strategy;
+            $newStrategy->setPortfolioId($newPortfolio->getId());
+            $this->getDoctrine()->getManager()->persist($newStrategy);
+            $newStrategies[] = $newStrategy;
+        }
+        $newPortfolio->setSectors($newStrategies);
+
         $newShares = [];
         foreach($demoPortfolio->getShares() as $share) {
             $newShare = new Share();
@@ -252,6 +264,12 @@ class PortfolioController extends BaseController
                     $sector = $newPortfolio->getSectorByName($position->getSector()->getName());
                 }
                 $newPosition->setSector($sector);
+
+                $strategy = null;
+                if (null !== $position->getStrategy()) {
+                    $strategy = $newPortfolio->getStrategyByName($position->getStrategy()->getName());
+                }
+                $newPosition->setStrategy($strategy);
 
                 foreach($position->getLabels() as $label) {
                     $label = $newPortfolio->getLabelByName($label->getName());

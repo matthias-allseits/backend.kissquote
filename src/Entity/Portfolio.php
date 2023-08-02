@@ -81,6 +81,12 @@ class Portfolio
     private $sectors;
 
     /**
+     * @var Strategy[]
+     * @Serializer\Exclude()
+     */
+    private $strategies;
+
+    /**
      * @var Label[]
      * @Serializer\Exclude()
      */
@@ -208,6 +214,21 @@ class Portfolio
     }
 
 
+    public function getStrategyByName(string $name): ?Strategy
+    {
+        $hit = null;
+        if (is_array($this->strategies)) {
+            foreach ($this->strategies as $strategy) {
+                if ($strategy->getName() == $name) {
+                    $hit = $strategy;
+                }
+            }
+        }
+
+        return $hit;
+    }
+
+
     public function getCurrencyById(int $id): ?Currency
     {
         $hit = null;
@@ -227,6 +248,19 @@ class Portfolio
         foreach ($this->sectors as $sector) {
             if ($sector->getId() == $id) {
                 $hit = $sector;
+            }
+        }
+
+        return $hit;
+    }
+
+
+    public function getStrategyById(int $id): ?Sector
+    {
+        $hit = null;
+        foreach ($this->strategies as $strategy) {
+            if ($strategy->getId() == $id) {
+                $hit = $strategy;
             }
         }
 
@@ -412,6 +446,28 @@ class Portfolio
     public function setSectors($sectors): void
     {
         $this->sectors = $sectors;
+    }
+
+    /**
+     * @return Strategy[]|Collection
+     */
+    public function getStrategies(): array
+    {
+        if (null !== $this->strategies) {
+
+            return $this->strategies;
+        } else {
+
+            return [];
+        }
+    }
+
+    /**
+     * @param Strategy[]|Collection $strategies
+     */
+    public function setStrategies($strategies): void
+    {
+        $this->strategies = $strategies;
     }
 
     /**

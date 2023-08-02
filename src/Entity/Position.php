@@ -80,6 +80,17 @@ class Position
     private $sector;
 
     /**
+     * @var Strategy|null
+     * @Serializer\Type("App\Entity\Strategy")
+     *
+     * @ORM\ManyToOne(targetEntity="Strategy")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="strategy_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $strategy;
+
+    /**
      * @var boolean
      * @Serializer\Type("boolean")
      *
@@ -582,6 +593,22 @@ class Position
     public function setSector(?Sector $sector): void
     {
         $this->sector = $sector;
+    }
+
+    /**
+     * @return Strategy|null
+     */
+    public function getStrategy(): ?Strategy
+    {
+        return $this->strategy;
+    }
+
+    /**
+     * @param Strategy|null $strategy
+     */
+    public function setStrategy(?Strategy $strategy): void
+    {
+        $this->strategy = $strategy;
     }
 
     /**
