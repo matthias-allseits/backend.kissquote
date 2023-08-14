@@ -78,7 +78,7 @@ class ShareRatesCrawler extends Command
         $allShares = $this->entityManager->getRepository(Share::class)->findAll();
 
 //        $allShares = [];
-//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3303);
+//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3314);
 
         $filteredShares = [];
         $doubleCheck = [];
@@ -167,7 +167,9 @@ class ShareRatesCrawler extends Command
         $rateCell = str_replace('\'', '', $rateCell);
 
         $highCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(2)->text();
+        $highCell = str_replace('\'', '', $highCell);
         $lowCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(3)->text();
+        $lowCell = str_replace('\'', '', $lowCell);
 
         if ($this->verbose) {
             $this->output->writeln('rateCell: ' .  $rateCell);
