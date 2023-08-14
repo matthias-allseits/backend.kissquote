@@ -257,7 +257,7 @@ class Position
     }
 
 
-    public function getCountOfSharesByDate(\DateTime $date = null): int
+    public function getCountOfSharesByDate(\DateTime $date = null): float
     {
         if (null == $date) {
             $date = new DateTime();

@@ -9,7 +9,7 @@ use App\Entity\Stockrate;
 class Balance
 {
 
-    /** @var int */
+    /** @var float */
     private $amount;
 
     /** @var float */
