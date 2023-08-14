@@ -66,10 +66,10 @@ class Transaction
     private $date;
 
     /**
-     * @var integer
-     * @Serializer\Type("integer")
+     * @var float
+     * @Serializer\Type("float")
      *
-     * @ORM\Column(name="quantity", type="integer", nullable=false)
+     * @ORM\Column(name="quantity", type="float", precision=10, scale=0, nullable=false)
      */
     private $quantity;
 
@@ -208,17 +208,17 @@ class Transaction
     }
 
     /**
-     * @return int|null
+     * @return float|null
      */
-    public function getQuantity(): ?int
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
     /**
-     * @param int $quantity
+     * @param float $quantity
      */
-    public function setQuantity(int $quantity): void
+    public function setQuantity(float $quantity): void
     {
         $this->quantity = $quantity;
     }
