@@ -36,10 +36,9 @@ class PositionController extends BaseController
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $position->setBankAccount(null);
 
-        if (count($position->getTransactions()) > 0) {
-            $balance = $balanceService->getBalanceForPosition($position);
-            $position->setBalance($balance);
-        }
+
+        $balance = $balanceService->getBalanceForPosition($position);
+        $position->setBalance($balance);
         $position->setLogEntries(new ArrayCollection(array_reverse($position->getLogEntries()->toArray())));
 //        $position->setTransactions(array_reverse($position->getTransactions()));
 
@@ -152,12 +151,6 @@ class PositionController extends BaseController
         $this->persistShare($portfolio, $position);
         $this->persistCurrency($portfolio, $position, $position);
 
-        // happens in case of a import
-        // todo: probably useless?
-        if (count($position->getTransactions()) > 0) {
-            $this->persistTransactions($position, $portfolio);
-        }
-
         $this->getDoctrine()->getManager()->persist($position);
 
         $this->makeLogEntry('create new position', $position);
@@ -185,12 +178,6 @@ class PositionController extends BaseController
         // happens in case of a import
         if ($position->getShare()->getId() == 0) {
             $position->setShare(null);
-        }
-
-        // happens in case of a import
-        // todo: probably useless?
-        if (count($position->getTransactions()) > 0) {
-            $this->persistTransactions($position, $portfolio);
         }
 
         $this->getDoctrine()->getManager()->persist($position);

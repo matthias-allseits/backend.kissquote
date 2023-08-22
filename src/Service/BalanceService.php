@@ -25,7 +25,7 @@ class BalanceService
     public function getBalanceForPosition(Position $position): Balance
     {
         $balance = new Balance($position);
-        if (false === $position->isCash()) {
+        if (false === $position->isCash() && count($position->getTransactions()) > 0) {
             $currencyName = $position->getCurrency()->getName();
             $lastRate = null;
             $performance = [];
