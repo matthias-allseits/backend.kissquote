@@ -7,6 +7,8 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\OneToOne;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Annotation\Exclude;
 
@@ -35,16 +37,25 @@ class Position
 	private $id;
 
     /**
-     * @var BankAccount
+     * @var BankAccount|null
      * @Serializer\Type("App\Entity\BankAccount")
      * @Serializer\SerializedName("bankAccount")
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\BankAccount")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=true)
      * })
      */
     private $bankAccount;
+
+    /**
+     * @var Position|null
+     * @Serializer\Type("App\Entity\Position")
+     *
+     * @OneToOne(targetEntity="App\Entity\Position")
+     * @JoinColumn(name="underlying_id", referencedColumnName="id", nullable=true)
+     **/
+    private $underlying;
 
     /**
      * @var Share
@@ -215,6 +226,14 @@ class Position
      * @Serializer\Type("ArrayCollection<App\Entity\Label>")
      */
     private $labels;
+
+    /**
+     * Used for assign this position to another position as underlying
+     * @var integer|null
+     * @Serializer\Type("integer")
+     * @Serializer\SerializedName("motherId")
+     */
+    private $motherId;
 
 
 // todo: add annotations
@@ -545,6 +564,38 @@ class Position
     public function setBankAccount(?BankAccount $bankAccount): void
     {
         $this->bankAccount = $bankAccount;
+    }
+
+    /**
+     * @return Position|null
+     */
+    public function getUnderlying(): ?Position
+    {
+        return $this->underlying;
+    }
+
+    /**
+     * @param Position|null $underlying
+     */
+    public function setUnderlying(?Position $underlying): void
+    {
+        $this->underlying = $underlying;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getMotherId(): ?int
+    {
+        return $this->motherId;
+    }
+
+    /**
+     * @param int|null $motherId
+     */
+    public function setMotherId(?int $motherId): void
+    {
+        $this->motherId = $motherId;
     }
 
     /**

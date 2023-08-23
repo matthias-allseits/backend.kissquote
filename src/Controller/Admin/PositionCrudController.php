@@ -24,6 +24,7 @@ class PositionCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             AssociationField::new('bankAccount'),
+            AssociationField::new('underlying'),
             AssociationField::new('share'),
             AssociationField::new('currency'),
             AssociationField::new('sector'),
@@ -41,6 +42,7 @@ class PositionCrudController extends AbstractCrudController
     {
         return $filters
             ->add('bankAccount')
+            ->add('underlying')
             ->add('share')
             ->add('currency')
             ->add('sector')

@@ -36,11 +36,20 @@ class PositionController extends BaseController
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
         $position->setBankAccount(null);
 
+        $motherPosition = $this->getDoctrine()->getRepository(Position::class)->findOneBy(['underlying' => $position]);
+        if (null !== $motherPosition) {
+            $position->setMotherId($motherPosition->getId());
+        }
 
         $balance = $balanceService->getBalanceForPosition($position);
         $position->setBalance($balance);
         $position->setLogEntries(new ArrayCollection(array_reverse($position->getLogEntries()->toArray())));
-//        $position->setTransactions(array_reverse($position->getTransactions()));
+
+        if (null !== $position->getUnderlying()) {
+            $balance = $balanceService->getBalanceForPosition($position->getUnderlying());
+            $position->getUnderlying()->setBalance($balance);
+            $position->getUnderlying()->setLogEntries(new ArrayCollection(array_reverse($position->getLogEntries()->toArray())));
+        }
 
         return View::create($position, Response::HTTP_CREATED);
     }
@@ -158,6 +167,7 @@ class PositionController extends BaseController
         $this->getDoctrine()->getManager()->flush();
 
         $position->setBankAccount(null);
+
         return View::create($position, Response::HTTP_OK);
     }
 
@@ -184,6 +194,7 @@ class PositionController extends BaseController
         $this->getDoctrine()->getManager()->flush();
 
         $position->setBankAccount(null);
+
         return View::create($position, Response::HTTP_OK);
     }
 
@@ -284,6 +295,12 @@ class PositionController extends BaseController
             }
             $oldPosition->setStrategy($strategy);
 
+            if (null !== $oldPosition->getUnderlying() && null === $newPosition->getUnderlying()) {
+                $obsoletePosition = $oldPosition->getUnderlying();
+                $oldPosition->setUnderlying(null);
+                $this->getDoctrine()->getManager()->remove($obsoletePosition);
+            }
+
             $this->persistCurrency($portfolio, $newPosition, $oldPosition);
 
             $this->getDoctrine()->getManager()->persist($oldPosition);
@@ -294,6 +311,7 @@ class PositionController extends BaseController
         }
 
         $oldPosition->setBankAccount(null);
+
         return new View($oldPosition, Response::HTTP_OK);
     }
 
@@ -375,20 +393,30 @@ class PositionController extends BaseController
 
     /**
      * @param Request $request
-     * @param $portfolio
+     * @param Portfolio $portfolio
      * @return Position
      */
-    private function deserializePosition(Request $request, $portfolio): Position
+    private function deserializePosition(Request $request, Portfolio $portfolio): Position
     {
         $serializer = SerializerBuilder::create()->build();
         /** @var Position $position */
         $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
 
-        $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
-        if (null === $bankAccount) {
+        $bankAccount = null;
+        $motherPosition = null;
+        if ($position->getBankAccount()) {
+            $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
+        }
+        if ($position->getMotherId() > 0) {
+            $motherPosition = $portfolio->getPositionById($position->getMotherId());
+        }
+        if (null === $bankAccount && null === $motherPosition) {
             throw new AccessDeniedException();
         } else {
             $position->setBankAccount($bankAccount);
+            if (null !== $motherPosition) {
+                $motherPosition->setUnderlying($position);
+            }
         }
 
         return $position;

@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Marketplace;
+use App\Entity\Position;
 use App\Entity\Share;
 use App\Entity\Stockrate;
 use App\Helper\SpiderHelper;
@@ -83,10 +84,19 @@ class ShareRatesCrawler extends Command
         $filteredShares = [];
         $doubleCheck = [];
         foreach($allShares as $share) {
-            $dbCheck = $this->entityManager->getRepository(Stockrate::class)->findBy(['isin' => $share->getIsin(), 'marketplace' => $share->getMarketplace(), 'currencyName' => $share->getCurrency()->getName(), 'date' => $date]);
-            if (count($dbCheck) == 0 && $share->hasActivePosition() && !in_array($share->getSwissquoteUrl(), $doubleCheck)) {
-                $filteredShares[] = $share;
-                $doubleCheck[] = $share->getSwissquoteUrl();
+            if (!in_array($share->getSwissquoteUrl(), $doubleCheck)) {
+                $dbCheck = $this->entityManager->getRepository(Stockrate::class)->findBy(['isin' => $share->getIsin(), 'marketplace' => $share->getMarketplace(), 'currencyName' => $share->getCurrency()->getName(), 'date' => $date]);
+                if (count($dbCheck) == 0 && $share->hasActivePosition()) {
+                    $filteredShares[] = $share;
+                    $doubleCheck[] = $share->getSwissquoteUrl();
+                    continue;
+                }
+                $underlyingCheck = $this->entityManager->getRepository(Position::class)->findOneBy(['underlying' => $share]);
+                if (null !== $underlyingCheck) {
+                    $output->writeln('<info>underlying check</info>');
+                    $filteredShares[] = $share;
+                    $doubleCheck[] = $share->getSwissquoteUrl();
+                }
             }
         }
 

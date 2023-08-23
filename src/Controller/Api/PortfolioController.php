@@ -5,7 +5,6 @@ namespace App\Controller\Api;
 use App\Entity\BankAccount;
 use App\Entity\Currency;
 use App\Entity\Label;
-use App\Entity\LogEntry;
 use App\Entity\ManualDividend;
 use App\Entity\Portfolio;
 use App\Entity\Position;
@@ -400,6 +399,10 @@ class PortfolioController extends BaseController
             foreach ($bankAccount->getPositions() as $position) {
                 $balance = $balanceService->getBalanceForPosition($position);
                 $position->setBalance($balance);
+                if (null !== $position->getUnderlying()) {
+                    $balance = $balanceService->getBalanceForPosition($position->getUnderlying());
+                    $position->getUnderlying()->setBalance($balance);
+                }
             }
         }
         foreach ($portfolio->getWatchlistEntries() as $entry) {
