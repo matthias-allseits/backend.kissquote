@@ -73,9 +73,10 @@ class PortfolioController extends BaseController
      */
     public function restorePortfolio(Request $request, BalanceService $balanceService): View
     {
-        $key = $request->headers->get('Authorization');
+        // todo: implement a better solution
+        $content = json_decode($request->getContent());
 
-        $portfolio = $this->getPortfolioWithBalances($key, $balanceService);
+        $portfolio = $this->getPortfolioWithBalances($content->hashKey, $balanceService);
 
         return View::create($portfolio, Response::HTTP_OK);
     }
