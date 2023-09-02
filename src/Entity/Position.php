@@ -200,6 +200,15 @@ class Position
     /**
      * @var float|null
      * @Serializer\Type("float")
+     * @Serializer\SerializedName("manualDividend")
+     *
+     * @ORM\Column(name="manual_dividend", type="float", precision=10, scale=3, nullable=true)
+     */
+    private $manualDividend;
+
+    /**
+     * @var float|null
+     * @Serializer\Type("float")
      * @Serializer\SerializedName("targetPrice")
      *
      * @ORM\Column(name="target_price", type="float", precision=10, scale=3, nullable=true)
@@ -848,6 +857,16 @@ class Position
     public function setStopLoss(?float $stopLoss): void
     {
         $this->stopLoss = $stopLoss;
+    }
+
+    public function getManualDividend(): ?float
+    {
+        return $this->manualDividend;
+    }
+
+    public function setManualDividend(?float $manualDividend): void
+    {
+        $this->manualDividend = $manualDividend;
     }
 
     /**
