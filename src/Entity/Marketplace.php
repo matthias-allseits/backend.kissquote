@@ -50,10 +50,10 @@ class Marketplace
     private $currency;
 
     /**
-     * @var int
-     * @Serializer\Type("integer")
+     * @var string
+     * @Serializer\Type("string")
      *
-     * @ORM\Column(name="url_key", type="smallint", nullable=false)
+     * @ORM\Column(name="url_key", type="string", length=5, nullable=false)
      */
     private $urlKey;
 
@@ -127,18 +127,12 @@ class Marketplace
         $this->currency = $currency;
     }
 
-    /**
-     * @return int
-     */
-    public function getUrlKey(): ?int
+    public function getUrlKey(): ?string
     {
         return $this->urlKey;
     }
 
-    /**
-     * @param int $urlKey
-     */
-    public function setUrlKey(int $urlKey): void
+    public function setUrlKey(string $urlKey): void
     {
         $this->urlKey = $urlKey;
     }

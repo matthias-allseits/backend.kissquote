@@ -23,7 +23,7 @@ class MarketplaceCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
             TextField::new('name'),
             TextField::new('place'),
-            NumberField::new('urlKey'),
+            TextField::new('urlKey'),
             TextField::new('isinKey'),
             TextField::new('currency'),
         ];
