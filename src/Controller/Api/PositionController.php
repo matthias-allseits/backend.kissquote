@@ -91,8 +91,9 @@ class PositionController extends BaseController
         foreach($positions as $position) {
             if ($position->isActive()) {
                 $position->setBankAccount(null);
-                $position->setShare(null);
+//                $position->setShare(null);
                 $position->setCurrency(null);
+                $position->setTransactions(new ArrayCollection());
                 $activePositions[] = $position;
             }
         }

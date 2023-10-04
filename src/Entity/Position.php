@@ -731,9 +731,9 @@ class Position
     }
 
     /**
-     * @param array|null $transactions
+     * @param array|ArrayCollection $transactions
      */
-    public function setTransactions(?array $transactions): void
+    public function setTransactions(array|ArrayCollection $transactions): void
     {
         $this->transactions = $transactions;
     }
