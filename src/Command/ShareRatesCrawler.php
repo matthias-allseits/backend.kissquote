@@ -79,7 +79,7 @@ class ShareRatesCrawler extends Command
         $allShares = $this->entityManager->getRepository(Share::class)->findAll();
 
 //        $allShares = [];
-//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3314);
+//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3345);
 
         $filteredShares = [];
         $doubleCheck = [];
@@ -118,6 +118,7 @@ class ShareRatesCrawler extends Command
                     $this->output->writeln($e);
                 }
                 $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
+                throw $e;
                 $rate = null;
             }
             if (null === $rate) {
@@ -176,9 +177,13 @@ class ShareRatesCrawler extends Command
         $rateCell = trim($rateCell);
         $rateCell = str_replace('\'', '', $rateCell);
 
-        $highCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(2)->text();
+        $rowNumber = 1;
+        if ($share->getMarketplace()->getName() == 'Currencies') {
+            $rowNumber = 0;
+        }
+        $highCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq($rowNumber)->filter('td')->eq(2)->text();
         $highCell = str_replace('\'', '', $highCell);
-        $lowCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq(1)->filter('td')->eq(3)->text();
+        $lowCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq($rowNumber)->filter('td')->eq(3)->text();
         $lowCell = str_replace('\'', '', $lowCell);
 
         if ($this->verbose) {

@@ -552,14 +552,6 @@ class Position
     }
 
     /**
-     * @param int $id
-     */
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return BankAccount|null
      */
     public function getBankAccount(): ?BankAccount

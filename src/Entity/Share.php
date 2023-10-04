@@ -164,14 +164,6 @@ class Share
     }
 
     /**
-     * @param int $id
-     */
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return Currency|null
      */
     public function getCurrency(): ?Currency
