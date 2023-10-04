@@ -50,7 +50,6 @@ class Position
 
     /**
      * @var Position|null
-     * @Serializer\Type("App\Entity\Position")
      *
      * @OneToOne(targetEntity="App\Entity\Position")
      * @JoinColumn(name="underlying_id", referencedColumnName="id", nullable=true)

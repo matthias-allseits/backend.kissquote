@@ -212,8 +212,13 @@ class PositionController extends BaseController
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
+        $removeUnderlying = false;
+        if (isset($content->removeUnderlying)) {
+            $removeUnderlying = true;
+        }
         unset($content->balance);
         unset($content->transactions);
+        unset($content->underlying);
 //        var_dump($content);
         /** @var Position $newPosition */
         $newPosition = $serializer->deserialize(json_encode($content), Position::class, 'json');
@@ -304,7 +309,7 @@ class PositionController extends BaseController
             }
             $oldPosition->setStrategy($strategy);
 
-            if (null !== $oldPosition->getUnderlying() && null === $newPosition->getUnderlying()) {
+            if ($removeUnderlying) {
                 $obsoletePosition = $oldPosition->getUnderlying();
                 $oldPosition->setUnderlying(null);
                 $this->getDoctrine()->getManager()->remove($obsoletePosition);
