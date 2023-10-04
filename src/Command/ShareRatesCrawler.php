@@ -79,7 +79,7 @@ class ShareRatesCrawler extends Command
         $allShares = $this->entityManager->getRepository(Share::class)->findAll();
 
 //        $allShares = [];
-//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3345);
+//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3349);
 
         $filteredShares = [];
         $doubleCheck = [];
@@ -177,12 +177,15 @@ class ShareRatesCrawler extends Command
         $rateCell = str_replace('\'', '', $rateCell);
 
         $rowNumber = 1;
+        $cellNumber = 2;
         if ($share->getMarketplace()->getName() == 'Currencies') {
             $rowNumber = 0;
+            $cellNumber = 0;
+            $currency = substr($share->getSwissquoteUrl(), -3);
         }
-        $highCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq($rowNumber)->filter('td')->eq(2)->text();
+        $highCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq($rowNumber)->filter('td')->eq($cellNumber)->text();
         $highCell = str_replace('\'', '', $highCell);
-        $lowCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq($rowNumber)->filter('td')->eq(3)->text();
+        $lowCell = $crawler->filter('tr.FullquoteTable__body--bidAskHighLow')->eq($rowNumber)->filter('td')->eq($cellNumber + 1)->text();
         $lowCell = str_replace('\'', '', $lowCell);
 
         if ($this->verbose) {
