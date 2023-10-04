@@ -118,7 +118,6 @@ class ShareRatesCrawler extends Command
                     $this->output->writeln($e);
                 }
                 $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
-                throw $e;
                 $rate = null;
             }
             if (null === $rate) {
