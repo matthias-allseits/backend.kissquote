@@ -208,7 +208,18 @@ class Position
     /**
      * @var float|null
      * @Serializer\Type("float")
+     * @Serializer\SerializedName("manualTargetPrice")
+     * used to change the value in the target-value list. If set it overrules all analyst target-prices
+     *
+     * @ORM\Column(name="manual_target_price", type="float", precision=10, scale=3, nullable=true)
+     */
+    private $manualTargetPrice;
+
+    /**
+     * @var float|null
+     * @Serializer\Type("float")
      * @Serializer\SerializedName("targetPrice")
+     * used to mark the limit, this position will be marked green in frontend. showed also in share-chart
      *
      * @ORM\Column(name="target_price", type="float", precision=10, scale=3, nullable=true)
      */
@@ -858,6 +869,16 @@ class Position
     public function setManualDividend(?float $manualDividend): void
     {
         $this->manualDividend = $manualDividend;
+    }
+
+    public function getManualTargetPrice(): ?float
+    {
+        return $this->manualTargetPrice;
+    }
+
+    public function setManualTargetPrice(?float $manualTargetPrice): void
+    {
+        $this->manualTargetPrice = $manualTargetPrice;
     }
 
     /**

@@ -261,6 +261,15 @@ class PositionController extends BaseController
             }
             $oldPosition->setManualDividend($newPosition->getManualDividend());
 
+            if ($oldPosition->getManualTargetPrice() !== $newPosition->getManualTargetPrice()) {
+                if ($newPosition->getManualTargetPrice() > 0) {
+                    $this->addPositionLogEntry('Setze manuellen Target-Price auf: ' . $newPosition->getManualTargetPrice(), $oldPosition);
+                } else {
+                    $this->addPositionLogEntry('Entferne manuellen Target-Price', $oldPosition);
+                }
+            }
+            $oldPosition->setManualTargetPrice($newPosition->getManualTargetPrice());
+
             if ($oldPosition->getStopLoss() !== $newPosition->getStopLoss()) {
                 if ($newPosition->getStopLoss() > 0) {
                     $this->addPositionLogEntry('Setze Stop-Loss auf: ' . $newPosition->getStopLoss(), $oldPosition);

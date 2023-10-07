@@ -32,6 +32,7 @@ class PositionCrudController extends AbstractCrudController
             DateField::new('activeUntil'),
             NumberField::new('shareheadId'),
             NumberField::new('manualDrawdown')->hideOnIndex(),
+            NumberField::new('manualTargetPrice')->hideOnIndex(),
             AssociationField::new('labels')->hideOnIndex(),
             BooleanField::new('active'),
             BooleanField::new('isCash'),
