@@ -207,7 +207,7 @@ class PositionController extends BaseController
      * @return View
      * @throws \Exception
      */
-    public function updatePosition(Request $request, int $positionId): View
+    public function updatePosition(Request $request, int $positionId, BalanceService $balanceService): View
     {
         $portfolio = $this->getPortfolioByAuth($request);
 
@@ -335,6 +335,10 @@ class PositionController extends BaseController
         }
 
         $oldPosition->setBankAccount(null);
+
+        $balance = $balanceService->getBalanceForPosition($oldPosition);
+        $oldPosition->setBalance($balance);
+        $oldPosition->setLogEntries(new ArrayCollection(array_reverse($oldPosition->getLogEntries()->toArray())));
 
         return new View($oldPosition, Response::HTTP_OK);
     }
