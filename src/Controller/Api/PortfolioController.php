@@ -17,7 +17,6 @@ use App\Entity\Transaction;
 use App\Entity\Watchlist;
 use App\Helper\RandomizeHelper;
 use App\Service\BalanceService;
-use Doctrine\Common\Collections\ArrayCollection;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
@@ -398,20 +397,14 @@ class PortfolioController extends BaseController
         }
 
         foreach ($portfolio->getBankAccounts() as $bankAccount) {
-            $activePositions = [];
             foreach ($bankAccount->getPositions() as $position) {
-                if ($position->isActive()) {
-                    $balance = $balanceService->getBalanceForPosition($position);
-                    $position->setBalance($balance);
-                    if (null !== $position->getUnderlying()) {
-                        $balance = $balanceService->getBalanceForPosition($position->getUnderlying());
-                        $position->getUnderlying()->setBalance($balance);
-                    }
-                    $activePositions[] = $position;
+                $balance = $balanceService->getBalanceForPosition($position);
+                $position->setBalance($balance);
+                if (null !== $position->getUnderlying()) {
+                    $balance = $balanceService->getBalanceForPosition($position->getUnderlying());
+                    $position->getUnderlying()->setBalance($balance);
                 }
             }
-            // todo: make another member in the bank-account entity and find a solution, how to work with groups
-            $bankAccount->setPositions(new ArrayCollection($activePositions));
         }
         foreach ($portfolio->getWatchlistEntries() as $entry) {
             $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
