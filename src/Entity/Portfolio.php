@@ -242,6 +242,21 @@ class Portfolio
     }
 
 
+    public function getManualDividendById(int $id): ?ManualDividend
+    {
+        $hit = null;
+        foreach ($this->shares as $share) {
+            foreach($share->getManualDividends() as $manualDividend) {
+                if ($manualDividend->getId() == $id) {
+                    $hit = $manualDividend;
+                }
+            }
+        }
+
+        return $hit;
+    }
+
+
     public function getSectorById(int $id): ?Sector
     {
         $hit = null;
