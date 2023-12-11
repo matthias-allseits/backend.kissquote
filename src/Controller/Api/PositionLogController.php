@@ -100,6 +100,12 @@ class PositionLogController extends BaseController
         $existingPositionLog->setDate($updatedPositionLog->getDate());
         $existingPositionLog->setLog($updatedPositionLog->getLog());
         $existingPositionLog->setEmoticon($updatedPositionLog->getEmoticon());
+        if ($updatedPositionLog->isPinned()) {
+            foreach($position->getLogEntries() as $entry) {
+                $entry->setPinned(false);
+            }
+        }
+        $existingPositionLog->setPinned($updatedPositionLog->isPinned());
 
         $this->getDoctrine()->getManager()->persist($position);
         $this->getDoctrine()->getManager()->persist($existingPositionLog);

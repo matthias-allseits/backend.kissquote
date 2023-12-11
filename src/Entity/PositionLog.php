@@ -60,6 +60,22 @@ class PositionLog
     private $emoticon;
 
     /**
+     * @var boolean
+     * @Serializer\Type("boolean")
+     *
+     * @ORM\Column(name="demo", type="boolean", nullable=false)
+     */
+    private bool $demo = true;
+
+    /**
+     * @var boolean
+     * @Serializer\Type("boolean")
+     *
+     * @ORM\Column(name="pinned", type="boolean", nullable=false)
+     */
+    private bool $pinned = false;
+
+    /**
      * @var integer
      * @Serializer\Type("integer")
      */
@@ -148,6 +164,26 @@ class PositionLog
     public function setEmoticon(?string $emoticon): void
     {
         $this->emoticon = $emoticon;
+    }
+
+    public function isDemo(): bool
+    {
+        return $this->demo;
+    }
+
+    public function setDemo(bool $demo): void
+    {
+        $this->demo = $demo;
+    }
+
+    public function isPinned(): bool
+    {
+        return $this->pinned;
+    }
+
+    public function setPinned(bool $pinned): void
+    {
+        $this->pinned = $pinned;
     }
 
 }
