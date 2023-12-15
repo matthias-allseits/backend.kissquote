@@ -744,7 +744,7 @@ class Position
     /**
      * @param array|ArrayCollection $transactions
      */
-    public function setTransactions(array|ArrayCollection $transactions): void
+    public function setTransactions(ArrayCollection|array $transactions): void
     {
         $this->transactions = $transactions;
     }

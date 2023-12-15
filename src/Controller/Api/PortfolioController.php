@@ -171,7 +171,7 @@ class PortfolioController extends BaseController
             $this->getDoctrine()->getManager()->persist($newStrategy);
             $newStrategies[] = $newStrategy;
         }
-        $newPortfolio->setSectors($newStrategies);
+        $newPortfolio->setStrategies($newStrategies);
 
         $newShares = [];
         foreach($demoPortfolio->getShares() as $share) {
@@ -220,6 +220,14 @@ class PortfolioController extends BaseController
                 $newPosition->setActiveUntil($position->getActiveUntil());
                 $newPosition->setShareheadId($position->getShareheadId());
                 $newPosition->setDividendPeriodicity($position->getDividendPeriodicity());
+                $newPosition->setManualDividendDrop($position->getManualDividendDrop());
+                $newPosition->setManualDrawdown($position->getManualDrawdown());
+                $newPosition->setStopLoss($position->getStopLoss());
+                $newPosition->setTargetPrice($position->getTargetPrice());
+                $newPosition->setTargetType($position->getTargetType());
+                $newPosition->setManualDividend($position->getManualDividend());
+                $newPosition->setManualTargetPrice($position->getManualTargetPrice());
+                // todo: implement missing underlying copy
                 $newPosition->setIsCash($position->isCash());
                 $this->getDoctrine()->getManager()->persist($newPosition);
 
