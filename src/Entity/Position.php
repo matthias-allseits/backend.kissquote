@@ -742,6 +742,14 @@ class Position
     }
 
     /**
+     * @param Transaction $transaction
+     */
+    public function removeTransaction(Transaction $transaction)
+    {
+        $this->transactions->removeElement($transaction);
+    }
+
+    /**
      * @param array|ArrayCollection $transactions
      */
     public function setTransactions(ArrayCollection|array $transactions): void

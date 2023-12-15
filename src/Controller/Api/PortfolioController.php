@@ -96,15 +96,34 @@ class PortfolioController extends BaseController
 
         $portfolio = $this->getPortfolioWithBalances($key, $balanceService);
         foreach($portfolio->getBankAccounts() as $account) {
+            // todo: loop over positions and check the activeUntil to eventually reactivate closed positions
+            foreach($account->getPositions() as $position) {
+                if (null !== $position->getActiveUntil() && $position->getActiveUntil() > $timeWarpDate) {
+                    $position->setActiveUntil(null);
+                    $position->setActive(true);
+                }
+            }
+            // todo: loop over positions and remove all activeFrom after the given date
             foreach($account->getPositions() as $position) {
                 if ($position->getActiveFrom() > $timeWarpDate) {
                     $account->removePosition($position);
                 }
             }
+            // todo: loop over positions->transactions and remove all after the given date
+            foreach($account->getPositions() as $position) {
+                foreach($position->getTransactions() as $transaction) {
+                    if ($transaction->getDate() > $timeWarpDate) {
+                        $position->removeTransaction($transaction);
+                    }
+                }
+            }
         }
-        // todo: loop over positions and remove all activeFrom after the given date
-        // todo: loop over positions and handle the activeUntil and isActive fields to make it real timewarped
-        // todo: loop over positions->transactions and remove all after the given date
+        foreach($portfolio->getBankAccounts() as $account) {
+            foreach ($account->getPositions() as $position) {
+                $balance = $balanceService->getBalanceForPosition($position);
+                $position->setBalance($balance);
+            }
+        }
 
         return View::create($portfolio, Response::HTTP_OK);
     }
