@@ -120,7 +120,7 @@ class PortfolioController extends BaseController
         }
         foreach($portfolio->getBankAccounts() as $account) {
             foreach ($account->getPositions() as $position) {
-                $balance = $balanceService->getBalanceForPosition($position);
+                $balance = $balanceService->getBalanceForPosition($position, $timeWarpDate);
                 $position->setBalance($balance);
             }
         }

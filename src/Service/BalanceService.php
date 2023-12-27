@@ -22,7 +22,7 @@ class BalanceService
     }
 
 
-    public function getBalanceForPosition(Position $position): Balance
+    public function getBalanceForPosition(Position $position, \DateTime $timeWarpDate = null): Balance
     {
         $balance = new Balance($position);
         if (false === $position->isCash()) {
@@ -30,11 +30,15 @@ class BalanceService
             $lastRate = null;
             $performance = [];
             if (null !== $position->getShare()) {
-                /** @var Stockrate $lastRate */
-                $lastRate = $this->em->getRepository(Stockrate::class)->findOneBy(
-                    ['isin' => $position->getShare()->getIsin(), 'marketplace' => $position->getShare()->getMarketplace(), 'currencyName' => $currencyName],
-                    ['date' => 'DESC']
-                );
+                if (null === $timeWarpDate) {
+                    /** @var Stockrate $lastRate */
+                    $lastRate = $this->em->getRepository(Stockrate::class)->findOneBy(
+                        ['isin' => $position->getShare()->getIsin(), 'marketplace' => $position->getShare()->getMarketplace(), 'currencyName' => $currencyName],
+                        ['date' => 'DESC']
+                    );
+                } else {
+                    $lastRate = $this->em->getRepository(Stockrate::class)->getLastRateByIsinAndMarketAndCurrencyNameAndDate($position->getShare()->getIsin(), $position->getShare()->getMarketplace(), $currencyName, $timeWarpDate);
+                }
             }
             if (null !== $lastRate) {
                 $balance->setLastRate($lastRate);
