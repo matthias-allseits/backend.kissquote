@@ -37,7 +37,7 @@ class BalanceService
                         ['date' => 'DESC']
                     );
                 } else {
-                    $lastRate = $this->em->getRepository(Stockrate::class)->getLastRateByIsinAndMarketAndCurrencyNameAndDate($position->getShare()->getIsin(), $position->getShare()->getMarketplace(), $currencyName, $timeWarpDate);
+                    $lastRate = $this->getRateByDate($timeWarpDate, $position);
                 }
             }
             if (null !== $lastRate) {
