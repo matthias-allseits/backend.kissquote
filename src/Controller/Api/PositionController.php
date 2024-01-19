@@ -285,6 +285,7 @@ class PositionController extends BaseController
                 } else {
                     $this->addPositionLogEntry('Entferne Target-Price', $oldPosition);
                     $newPosition->setTargetType(null);
+                    $newPosition->setTargetPrice(null);
                 }
             }
             $oldPosition->setTargetPrice($newPosition->getTargetPrice());
