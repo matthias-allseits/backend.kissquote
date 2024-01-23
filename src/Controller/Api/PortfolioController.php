@@ -277,12 +277,14 @@ class PortfolioController extends BaseController
 
                 $newLogEntries = [];
                 foreach($position->getLogEntries() as $logEntry) {
-                    $newLogEntry = new PositionLog();
-                    $newLogEntry->setPosition($newPosition);
-                    $newLogEntry->setDate($logEntry->getDate());
-                    $newLogEntry->setLog($logEntry->getLog());
-                    $newLogEntry->setEmoticon($logEntry->getEmoticon());
-                    $newLogEntries[] = $newLogEntry;
+                    if ($logEntry->isDemo()) {
+                        $newLogEntry = new PositionLog();
+                        $newLogEntry->setPosition($newPosition);
+                        $newLogEntry->setDate($logEntry->getDate());
+                        $newLogEntry->setLog($logEntry->getLog());
+                        $newLogEntry->setEmoticon($logEntry->getEmoticon());
+                        $newLogEntries[] = $newLogEntry;
+                    }
                 }
                 $newPosition->setLogEntries($newLogEntries);
 
