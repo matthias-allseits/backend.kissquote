@@ -283,6 +283,7 @@ class PortfolioController extends BaseController
                         $newLogEntry->setDate($logEntry->getDate());
                         $newLogEntry->setLog($logEntry->getLog());
                         $newLogEntry->setEmoticon($logEntry->getEmoticon());
+                        $newLogEntry->setPinned($logEntry->isPinned());
                         $newLogEntries[] = $newLogEntry;
                     }
                 }
