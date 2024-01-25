@@ -233,6 +233,7 @@ class PositionController extends BaseController
             $oldPosition->setActive($newPosition->isActive());
             $oldPosition->setShareheadId($newPosition->getShareheadId());
             $oldPosition->getShare()->setName($newPosition->getShare()->getName());
+            $oldPosition->getShare()->setShortname($newPosition->getShare()->getShortname());
             $oldPosition->getShare()->setIsin($newPosition->getShare()->getIsin());
             if ($oldPosition->getManualDrawdown() != $newPosition->getManualDrawdown()) {
                 if ($newPosition->getManualDrawdown() > 0) {
