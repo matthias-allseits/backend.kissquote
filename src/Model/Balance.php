@@ -21,6 +21,9 @@ class Balance
     /** @var float */
     private $averagePayedPriceNet;
 
+    /** @var float */
+    private $breakEvenPrice;
+
     /** @var int */
     private $investment;
 
@@ -65,6 +68,7 @@ class Balance
         if (false === $position->isCash()) {
             $this->averagePayedPriceGross = $position->getAveragePayedPriceGross();
             $this->averagePayedPriceNet = $position->getAveragePayedPriceNet();
+            $this->breakEvenPrice = $position->getBreakEventPrice();
         } else {
             $this->cashValue = $position->getCashValue();
         }

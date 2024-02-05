@@ -348,6 +348,16 @@ class Position
     }
 
 
+    public function getBreakEventPrice(): ?float
+    {
+        if ($this->getCountOfSharesByDate()) {
+            return round(($this->getSummedInvestmentGross() - $this->getCollectedDividends()) / $this->getCountOfSharesByDate(), 2);
+        }
+
+        return null;
+    }
+
+
     public function getSummedInvestmentGross(): int
     {
         $value = 0;
