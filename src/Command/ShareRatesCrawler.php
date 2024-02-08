@@ -40,12 +40,14 @@ class ShareRatesCrawler extends Command
             ->setHelp('Crawls for last rates for every user-share')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Forces the flush')
             ->addOption('update', null, InputOption::VALUE_NONE, 'Executes but before removes the stock-rates from this day')
+            ->addOption('shareId', null, InputOption::VALUE_OPTIONAL, 'Execution for only one given share')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->verbose = $input->getOption('verbose');
+        $shareId = $input->getOption('shareId');
         if ($input->getOption('force')) {
             $force = true;
         } else {
@@ -76,10 +78,12 @@ class ShareRatesCrawler extends Command
 //        $output->writeln($date->format('d.m.Y'));
 
         /** @var Share[] $allShares */
-        $allShares = $this->entityManager->getRepository(Share::class)->findAll();
-
-//        $allShares = [];
-//        $allShares[] = $this->entityManager->getRepository(Share::class)->find(3349);
+        $allShares = [];
+        if (null !== $shareId) {
+            $allShares[] = $this->entityManager->getRepository(Share::class)->find($shareId);
+        } else {
+            $allShares = $this->entityManager->getRepository(Share::class)->findAll();
+        }
 
         $filteredShares = [];
         $doubleCheck = [];
@@ -171,6 +175,7 @@ class ShareRatesCrawler extends Command
         }
         if (strpos($rateCell, 'Referenzpreis:') > -1) {
             $rateCell = substr($rateCell, strpos($rateCell, 'Referenzpreis:') + 15, 6);
+            $currency = $share->getCurrency()->getName();
         }
         $rateCell = str_replace('&nbsp;', ' ', $rateCell);
         $rateCell = trim($rateCell);
