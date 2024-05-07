@@ -263,6 +263,13 @@ class Position
      */
     private $balance;
 
+    /**
+     * @var string|null
+     * @Serializer\Type("string")
+     * @Serializer\SerializedName("bankAccountName")
+     */
+    private $bankAccountName;
+
 
     public function __clone()
     {
@@ -977,6 +984,11 @@ class Position
     public function setBalance(?Balance $balance): void
     {
         $this->balance = $balance;
+    }
+
+    public function setBankAccountName(?string $bankAccountName): void
+    {
+        $this->bankAccountName = $bankAccountName;
     }
 
 }

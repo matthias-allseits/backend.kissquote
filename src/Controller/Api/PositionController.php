@@ -34,6 +34,7 @@ class PositionController extends BaseController
         $portfolio = $this->getPortfolioByAuth($request);
 
         $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
+        $position->setBankAccountName($position->getBankAccount()->getName());
         $position->setBankAccount(null);
 
         $motherPosition = $this->getDoctrine()->getRepository(Position::class)->findOneBy(['underlying' => $position]);
