@@ -124,29 +124,33 @@ class ShareRatesCrawler extends Command
 //                $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
                 $rate = null;
             }
-            if (null === $rate) {
-                $alternativeUrl = $this->getAlternativeSwissquoteUrl($share);
-                if ($alternativeUrl !== $url) {
-                    try {
-                        $url = $alternativeUrl;
-                        $rate = $this->getRateBySwissquoteUrl($url, $share);
-                        $this->entityManager->persist($share);
-                        // todo: make a log-entry
-                    } catch(\Exception $e) {
-                        $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
-
-                        continue;
-                    }
-                }
-            }
+//            if (null === $rate) {
+//                $alternativeUrl = $this->getAlternativeSwissquoteUrl($share);
+//                if ($alternativeUrl !== $url) {
+//                    try {
+//                        $url = $alternativeUrl;
+//                        $rate = $this->getRateBySwissquoteUrl($url, $share);
+//                        $this->entityManager->persist($share);
+//                        // todo: make a log-entry
+//                    } catch(\Exception $e) {
+//                        $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
+//
+//                        continue;
+//                    }
+//                }
+//            }
 //            $output->writeln($url);
-            $output->writeln($rate);
-            if (null !== $rate) {
-                $this->entityManager->persist($rate);
-            }
-            sleep($this->sleep);
-            if ($force) {
-                $this->entityManager->flush();
+            if ($rate) {
+                $output->writeln($rate);
+                if (null !== $rate) {
+                    $this->entityManager->persist($rate);
+                }
+                sleep($this->sleep);
+                if ($force) {
+                    $this->entityManager->flush();
+                }
+            } else {
+                $output->writeln('<error>rate crawling failed</error>');
             }
             $output->writeln('---------------------------');
         }
@@ -164,7 +168,7 @@ class ShareRatesCrawler extends Command
         ];
         $response = $this->spiderHelper->curlPostAction($apiUrl, $data);
 
-        $stockRate = new Stockrate();
+        $stockRate = null;
         if (isset($response->productInfo) && count($response->productInfo) > 0) {
             $lastRate = $response->productInfo[count($response->productInfo) - 1];
 
