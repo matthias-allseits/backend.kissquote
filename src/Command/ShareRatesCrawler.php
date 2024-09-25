@@ -164,18 +164,19 @@ class ShareRatesCrawler extends Command
         ];
         $response = $this->spiderHelper->curlPostAction($apiUrl, $data);
 
+        $stockRate = new Stockrate();
         if (isset($response->productInfo) && count($response->productInfo) > 0) {
             $lastRate = $response->productInfo[count($response->productInfo) - 1];
-        }
 
-        $stockRate = new Stockrate();
-        $stockRate->setIsin($share->getIsin());
-        $stockRate->setMarketplace($share->getMarketplace());
-        $stockRate->setCurrencyName($share->getCurrency()->getName());
-        $stockRate->setRate($lastRate->close);
-        $stockRate->setHigh($lastRate->high);
-        $stockRate->setLow($lastRate->low);
-        $stockRate->setDate(new \DateTime());
+            $stockRate = new Stockrate();
+            $stockRate->setIsin($share->getIsin());
+            $stockRate->setMarketplace($share->getMarketplace());
+            $stockRate->setCurrencyName($share->getCurrency()->getName());
+            $stockRate->setRate($lastRate->close);
+            $stockRate->setHigh($lastRate->high);
+            $stockRate->setLow($lastRate->low);
+            $stockRate->setDate(new \DateTime());
+        }
 
         return $stockRate;
     }
