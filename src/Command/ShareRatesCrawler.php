@@ -113,7 +113,7 @@ class ShareRatesCrawler extends Command
             $url = '';
             try {
                 $url = $share->getSwissquoteUrl();
-                $rate = $this->getRateBySwissquoteUrl($url, $share);
+                $rate = $this->getRateBySwissquoteApi($share);
                 if ($this->verbose) {
                     $this->output->writeln('rate: ' . $rate);
                 }
@@ -121,7 +121,7 @@ class ShareRatesCrawler extends Command
                 if ($this->verbose) {
                     $this->output->writeln($e);
                 }
-                $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
+//                $output->writeln('<error>rate crawling failed for url ' . $url . '</error>');
                 $rate = null;
             }
             if (null === $rate) {
@@ -139,7 +139,7 @@ class ShareRatesCrawler extends Command
                     }
                 }
             }
-            $output->writeln($url);
+//            $output->writeln($url);
             $output->writeln($rate);
             if (null !== $rate) {
                 $this->entityManager->persist($rate);
@@ -153,6 +153,32 @@ class ShareRatesCrawler extends Command
 
     }
 
+
+    private function getRateBySwissquoteApi(Share $share): ?Stockrate
+    {
+        $apiUrl = 'https://www.swissquote.ch/securities-retail-chart-plugin/api/chart/trading-view/intraday?resolution=1';
+        $data = [
+            'isin' => $share->getIsin(),
+            'exchangeId' => $share->getMarketplace()->getUrlKey(),
+            'currency' => $share->getCurrency()->getName(),
+        ];
+        $response = $this->spiderHelper->curlPostAction($apiUrl, $data);
+
+        if (isset($response->productInfo) && count($response->productInfo) > 0) {
+            $lastRate = $response->productInfo[count($response->productInfo) - 1];
+        }
+
+        $stockRate = new Stockrate();
+        $stockRate->setIsin($share->getIsin());
+        $stockRate->setMarketplace($share->getMarketplace());
+        $stockRate->setCurrencyName($share->getCurrency()->getName());
+        $stockRate->setRate($lastRate->close);
+        $stockRate->setHigh($lastRate->high);
+        $stockRate->setLow($lastRate->low);
+        $stockRate->setDate(new \DateTime());
+
+        return $stockRate;
+    }
 
     private function getRateBySwissquoteUrl(string $url, Share $share): ?Stockrate
     {
