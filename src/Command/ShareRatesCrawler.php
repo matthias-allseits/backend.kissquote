@@ -8,11 +8,13 @@ use App\Entity\Share;
 use App\Entity\Stockrate;
 use App\Helper\SpiderHelper;
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\DateTimeImmutable;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 
 class ShareRatesCrawler extends Command
@@ -170,16 +172,27 @@ class ShareRatesCrawler extends Command
 
         $stockRate = null;
         if (isset($response->productInfo) && count($response->productInfo) > 0) {
-            $lastRate = $response->productInfo[count($response->productInfo) - 1];
-
+            $today = new DateTimeImmutable(false);
+            $todayStamp = $today->format('Y-m-d');
             $stockRate = new Stockrate();
             $stockRate->setIsin($share->getIsin());
             $stockRate->setMarketplace($share->getMarketplace());
             $stockRate->setCurrencyName($share->getCurrency()->getName());
-            $stockRate->setRate($lastRate->close);
-            $stockRate->setHigh($lastRate->high);
-            $stockRate->setLow($lastRate->low);
             $stockRate->setDate(new \DateTime());
+            foreach ($response->productInfo as $entry) {
+                if (str_contains($entry->time, $todayStamp)) {
+                    if (null === $stockRate->getLow()) {
+                        $stockRate->setLow($entry->low);
+                    }
+                    $stockRate->setRate($entry->close);
+                    if ($entry->high > $stockRate->getHigh()) {
+                        $stockRate->setHigh($entry->high);
+                    }
+                    if ($entry->low < $stockRate->getLow()) {
+                        $stockRate->setLow($entry->low);
+                    }
+                }
+            }
         }
 
         return $stockRate;
