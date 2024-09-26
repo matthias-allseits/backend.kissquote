@@ -147,13 +147,13 @@ class ShareRatesCrawler extends Command
                 if (null !== $rate) {
                     $this->entityManager->persist($rate);
                 }
-                sleep($this->sleep);
                 if ($force) {
                     $this->entityManager->flush();
                 }
             } else {
                 $output->writeln('<error>rate crawling failed</error>');
             }
+            sleep($this->sleep);
             $output->writeln('---------------------------');
         }
 
@@ -195,7 +195,10 @@ class ShareRatesCrawler extends Command
             }
         }
 
-        return $stockRate;
+        if ($stockRate && $stockRate->getRate() !== null) {
+            return $stockRate;
+        }
+        return null;
     }
 
     private function getRateBySwissquoteUrl(string $url, Share $share): ?Stockrate
