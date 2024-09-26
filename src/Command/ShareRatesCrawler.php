@@ -172,7 +172,7 @@ class ShareRatesCrawler extends Command
 
         $stockRate = null;
         if (isset($response->productInfo) && count($response->productInfo) > 0) {
-            $today = new DateTimeImmutable(false);
+            $today = new \DateTimeImmutable(false);
             $todayStamp = $today->format('Y-m-d');
             $stockRate = new Stockrate();
             $stockRate->setIsin($share->getIsin());
