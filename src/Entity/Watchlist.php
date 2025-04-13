@@ -32,6 +32,7 @@ class Watchlist
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
      * })
+     * @Serializer\Exclude()
      */
     private $portfolio;
 

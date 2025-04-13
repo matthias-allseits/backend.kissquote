@@ -24,12 +24,12 @@ class WatchlistController extends BaseController
         $portfolio = $this->getPortfolioByAuth($request);
 
         $entries = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
-        foreach($entries as $entry) {
-            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-            if (null !== $shareheadShare) {
-                $entry->setTitle($shareheadShare->getName());
-            }
-        }
+//        foreach($entries as $entry) {
+//            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+//            if (null !== $shareheadShare) {
+//                $entry->setTitle($shareheadShare->getName());
+//            }
+//        }
 
         return View::create($entries, Response::HTTP_CREATED);
     }
@@ -61,13 +61,12 @@ class WatchlistController extends BaseController
         $this->makeLogEntry('add watchlist-entry', $watchlistEntry);
 
         $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
-        $sortArray = [];
-        foreach($watchlist as $entry) {
-            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-            if (null !== $shareheadShare) {
-                $entry->setTitle($shareheadShare->getName());
-            }
-        }
+//        foreach($watchlist as $entry) {
+//            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+//            if (null !== $shareheadShare) {
+//                $entry->setTitle($shareheadShare->getName());
+//            }
+//        }
 
         return new View($watchlist, Response::HTTP_CREATED);
     }
@@ -90,12 +89,12 @@ class WatchlistController extends BaseController
         $this->makeLogEntry('remove watchlist-entry', $watchlistEntry);
 
         $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
-        foreach($watchlist as $entry) {
-            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-            if (null !== $shareheadShare) {
-                $entry->setTitle($shareheadShare->getName());
-            }
-        }
+//        foreach($watchlist as $entry) {
+//            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
+//            if (null !== $shareheadShare) {
+//                $entry->setTitle($shareheadShare->getName());
+//            }
+//        }
 
         return new View($watchlist, Response::HTTP_OK);
     }
