@@ -1,0 +1,32 @@
+{% set activePage = 'home' %}
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Bunte Webseite fürs Backoffice</h1>
+
+    <h3>Portfolios</h3>
+    <p>Portfolios count: {{ portfolios|length }}</p>
+    <table class="table table-striped table-sm">
+        <tr>
+            <th>Name</th>
+            <th>Key</th>
+            <th>Started</th>
+            <th>Bank-Accounts</th>
+            <th>Positions</th>
+            <th>Currencies
+            <th></th>
+        </tr>
+        {% for portfolio in portfolios %}
+            <tr>
+                <td>{{ portfolio }}</td>
+                <td>{{ portfolio.hashKey }}</td>
+                <td>{{ portfolio.startDate|date('d.m.Y') }}</td>
+                <td>{{ portfolio.bankAccounts|length }}</td>
+                <td>{{ portfolio.allPositions|length }}</td>
+                <td>{{ portfolio.currencies|length }}</td>
+                <td><a href="{{ path('app_portfolio_delete', { portfolioId: portfolio.id }) }}" type="button" class="btn btn-sm btn-outline-primary">Löschen</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
