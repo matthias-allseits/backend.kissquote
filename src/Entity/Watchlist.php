@@ -7,50 +7,31 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 
-/**
- * Watchlist
- *
- * @ORM\Table(name="watchlist")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Watchlist
 {
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
     /**
-     * @var Portfolio
-     *
-     * @ORM\ManyToOne(targetEntity="Portfolio")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
-     * })
      * @Serializer\Exclude()
      */
-    private $portfolio;
+    #[ORM\ManyToOne(targetEntity: Portfolio::class)]
+    #[ORM\JoinColumn(name: 'portfolio', referencedColumnName: 'id')]
+    private Portfolio $portfolio;
 
     /**
-     * @var integer
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("shareheadId")
-     *
-     * @ORM\Column(name="sharehead_id", type="integer", nullable=false)
      */
-    private $shareheadId;
+    #[ORM\Column(name: "sharehead_id", type: "integer", nullable: false)]
+    private int $shareheadId;
 
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="start_date", type="date", nullable=false)
-     */
-    private $startDate;
+    #[ORM\Column(name: "start_date", type: "date", nullable: false)]
+    private DateTime $startDate;
 
 
     /**

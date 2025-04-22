@@ -7,118 +7,51 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 
-/**
- * Share
- *
- * @ORM\Table(name="share")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Share
 {
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
+
+    #[ORM\ManyToOne(targetEntity: Currency::class)]
+    #[ORM\JoinColumn(name: 'currency', referencedColumnName: 'id')]
+    private Currency $currency;
+
+    #[ORM\Column(name: "portfolio_id", type: "integer", nullable: true)]
+    private ?int $portfolioId;
 
     /**
-     * @var Currency
-     *
-     * @ORM\ManyToOne(targetEntity="Currency")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="currency_id", referencedColumnName="id")
-     * })
-     */
-    private $currency;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="portfolio_id", type="integer", nullable=true)
-     */
-    private $portfolioId;
-
-    /**
-     * @var Marketplace|null
      * @Serializer\Type("App\Entity\Marketplace")
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Marketplace")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="marketplace_id", referencedColumnName="id", nullable=true)
-     * })
      */
-    private $marketplace;
+    #[ORM\ManyToOne(targetEntity: Marketplace::class)]
+    #[ORM\JoinColumn(name: 'marketplace', referencedColumnName: 'id')]
+    private ?Marketplace $marketplace;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="name", type="string", length=64, nullable=false)
      */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 64, unique: false, nullable: false)]
+    private string $name;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="shortname", type="string", length=16, nullable=false)
      */
-    private $shortname;
+    #[ORM\Column(name: "shortname", type: "string", length: 16, unique: false, nullable: false)]
+    private string $shortname;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="valor", type="integer", nullable=true)
-     */
-    private $valor;
-
-    /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="isin", type="string", length=16, nullable=false)
      */
-    private $isin;
+    #[ORM\Column(name: "isin", type: "string", length: 16, unique: false, nullable: false)]
+    private string $isin;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="type", type="string", length=16, nullable=false)
-     */
-    private $type = 'stock';
+    #[ORM\OneToMany(targetEntity: Position::class, mappedBy: "share", cascade: ["remove"])]
+    private array|Collection $positions;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="branche", type="string", length=64, nullable=true)
-     */
-    private $branche;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="headquarter", type="string", length=64, nullable=true)
-     */
-    private $headquarter;
-
-    /**
-     * @var Collection|Position[]
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="share", cascade={"remove"})
-     */
-    private $positions;
-
-    /**
-     * @var Collection|ManualDividend[]
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\ManualDividend", mappedBy="share", cascade={"remove", "persist"})
-     */
-    private $manualDividends;
+    #[ORM\OneToMany(targetEntity: ManualDividend::class, mappedBy: "share", cascade: ["remove", "persist"])]
+    private array|Collection $manualDividends;
 
 
     public function __clone()
@@ -244,22 +177,6 @@ class Share
     }
 
     /**
-     * @return int|null
-     */
-    public function getValor(): ?int
-    {
-        return $this->valor;
-    }
-
-    /**
-     * @param int|null $valor
-     */
-    public function setValor(?int $valor): void
-    {
-        $this->valor = $valor;
-    }
-
-    /**
      * @return string|null
      */
     public function getIsin(): ?string
@@ -273,54 +190,6 @@ class Share
     public function setIsin(string $isin): void
     {
         $this->isin = $isin;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     */
-    public function setType(string $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getBranche(): ?string
-    {
-        return $this->branche;
-    }
-
-    /**
-     * @param string|null $branche
-     */
-    public function setBranche(?string $branche): void
-    {
-        $this->branche = $branche;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getHeadquarter(): ?string
-    {
-        return $this->headquarter;
-    }
-
-    /**
-     * @param string|null $headquarter
-     */
-    public function setHeadquarter(?string $headquarter): void
-    {
-        $this->headquarter = $headquarter;
     }
 
     /**

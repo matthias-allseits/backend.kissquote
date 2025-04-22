@@ -6,39 +6,23 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 
-/**
- * Label
- *
- * @ORM\Table(name="sector")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Sector
 {
 
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+	private int $id;
+
+    #[ORM\Column(name: "portfolio_id", type: "integer", nullable: true)]
+    private ?int $portfolioId;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="portfolio_id", type="integer", nullable=true)
-     */
-    private $portfolioId;
-
-    /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="name", type="string", length=64, nullable=false)
      */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 64, unique: false, nullable: false)]
+    private string $name;
 
 
     public function __clone()

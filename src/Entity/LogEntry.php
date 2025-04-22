@@ -7,24 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 
-/**
- * LogEntry
- *
- * @ORM\Table(name="log_entry")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class LogEntry
 {
-
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
     /**
      * @var Portfolio|null

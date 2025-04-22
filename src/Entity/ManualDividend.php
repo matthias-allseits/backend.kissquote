@@ -5,50 +5,33 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
-/**
- * Dividend
- *
- * @ORM\Table(name="manual_dividend", indexes={@ORM\Index(name="shareindex", columns={"share_id"})})
- * @ORM\Entity
- */
+#[ORM\Entity()]
+#[ORM\Index(name: "shareindex", columns: ["share_id"])]
 class ManualDividend
 {
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
 	/**
-	 * @var Share
      * @Serializer\Type("App\Entity\Share")
-	 *
-	 * @ORM\ManyToOne(targetEntity="Share")
-	 * @ORM\JoinColumns({
-	 *   @ORM\JoinColumn(name="share_id", referencedColumnName="id", nullable=false)
-	 * })
 	 */
-	private $share;
+    #[ORM\ManyToOne(targetEntity: Share::class)]
+    #[ORM\JoinColumn(name: 'share_id', referencedColumnName: 'id')]
+	private Share $share;
 
     /**
-     * @var int
      * @Serializer\Type("integer")
-     *
-     * @ORM\Column(name="year", type="integer", nullable=false)
      */
-    private $year;
+    #[ORM\Column(name: "year", type: "integer", nullable: false)]
+    private int $year;
 
     /**
-     * @var int
      * @Serializer\Type("integer")
-     *
-     * @ORM\Column(name="amount", type="integer", nullable=false)
      */
-    private $amount;
+    #[ORM\Column(name: "amount", type: "integer", nullable: false)]
+    private int $amount;
 
 
     public function __toString()

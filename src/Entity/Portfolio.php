@@ -6,31 +6,29 @@ use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use JMS\Serializer\Annotation\MaxDepth;
 
 
 #[ORM\Entity()]
 class Portfolio
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int $id;
 
-    #[ORM\Column(name: "user_name", type: "string", length: 32, unique: true, nullable: true)]
+    #[ORM\Column(name: "user_name", type: "string", length: 32, unique: false, nullable: true)]
     private ?string $userName;
 
-    #[ORM\Column(name: "hash_key", type: "string", length: 32, unique: true, nullable: true)]
+    #[ORM\Column(name: "hash_key", type: "string", length: 32, unique: false, nullable: true)]
     private ?string $hashKey;
 
     #[ORM\Column(name: "start_date", type: "date", nullable: false)]
     private DateTime $startDate;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\BankAccount", mappedBy: "portfolio", cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(targetEntity: BankAccount::class, mappedBy: "portfolio", cascade: ["remove", "persist"])]
     private array|Collection $bankAccounts;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\Watchlist", mappedBy: "portfolio", cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(targetEntity: Watchlist::class, mappedBy: "portfolio", cascade: ["remove", "persist"])]
     private array|Collection $watchlistEntries;
 
     /**
@@ -101,6 +99,7 @@ class Portfolio
     public function getAllPositions(): array
     {
         $positions = [];
+        /** @var BankAccount $account */
         foreach($this->bankAccounts as $account) {
             $positions = array_merge($positions, $account->getPositions());
         }

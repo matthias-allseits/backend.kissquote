@@ -6,63 +6,43 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 
-/**
- * Marketplace
- *
- * @ORM\Table(name="marketplace")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Marketplace
 {
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="name", type="string", length=64, nullable=false)
      */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 64, unique: false, nullable: false)]
+    private string $name;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="place", type="string", length=64, nullable=false)
      */
-    private $place;
+    #[ORM\Column(name: "place", type: "string", length: 64, unique: false, nullable: false)]
+    private string $place;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="currency", type="string", length=4, nullable=false)
      */
-    private $currency;
+    #[ORM\Column(name: "currency", type: "string", length: 4, unique: false, nullable: false)]
+    private string $currency;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="url_key", type="string", length=5, nullable=false)
      */
-    private $urlKey;
+    #[ORM\Column(name: "url_key", type: "string", length: 5, unique: false, nullable: false)]
+    private string $urlKey;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="isin_key", type="string", length=4, nullable=false)
      */
-    private $isinKey;
+    #[ORM\Column(name: "isin_key", type: "string", length: 4, unique: false, nullable: false)]
+    private string $isinKey;
 
 
     public function __toString()

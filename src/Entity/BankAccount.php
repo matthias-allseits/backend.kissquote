@@ -6,64 +6,25 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
-/**
- * BankAccout
- *
- * @ORM\Table(name="bank_account")
- * @ORM\Entity
- */
+
+#[ORM\Entity()]
 class BankAccount
 {
 
-    /**
-     * @var integer
-     * @Serializer\Type("integer")
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
-    /**
-     * @var Portfolio
-     *
-     * @ORM\ManyToOne(targetEntity="Portfolio")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id")
-     * })
-     */
-    private $portfolio;
+    #[ORM\ManyToOne(targetEntity: Portfolio::class)]
+    #[ORM\JoinColumn(name: 'portfolio', referencedColumnName: 'id')]
+    private Portfolio $portfolio;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 255, unique: true, nullable: true)]
+    private string $name;
 
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="bankAccountFrom")
-     */
-    private $transfersFrom;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="bankAccountTo")
-     */
-    private $transfersTo;
-
-    /**
-     * @var Collection
-     * @Serializer\Type("ArrayCollection<App\Entity\Position>")
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="bankAccount", cascade={"persist"})
-     */
-    private $positions;
+    #[ORM\OneToMany(targetEntity: Position::class, mappedBy: "bankAccount")]
+    private array|Collection $positions;
 
 
     public function getCashPositionByCurrency(Currency $currency): ?Position

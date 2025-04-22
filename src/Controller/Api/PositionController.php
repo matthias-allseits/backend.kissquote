@@ -498,7 +498,6 @@ class PositionController extends BaseController
             $marketplace = $this->getDoctrine()->getRepository(Marketplace::class)->find($share->getMarketplace()->getId());
             $share->setMarketplace($marketplace);
             $share->setPortfolioId($portfolio->getId());
-            $share->setType('stock');
             $this->getDoctrine()->getManager()->persist($share);
         }
         $position->setShare($share);

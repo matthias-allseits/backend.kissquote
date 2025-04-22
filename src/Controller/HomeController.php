@@ -30,8 +30,8 @@ class HomeController extends AbstractController
             $portfolio->setCurrencies($currencies);
             $sectors = $entityManager->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setSectors($sectors);
-            $shares = $entityManager->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
-            $portfolio->setShares($shares);
+//            $shares = $entityManager->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
+//            $portfolio->setShares($shares);
         }
 
         return $this->render('home/home.html.twig', [

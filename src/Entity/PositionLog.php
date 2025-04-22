@@ -5,35 +5,20 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
-/**
- * PositionLog
- *
- * @ORM\Table(name="position_log")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class PositionLog
 {
-
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
     /**
-     * @var Position
      * @Serializer\Type("App\Entity\Position")
-     *
-     * @ORM\ManyToOne(targetEntity="Position")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="position_id", referencedColumnName="id", nullable=false)
-     * })
      */
-    private $position;
+    #[ORM\ManyToOne(targetEntity: Position::class, inversedBy: 'logEntries')]
+    #[ORM\JoinColumn(name: 'position', referencedColumnName: 'id')]
+    private Position $position;
 
     /**
      * @var \DateTime

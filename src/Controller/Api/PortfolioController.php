@@ -198,9 +198,6 @@ class PortfolioController extends BaseController
             $newShare->setName($share->getName());
             $newShare->setIsin($share->getIsin());
             $newShare->setMarketplace($share->getMarketplace());
-            $newShare->setBranche($share->getBranche());
-            $newShare->setHeadquarter($share->getHeadquarter());
-            $newShare->setValor($share->getValor());
             $newShare->setShortname($share->getShortname());
             $currency = $newPortfolio->getCurrencyByName($share->getCurrency()->getName());
             $newShare->setCurrency($currency);

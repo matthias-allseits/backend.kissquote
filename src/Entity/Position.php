@@ -12,12 +12,7 @@ use Doctrine\ORM\Mapping\OneToOne;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Annotation\Exclude;
 
-/**
- * Position
- *
- * @ORM\Table(name="position")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Position
 {
 
@@ -26,240 +21,175 @@ class Position
     const TITLES_INTEREST = ['Zins'];
     const TITLES_COUPON = ['Coupon'];
 
-    /**
-     * @var integer
-     * @Serializer\Type("integer")
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
     /**
-     * @var BankAccount|null
      * @Serializer\Type("App\Entity\BankAccount")
      * @Serializer\SerializedName("bankAccount")
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\BankAccount")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="bank_account_id", referencedColumnName="id", nullable=true)
-     * })
      */
-    private $bankAccount;
+    #[ORM\ManyToOne(targetEntity: BankAccount::class, inversedBy: 'positions', cascade: ["remove", "persist"])]
+    #[JoinColumn(name: 'product_id', referencedColumnName: 'id')]
+    private ?BankAccount $bankAccount;
+
+//    #[ORM\OneToOne(targetEntity: Position::class, inversedBy: 'position')]
+//    #[JoinColumn(name: 'underlying_id', referencedColumnName: 'id')]
+//    private ?Position $underlying;
 
     /**
-     * @var Position|null
-     *
-     * @OneToOne(targetEntity="App\Entity\Position")
-     * @JoinColumn(name="underlying_id", referencedColumnName="id", nullable=true)
-     **/
-    private $underlying;
-
-    /**
-     * @var Share
      * @Serializer\Type("App\Entity\Share")
-     *
-     * @ORM\ManyToOne(targetEntity="Share", cascade={"remove", "persist"})
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="share_id", referencedColumnName="id")
-     * })
      */
-    private $share;
+    #[ORM\ManyToOne(targetEntity: Share::class)]
+    #[ORM\JoinColumn(name: 'share', referencedColumnName: 'id')]
+    private Share $share;
 
     /**
-     * @var Currency
      * @Serializer\Type("App\Entity\Currency")
-     *
-     * @ORM\ManyToOne(targetEntity="Currency")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="currency_id", referencedColumnName="id")
-     * })
      */
-    private $currency;
+    #[ORM\ManyToOne(targetEntity: Currency::class)]
+    #[ORM\JoinColumn(name: 'currency', referencedColumnName: 'id')]
+    private Currency $currency;
 
     /**
-     * @var Sector|null
      * @Serializer\Type("App\Entity\Sector")
-     *
-     * @ORM\ManyToOne(targetEntity="Sector")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="sector_id", referencedColumnName="id", nullable=true)
-     * })
      */
-    private $sector;
+    #[ORM\ManyToOne(targetEntity: Sector::class)]
+    #[ORM\JoinColumn(name: 'sector', referencedColumnName: 'id')]
+    private ?Sector $sector;
 
     /**
-     * @var Strategy|null
      * @Serializer\Type("App\Entity\Strategy")
-     *
-     * @ORM\ManyToOne(targetEntity="Strategy")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="strategy_id", referencedColumnName="id", nullable=true)
-     * })
      */
-    private $strategy;
+    #[ORM\ManyToOne(targetEntity: Strategy::class)]
+    #[ORM\JoinColumn(name: 'strategy', referencedColumnName: 'id')]
+    private ?Strategy $strategy;
 
     /**
-     * @var boolean
      * @Serializer\Type("boolean")
-     *
-     * @ORM\Column(name="active", type="boolean", nullable=false)
      */
-    private $active = true;
+    #[ORM\Column(name: "active", type: "boolean", nullable: false)]
+    private bool $active = true;
 
     /**
-     * @var DateTime
      * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
      * @Serializer\SerializedName("activeFrom")
-     *
-     * @ORM\Column(name="active_from", type="date", nullable=true)
      */
-    private $activeFrom;
+    #[ORM\Column(name: "active_from", type: "date", nullable: true)]
+    private ?DateTime $activeFrom;
 
     /**
-     * @var DateTime|null
      * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
      * @Serializer\SerializedName("activeUntil")
-     *
-     * @ORM\Column(name="active_until", type="date", nullable=true)
      */
-    private $activeUntil;
+    #[ORM\Column(name: "active_until", type: "date", nullable: true)]
+    private ?DateTime $activeUntil;
 
     /**
-     * @var Collection
      * @Serializer\Type("ArrayCollection<App\Entity\Transaction>")
-     *
-     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="position", cascade={"remove", "persist"})
      */
-    private $transactions;
+    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: "position", cascade: ["remove", "persist"])]
+    private array|Collection $transactions;
 
     /**
-     * @var Collection
      * @Serializer\Type("ArrayCollection<App\Entity\PositionLog>")
-     *
-     * @ORM\OneToMany(targetEntity="PositionLog", mappedBy="position", cascade={"remove", "persist"})
      */
-    private $logEntries;
+    #[ORM\OneToMany(targetEntity: PositionLog::class, mappedBy: "position", cascade: ["remove", "persist"])]
+    private array|Collection $logEntries;
 
     /**
-     * @var boolean
      * @Serializer\Type("boolean")
      * @Serializer\SerializedName("isCash")
-     *
-     * @ORM\Column(name="isCash", type="boolean", nullable=false)
      */
-    private $isCash = false;
+    #[ORM\Column(name: "is_cash", type: "boolean", nullable: false)]
+    private bool $isCash = false;
 
     /**
-     * @var string
      * @Serializer\Type("string")
      * @Serializer\SerializedName("dividendPeriodicity")
-     *
-     * @ORM\Column(name="dividend_periodicity", type="string", length=32, nullable=true)
      */
-    private $dividendPeriodicity;
+    #[ORM\Column(name: "dividend_periodicity", type: "string", length: 32, unique: false, nullable: true)]
+    private ?string $dividendPeriodicity;
 
     /**
-     * @var int|null
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("manualDrawdown")
-     *
-     * @ORM\Column(name="manual_drawdown", type="smallint", nullable=true)
      */
-    private $manualDrawdown;
+    #[ORM\Column(name: "manual_drawdown", type: "smallint", nullable: true)]
+    private ?int $manualDrawdown;
 
     /**
-     * @var int|null
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("manualDividendDrop")
-     *
-     * @ORM\Column(name="manual_dividend_drop", type="smallint", nullable=true)
      */
-    private $manualDividendDrop;
+    #[ORM\Column(name: "manual_dividend_drop", type: "smallint", nullable: true)]
+    private ?int $manualDividendDrop;
 
     /**
-     * @var DateTime|null
      * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
      * @Serializer\SerializedName("manualDividendExDate")
-     *
-     * @ORM\Column(name="manual_dividend_ex_date", type="date", nullable=true)
      */
+    #[ORM\Column(name: "manual_dividend_ex_date", type: "date", nullable: true)]
     private ?DateTime $manualDividendExDate;
 
     /**
-     * @var DateTime|null
      * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
      * @Serializer\SerializedName("manualDividendPayDate")
-     *
-     * @ORM\Column(name="manual_dividend_pay_date", type="date", nullable=true)
      */
+    #[ORM\Column(name: "manual_dividend_pay_date", type: "date", nullable: true)]
     private ?DateTime $manualDividendPayDate;
 
     /**
-     * @var float|null
      * @Serializer\Type("float")
      * @Serializer\SerializedName("manualDividendAmount")
-     *
-     * @ORM\Column(name="manual_dividend_amount", type="float", precision=10, scale=3, nullable=true)
      */
+    #[ORM\Column(name: "manual_dividend_amount", type: "float", precision: 10, scale: 3, nullable: true)]
     private ?float $manualDividendAmount;
 
     /**
-     * @var integer|null
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("shareheadId")
-     *
-     * @ORM\Column(name="sharehead_id", type="integer", nullable=true)
      */
-    private $shareheadId;
+    #[ORM\Column(name: "sharehead_id", type: "integer", nullable: true)]
+    private ?int $shareheadId;
 
     /**
-     * @var float|null
      * @Serializer\Type("float")
      * @Serializer\SerializedName("stopLoss")
-     *
-     * @ORM\Column(name="stop_loss", type="float", precision=10, scale=3, nullable=true)
      */
-    private $stopLoss;
+    #[ORM\Column(name: "stop_loss", type: "float", precision: 10, scale: 3, nullable: true)]
+    private ?float $stopLoss;
 
     /**
-     * @var float|null
      * @Serializer\Type("float")
      * @Serializer\SerializedName("manualDividend")
-     *
-     * @ORM\Column(name="manual_dividend", type="float", precision=10, scale=3, nullable=true)
      */
-    private $manualDividend;
+    #[ORM\Column(name: "manual_dividend", type: "float", precision: 10, scale: 3, nullable: true)]
+    private ?float $manualDividend;
 
     /**
-     * @var float|null
      * @Serializer\Type("float")
      * @Serializer\SerializedName("manualTargetPrice")
      * used to change the value in the target-value list. If set it overrules all analyst target-prices
-     *
-     * @ORM\Column(name="manual_target_price", type="float", precision=10, scale=3, nullable=true)
      */
-    private $manualTargetPrice;
+    #[ORM\Column(name: "manual_target_price", type: "float", precision: 10, scale: 3, nullable: true)]
+    private ?float $manualTargetPrice;
 
     /**
-     * @var float|null
      * @Serializer\Type("float")
      * @Serializer\SerializedName("targetPrice")
      * used to mark the limit, this position will be marked green in frontend. showed also in share-chart
-     *
-     * @ORM\Column(name="target_price", type="float", precision=10, scale=3, nullable=true)
      */
-    private $targetPrice;
+    #[ORM\Column(name: "target_price", type: "float", precision: 10, scale: 3, nullable: true)]
+    private ?float $targetPrice;
 
     /**
-     * @var string|null
      * @Serializer\Type("string")
      * @Serializer\SerializedName("targetType")
-     *
-     * @ORM\Column(name="target_type", type="string", length=8, nullable=true)
      */
-    private $targetType;
+    #[ORM\Column(name: "target_type", type: "string", length: 8, unique: false, nullable: true)]
+    private ?string $targetType;
 
     /**
      * Many Positions have Many Labels.
@@ -271,43 +201,36 @@ class Position
      * @var Collection<int, Label>
      * @Serializer\Type("ArrayCollection<App\Entity\Label>")
      */
-    private $labels;
+    #[ORM\ManyToMany(targetEntity: Label::class)]
+    #[ORM\JoinTable(name: "position_labels", joinColumns: [
+
+    ])]
+    private array|Collection $labels;
 
     /**
      * Used for assign this position to another position as underlying
-     * @var integer|null
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("motherId")
      */
-    private $motherId;
+    private ?int $motherId;
 
 
 // todo: add annotations
 //    private $rates;
 
-    /**
-     * @var Balance|null
-     */
-    private $balance;
+    private ?Balance $balance;
 
     /**
-     * @var string|null
      * @Serializer\Type("string")
      * @Serializer\SerializedName("bankAccountName")
      */
-    private $bankAccountName;
+    private ?string $bankAccountName;
 
 
     public function __clone()
     {
         $this->id = null;
         $newTransactions = [];
-//        foreach($this->getTransactions() as $transaction) {
-//            $newTransaction = clone $transaction;
-//            $newTransaction->setPosition($this);
-//            $newTransaction->setCurrency(null);
-//            $newTransactions[] = $newTransaction;
-//        }
         $this->setTransactions($newTransactions);
     }
 

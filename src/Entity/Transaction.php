@@ -5,89 +5,61 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
-/**
- * Transaction
- *
- * @ORM\Table(name="transaction", indexes={@ORM\Index(name="positionactionindex", columns={"position_id"})})
- * @ORM\Entity
- */
+#[ORM\Entity()]
+//#[ORM\Index(name: "positionactionindex", columns: ["position_id"])]
 class Transaction
 {
-
     const TITLES_POSITIVE = ['Einzahlung', 'Vergütung', 'Verkauf', 'Forex-Gutschrift', 'Fx-Gutschrift Comp.', 'Dividende', 'Kapitalrückzahlung', 'Capital Gain', 'Korrekturbuchung', 'Zins', 'Coupon'];
     const TITLES_NEGATIVE = ['Auszahlung', 'Kauf', 'Depotgebühren', 'Forex-Belastung', 'Fx-Belastung Comp.', 'Negativzins']; // todo: negativzinsen will not last forever!
 
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
     /**
-     * @var Position
      * @Serializer\Type("App\Entity\Position")
-     *
-     * @ORM\ManyToOne(targetEntity="Position")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="position_id", referencedColumnName="id", nullable=false)
-     * })
      */
-    private $position;
+    #[ORM\ManyToOne(targetEntity: Position::class, inversedBy: 'transactions')]
+    #[ORM\JoinColumn(name: 'position', referencedColumnName: 'id')]
+    private Position $position;
 
     /**
-     * @var Currency
      * @Serializer\Type("App\Entity\Currency")
-     *
-     * @ORM\ManyToOne(targetEntity="Currency")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="currency_id", referencedColumnName="id")
-     * })
      */
-    private $currency;
+    #[ORM\ManyToOne(targetEntity: Currency::class)]
+    #[ORM\JoinColumn(name: 'currency', referencedColumnName: 'id')]
+    private Currency $currency;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="title", type="string", length=64, nullable=true)
      */
-    private $title;
+    #[ORM\Column(name: "title", type: "string", length: 64, unique: false, nullable: true)]
+    private ?string $title;
 
     /**
-     * @var \DateTime
      * @Serializer\Type("DateTime<'Y-m-d'>")
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
      */
-    private $date;
+    #[ORM\Column(name: "date", type: "date", nullable: false)]
+    private \DateTime $date;
 
     /**
-     * @var float
      * @Serializer\Type("float")
-     *
-     * @ORM\Column(name="quantity", type="float", precision=10, scale=0, nullable=false)
      */
-    private $quantity;
+    #[ORM\Column(name: "quantity", type: "float", precision: 10, scale: 0, nullable: false)]
+    private float $quantity;
 
     /**
-     * @var float
      * @Serializer\Type("float")
-     *
-     * @ORM\Column(name="rate", type="float", precision=10, scale=0, nullable=false)
      */
-    private $rate;
+    #[ORM\Column(name: "rate", type: "float", precision: 10, scale: 0, nullable: false)]
+    private float $rate;
 
     /**
-     * @var float
      * @Serializer\Type("float")
-     *
-     * @ORM\Column(name="fee", type="float", precision=10, scale=0, nullable=true)
      */
-    private $fee;
+    #[ORM\Column(name: "fee", type: "float", precision: 10, scale: 0, nullable: true)]
+    private ?float $fee;
 
 
     public function __clone()
