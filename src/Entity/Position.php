@@ -26,15 +26,15 @@ class Position
     const TITLES_INTEREST = ['Zins'];
     const TITLES_COUPON = ['Coupon'];
 
-	/**
-	 * @var integer
+    /**
+     * @var integer
      * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
 
     /**
      * @var BankAccount|null
@@ -177,6 +177,33 @@ class Position
      * @ORM\Column(name="manual_dividend_drop", type="smallint", nullable=true)
      */
     private $manualDividendDrop;
+
+    /**
+     * @var DateTime|null
+     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
+     * @Serializer\SerializedName("manualDividendExDate")
+     *
+     * @ORM\Column(name="manual_dividend_ex_date", type="date", nullable=true)
+     */
+    private ?DateTime $manualDividendExDate;
+
+    /**
+     * @var DateTime|null
+     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
+     * @Serializer\SerializedName("manualDividendPayDate")
+     *
+     * @ORM\Column(name="manual_dividend_pay_date", type="date", nullable=true)
+     */
+    private ?DateTime $manualDividendPayDate;
+
+    /**
+     * @var float|null
+     * @Serializer\Type("float")
+     * @Serializer\SerializedName("manualDividendAmount")
+     *
+     * @ORM\Column(name="manual_dividend_amount", type="float", precision=10, scale=3, nullable=true)
+     */
+    private ?float $manualDividendAmount;
 
     /**
      * @var integer|null
@@ -852,6 +879,36 @@ class Position
     public function setManualDividendDrop(?int $manualDividendDrop): void
     {
         $this->manualDividendDrop = $manualDividendDrop;
+    }
+
+    public function getManualDividendExDate(): ?DateTime
+    {
+        return $this->manualDividendExDate;
+    }
+
+    public function setManualDividendExDate(?DateTime $manualDividendExDate): void
+    {
+        $this->manualDividendExDate = $manualDividendExDate;
+    }
+
+    public function getManualDividendPayDate(): ?DateTime
+    {
+        return $this->manualDividendPayDate;
+    }
+
+    public function setManualDividendPayDate(?DateTime $manualDividendPayDate): void
+    {
+        $this->manualDividendPayDate = $manualDividendPayDate;
+    }
+
+    public function getManualDividendAmount(): ?float
+    {
+        return $this->manualDividendAmount;
+    }
+
+    public function setManualDividendAmount(?float $manualDividendAmount): void
+    {
+        $this->manualDividendAmount = $manualDividendAmount;
     }
 
     /**
