@@ -17,7 +17,7 @@ class ManualDividend
 	/**
      * @Serializer\Type("App\Entity\Share")
 	 */
-    #[ORM\ManyToOne(targetEntity: Share::class)]
+    #[ORM\ManyToOne(targetEntity: Share::class, inversedBy: "manualDividends")]
     #[ORM\JoinColumn(name: 'share_id', referencedColumnName: 'id')]
 	private Share $share;
 

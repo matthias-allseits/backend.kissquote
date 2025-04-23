@@ -19,7 +19,7 @@ class Watchlist
     /**
      * @Serializer\Exclude()
      */
-    #[ORM\ManyToOne(targetEntity: Portfolio::class)]
+    #[ORM\ManyToOne(targetEntity: Portfolio::class, inversedBy: 'watchlistEntries')]
     #[ORM\JoinColumn(name: 'portfolio', referencedColumnName: 'id')]
     private Portfolio $portfolio;
 

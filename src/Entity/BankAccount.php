@@ -16,7 +16,7 @@ class BankAccount
     #[ORM\Column]
     private int $id;
 
-    #[ORM\ManyToOne(targetEntity: Portfolio::class)]
+    #[ORM\ManyToOne(targetEntity: Portfolio::class, inversedBy: 'bankAccounts')]
     #[ORM\JoinColumn(name: 'portfolio', referencedColumnName: 'id')]
     private Portfolio $portfolio;
 

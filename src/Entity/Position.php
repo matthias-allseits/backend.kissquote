@@ -8,9 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
-use Doctrine\ORM\Mapping\OneToOne;
 use JMS\Serializer\Annotation as Serializer;
-use JMS\Serializer\Annotation\Exclude;
+
 
 #[ORM\Entity()]
 class Position
@@ -34,14 +33,17 @@ class Position
     #[JoinColumn(name: 'product_id', referencedColumnName: 'id')]
     private ?BankAccount $bankAccount;
 
-//    #[ORM\OneToOne(targetEntity: Position::class, inversedBy: 'position')]
-//    #[JoinColumn(name: 'underlying_id', referencedColumnName: 'id')]
-//    private ?Position $underlying;
+    #[ORM\OneToOne(targetEntity: Position::class, inversedBy: 'position')]
+    #[JoinColumn(name: 'underlying_id', referencedColumnName: 'id')]
+    private ?Position $underlying;
+
+    #[ORM\OneToOne(targetEntity: Position::class, mappedBy: 'underlying')]
+    private ?Position $position;
 
     /**
      * @Serializer\Type("App\Entity\Share")
      */
-    #[ORM\ManyToOne(targetEntity: Share::class)]
+    #[ORM\ManyToOne(targetEntity: Share::class, inversedBy: 'positions')]
     #[ORM\JoinColumn(name: 'share', referencedColumnName: 'id')]
     private Share $share;
 
@@ -504,18 +506,13 @@ class Position
         if (null !== $this->transactions) {
             foreach($this->getTransactions() as $transaction) {
                 if ($transaction->isPositive()) {
-//                    echo $transaction->getRate() . "\n";
                     $value += $transaction->getRate();
-//                    echo 'result: ' . $value . "\n";
                 } elseif ($transaction->isNegative()) {
-//                    echo $transaction->getRate() . "\n";
                     $value -= $transaction->getRate();
-//                    echo 'result: ' . $value . "\n";
                 }
             }
         }
 
-//        echo 'result: ' . $value . "\n";
         return $value;
     }
 
