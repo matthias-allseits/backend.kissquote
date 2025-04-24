@@ -17,47 +17,37 @@ class PositionLog
      * @Serializer\Type("App\Entity\Position")
      */
     #[ORM\ManyToOne(targetEntity: Position::class, inversedBy: 'logEntries')]
-    #[ORM\JoinColumn(name: 'position', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id', nullable: false)]
     private Position $position;
 
     /**
-     * @var \DateTime
      * @Serializer\Type("DateTime<'Y-m-d'>")
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
      */
-    private $date;
+    #[ORM\Column(name: "date", type: "date", nullable: false)]
+    private \DateTime $date;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="log", type="string", length=256, nullable=false)
      */
-    private $log;
+    #[ORM\Column(name: "log", type: "string", length: 256, unique: false, nullable: false)]
+    private string $log;
 
     /**
-     * @var string|null
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="emoticon", type="string", length=8, nullable=true)
      */
-    private $emoticon;
+    #[ORM\Column(name: "emoticon", type: "string", length: 8, unique: false, nullable: true)]
+    private ?string $emoticon;
 
     /**
-     * @var boolean
      * @Serializer\Type("boolean")
-     *
-     * @ORM\Column(name="demo", type="boolean", nullable=false)
      */
+    #[ORM\Column(name: "demo", type: "boolean", nullable: false)]
     private bool $demo = true;
 
     /**
-     * @var boolean
      * @Serializer\Type("boolean")
-     *
-     * @ORM\Column(name="pinned", type="boolean", nullable=false)
      */
+    #[ORM\Column(name: "pinned", type: "boolean", nullable: false)]
     private bool $pinned = false;
 
     /**

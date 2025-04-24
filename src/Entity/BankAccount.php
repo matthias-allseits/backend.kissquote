@@ -10,17 +10,16 @@ use JMS\Serializer\Annotation as Serializer;
 #[ORM\Entity()]
 class BankAccount
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Portfolio::class, inversedBy: 'bankAccounts')]
-    #[ORM\JoinColumn(name: 'portfolio', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'portfolio_id', referencedColumnName: 'id')]
     private Portfolio $portfolio;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, unique: true, nullable: true)]
+    #[ORM\Column(name: "name", type: "string", length: 255, unique: false, nullable: false)]
     private string $name;
 
     #[ORM\OneToMany(targetEntity: Position::class, mappedBy: "bankAccount")]

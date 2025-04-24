@@ -5,59 +5,36 @@ namespace App\Entity;
 use DateTime;use Doctrine\ORM\Mapping as ORM;use JMS\Serializer\Annotation as Serializer;
 
 
-/**
- * Currency
- *
- * @ORM\Table(name="feedback")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Feedback
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
-
-    /**
-     * @var Portfolio|null
-     *
-     * @ORM\ManyToOne(targetEntity="Portfolio")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     * })
-     */
+    #[ORM\ManyToOne(targetEntity: Portfolio::class)]
+    #[ORM\JoinColumn(name: 'portfolio_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private $portfolio;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="mood", type="string", length=64, nullable=false)
      */
-    private $mood;
+    #[ORM\Column(name: "mood", type: "string", length: 64, unique: false, nullable: false)]
+    private string $mood;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="feedback", type="text", nullable=true)
      */
-    private $feedback;
+    #[ORM\Column(name: "feedback", type: "text", nullable: true)]
+    private ?string $feedback;
 
     /**
-     * @var DateTime
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      * @Serializer\SerializedName("dateTime")
-     *
-     * @ORM\Column(name="date_time", type="datetime", nullable=false)
      */
-    private $dateTime;
+    #[ORM\Column(name: "date_time", type: "datetime", nullable: false)]
+    private DateTime $dateTime;
 
 
     public function __construct()

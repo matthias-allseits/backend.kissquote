@@ -3,77 +3,38 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 
-/**
- * Stockrate
- *
- * @ORM\Table(name="stockrate",indexes={
- *     @ORM\Index(name="isin_idx", columns={"isin"})
- * })
- * @ORM\Entity(repositoryClass="App\Repository\StockrateRepository")
- */
+#[ORM\Entity()]
+#[ORM\Index(name: "isin_idx", columns: ["isin"])]
 class Stockrate
 {
-	/**
-	 * @var integer
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
-    /**
-     * @var Marketplace|null
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Marketplace")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="marketplace_id", referencedColumnName="id", nullable=true)
-     * })
-     */
-    private $marketplace;
+    #[ORM\ManyToOne(targetEntity: Marketplace::class)]
+    #[JoinColumn(name: 'marketplace_id', referencedColumnName: 'id', nullable: true)]
+    private ?Marketplace $marketplace;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="currency_name", type="string", length=4, nullable=false)
-     */
-    private $currencyName;
+    #[ORM\Column(name: "currency_name", type: "string", length: 4, unique: false, nullable: false)]
+    private string $currencyName;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="isin", type="string", length=16, nullable=false)
-     */
-    private $isin;
+    #[ORM\Column(name: "isin", type: "string", length: 16, unique: false, nullable: false)]
+    private string $isin;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
-     */
-    private $date;
+    #[ORM\Column(name: "date", type: "date", nullable: false)]
+    private \DateTime $date;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="rate", type="float", precision=10, scale=3, nullable=false)
-     */
-    private $rate;
+    #[ORM\Column(name: "rate", type: "float", precision: 10, scale: 3, nullable: false)]
+    private float $rate;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="high", type="float", precision=10, scale=3, nullable=true)
-     */
+    #[ORM\Column(name: "high", type: "float", precision: 10, scale: 3, nullable: true)]
     private $high;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="low", type="float", precision=10, scale=3, nullable=true)
-     */
+    #[ORM\Column(name: "low", type: "float", precision: 10, scale: 3, nullable: true)]
     private $low;
 
 

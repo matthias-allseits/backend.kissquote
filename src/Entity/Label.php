@@ -14,28 +14,20 @@ class Label
     #[ORM\Column]
     private int $id;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="portfolio_id", type="integer", nullable=true)
-     */
-    private $portfolioId;
+    #[ORM\Column(name: "portfolio_id", type: "integer", nullable: true)]
+    private ?int $portfolioId;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="name", type="string", length=64, nullable=false)
      */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 64, unique: false, nullable: false)]
+    private string $name;
 
     /**
-     * @var string|null
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="color", type="string", length=64, nullable=true)
      */
-    private $color;
+    #[ORM\Column(name: "color", type: "string", length: 64, unique: false, nullable: true)]
+    private ?string $color;
 
 
     public function __clone()

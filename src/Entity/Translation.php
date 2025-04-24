@@ -5,50 +5,25 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 
-/**
- * Translation
- *
- * @ORM\Table(name="translation")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Translation
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="keystring", type="string", length=255, nullable=false, unique=true)
-     */
-    private $key;
+    #[ORM\Column(name: "keystring", type: "string", length: 255, unique: true, nullable: false)]
+    private string $key;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="de", type="string", length=255, nullable=true)
-     */
-    private $de;
+    #[ORM\Column(name: "de", type: "string", length: 255, unique: false, nullable: true)]
+    private ?string $de;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="en", type="string", length=255, nullable=true)
-     */
-    private $en;
+    #[ORM\Column(name: "en", type: "string", length: 255, unique: false, nullable: true)]
+    private ?string $en;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="fr", type="string", length=255, nullable=true)
-     */
-    private $fr;
+    #[ORM\Column(name: "fr", type: "string", length: 255, unique: false, nullable: true)]
+    private ?string $fr;
 
 
     public function __construct()

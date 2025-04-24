@@ -16,10 +16,10 @@ class Portfolio
     #[ORM\Column]
     private int $id;
 
-    #[ORM\Column(name: "user_name", type: "string", length: 32, unique: false, nullable: true)]
+    #[ORM\Column(name: "user_name", type: "string", length: 32, unique: true, nullable: true)]
     private ?string $userName;
 
-    #[ORM\Column(name: "hash_key", type: "string", length: 32, unique: false, nullable: true)]
+    #[ORM\Column(name: "hash_key", type: "string", length: 32, unique: true, nullable: true)]
     private ?string $hashKey;
 
     #[ORM\Column(name: "start_date", type: "date", nullable: false)]

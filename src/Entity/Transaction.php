@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 #[ORM\Entity()]
-//#[ORM\Index(name: "positionactionindex", columns: ["position_id"])]
+#[ORM\Index(name: "positionactionindex", columns: ["position_id"])]
 class Transaction
 {
     const TITLES_POSITIVE = ['Einzahlung', 'Vergütung', 'Verkauf', 'Forex-Gutschrift', 'Fx-Gutschrift Comp.', 'Dividende', 'Kapitalrückzahlung', 'Capital Gain', 'Korrekturbuchung', 'Zins', 'Coupon'];
@@ -21,14 +21,14 @@ class Transaction
      * @Serializer\Type("App\Entity\Position")
      */
     #[ORM\ManyToOne(targetEntity: Position::class, inversedBy: 'transactions')]
-    #[ORM\JoinColumn(name: 'position', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id', nullable: false)]
     private Position $position;
 
     /**
      * @Serializer\Type("App\Entity\Currency")
      */
     #[ORM\ManyToOne(targetEntity: Currency::class)]
-    #[ORM\JoinColumn(name: 'currency', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'currency_id', referencedColumnName: 'id')]
     private Currency $currency;
 
     /**

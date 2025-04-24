@@ -30,7 +30,7 @@ class Position
      * @Serializer\SerializedName("bankAccount")
      */
     #[ORM\ManyToOne(targetEntity: BankAccount::class, inversedBy: 'positions', cascade: ["remove", "persist"])]
-    #[JoinColumn(name: 'product_id', referencedColumnName: 'id')]
+    #[JoinColumn(name: 'bank_account_id', referencedColumnName: 'id')]
     private ?BankAccount $bankAccount;
 
     #[ORM\OneToOne(targetEntity: Position::class, inversedBy: 'position')]
@@ -44,28 +44,28 @@ class Position
      * @Serializer\Type("App\Entity\Share")
      */
     #[ORM\ManyToOne(targetEntity: Share::class, inversedBy: 'positions')]
-    #[ORM\JoinColumn(name: 'share', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'share_id', referencedColumnName: 'id')]
     private Share $share;
 
     /**
      * @Serializer\Type("App\Entity\Currency")
      */
     #[ORM\ManyToOne(targetEntity: Currency::class)]
-    #[ORM\JoinColumn(name: 'currency', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'currency_id', referencedColumnName: 'id')]
     private Currency $currency;
 
     /**
      * @Serializer\Type("App\Entity\Sector")
      */
     #[ORM\ManyToOne(targetEntity: Sector::class)]
-    #[ORM\JoinColumn(name: 'sector', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'sector_id', referencedColumnName: 'id')]
     private ?Sector $sector;
 
     /**
      * @Serializer\Type("App\Entity\Strategy")
      */
     #[ORM\ManyToOne(targetEntity: Strategy::class)]
-    #[ORM\JoinColumn(name: 'strategy', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'strategy_id', referencedColumnName: 'id')]
     private ?Strategy $strategy;
 
     /**
@@ -194,19 +194,12 @@ class Position
     private ?string $targetType;
 
     /**
-     * Many Positions have Many Labels.
-     * @ORM\ManyToMany(targetEntity="Label")
-     * @ORM\JoinTable(name="position_label",
-     *      joinColumns={@ORM\JoinColumn(name="position_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="label_id", referencedColumnName="id")}
-     *      )
-     * @var Collection<int, Label>
      * @Serializer\Type("ArrayCollection<App\Entity\Label>")
      */
     #[ORM\ManyToMany(targetEntity: Label::class)]
-    #[ORM\JoinTable(name: "position_labels", joinColumns: [
-
-    ])]
+    #[ORM\JoinTable(name: "position_label")]
+    #[ORM\JoinColumn(name: "position_id", referencedColumnName: "id")]
+    #[ORM\InverseJoinColumn(name: "label_id", referencedColumnName: "id")]
     private array|Collection $labels;
 
     /**

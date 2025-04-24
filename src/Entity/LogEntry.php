@@ -15,48 +15,34 @@ class LogEntry
     #[ORM\Column]
     private int $id;
 
-    /**
-     * @var Portfolio|null
-     *
-     * @ORM\ManyToOne(targetEntity="Portfolio")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="portfolio_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     * })
-     */
-    private $portfolio;
+    #[ORM\ManyToOne(targetEntity: Portfolio::class)]
+    #[ORM\JoinColumn(name: 'portfolio_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private Portfolio $portfolio;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="action", type="string", length=64, nullable=false)
      */
-    private $action;
+    #[ORM\Column(name: "action", type: "string", length: 64, unique: false, nullable: false)]
+    private string $action;
 
     /**
-     * @var string
      * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="result", type="string", length=256, nullable=false)
      */
+    #[ORM\Column(name: "result", type: "string", length: 256, unique: false, nullable: false)]
     private $result;
 
     /**
-     * @var bool
      * @Serializer\Type("boolean")
-     *
-     * @ORM\Column(name="failed", type="string", type="boolean", nullable=false)
      */
-    private $failed;
+    #[ORM\Column(name: "failed", type: "boolean", nullable: false)]
+    private bool $failed;
 
     /**
-     * @var DateTime
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      * @Serializer\SerializedName("dateTime")
-     *
-     * @ORM\Column(name="date_time", type="datetime", nullable=false)
      */
-    private $dateTime;
+    #[ORM\Column(name: "date_time", type: "datetime", nullable: false)]
+    private DateTime $dateTime;
 
 
     public function __construct()

@@ -16,7 +16,7 @@ class Share
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Currency::class)]
-    #[ORM\JoinColumn(name: 'currency', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'currency_id', referencedColumnName: 'id')]
     private Currency $currency;
 
     #[ORM\Column(name: "portfolio_id", type: "integer", nullable: true)]
@@ -26,7 +26,7 @@ class Share
      * @Serializer\Type("App\Entity\Marketplace")
      */
     #[ORM\ManyToOne(targetEntity: Marketplace::class)]
-    #[ORM\JoinColumn(name: 'marketplace', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'marketplace_id', referencedColumnName: 'id')]
     private ?Marketplace $marketplace;
 
     /**
