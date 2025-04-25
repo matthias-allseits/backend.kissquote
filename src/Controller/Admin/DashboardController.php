@@ -32,9 +32,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class DashboardController extends AbstractDashboardController
 {
 
-    /**
-     * @Route("/admin", name="admin")
-     */
     public function index(): Response
     {
         return parent::index();
@@ -48,7 +45,7 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Portfolios', 'fas fa-list', Portfolio::class);
         yield MenuItem::linkToCrud('Shares', 'fas fa-list', Share::class);
         yield MenuItem::linkToCrud('Bank accounts', 'fas fa-list', BankAccount::class);
@@ -58,11 +55,9 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Sectors', 'fas fa-list', Sector::class);
         yield MenuItem::linkToCrud('Labels', 'fas fa-list', Label::class);
         yield MenuItem::linkToCrud('Marketplaces', 'fas fa-list', Marketplace::class);
-        yield MenuItem::linkToCrud('Sharehead Shares', 'fas fa-list', ShareheadShare::class);
         yield MenuItem::linkToCrud('StockRates', 'fas fa-list', Stockrate::class);
         yield MenuItem::linkToCrud('Manual dividends', 'fas fa-list', ManualDividend::class);
         yield MenuItem::linkToCrud('Translations', 'fas fa-list', Translation::class);
-        yield MenuItem::linkToCrud('Feedback Proposals', 'fas fa-list', FeedbackProposal::class);
         yield MenuItem::linkToCrud('Feedbacks', 'fas fa-list', Feedback::class);
         yield MenuItem::linkToCrud('Watchlist Entries', 'fas fa-list', Watchlist::class);
         yield MenuItem::linkToCrud('PositionLog', 'fas fa-list', PositionLog::class);

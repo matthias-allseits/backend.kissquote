@@ -17,7 +17,7 @@ class LogEntry
 
     #[ORM\ManyToOne(targetEntity: Portfolio::class)]
     #[ORM\JoinColumn(name: 'portfolio_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
-    private Portfolio $portfolio;
+    private ?Portfolio $portfolio;
 
     /**
      * @Serializer\Type("string")
@@ -29,7 +29,7 @@ class LogEntry
      * @Serializer\Type("string")
      */
     #[ORM\Column(name: "result", type: "string", length: 256, unique: false, nullable: false)]
-    private $result;
+    private string $result;
 
     /**
      * @Serializer\Type("boolean")
