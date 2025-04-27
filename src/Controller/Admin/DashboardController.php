@@ -5,7 +5,6 @@ namespace App\Controller\Admin;
 use App\Entity\BankAccount;
 use App\Entity\Currency;
 use App\Entity\Feedback;
-use App\Entity\FeedbackProposal;
 use App\Entity\Label;
 use App\Entity\LogEntry;
 use App\Entity\ManualDividend;
@@ -15,7 +14,6 @@ use App\Entity\Position;
 use App\Entity\PositionLog;
 use App\Entity\Sector;
 use App\Entity\Share;
-use App\Entity\ShareheadShare;
 use App\Entity\Transaction;
 use App\Entity\Translation;
 use App\Entity\Stockrate;
@@ -34,7 +32,8 @@ class DashboardController extends AbstractDashboardController
 
     public function index(): Response
     {
-        return parent::index();
+        return $this->render('EasyAdmin/layout.html.twig', [
+        ]);
     }
 
     public function configureDashboard(): Dashboard

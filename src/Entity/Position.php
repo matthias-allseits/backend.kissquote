@@ -29,7 +29,7 @@ class Position
      * @Serializer\Type("App\Entity\BankAccount")
      * @Serializer\SerializedName("bankAccount")
      */
-    #[ORM\ManyToOne(targetEntity: BankAccount::class, inversedBy: 'positions', cascade: ["remove", "persist"])]
+    #[ORM\ManyToOne(targetEntity: BankAccount::class, cascade: ["remove", "persist"], inversedBy: 'positions')]
     #[JoinColumn(name: 'bank_account_id', referencedColumnName: 'id')]
     private ?BankAccount $bankAccount;
 
@@ -44,8 +44,8 @@ class Position
      * @Serializer\Type("App\Entity\Share")
      */
     #[ORM\ManyToOne(targetEntity: Share::class, inversedBy: 'positions')]
-    #[ORM\JoinColumn(name: 'share_id', referencedColumnName: 'id')]
-    private Share $share;
+    #[ORM\JoinColumn(name: 'share_id', referencedColumnName: 'id', nullable: true)]
+    private ?Share $share;
 
     /**
      * @Serializer\Type("App\Entity\Currency")
