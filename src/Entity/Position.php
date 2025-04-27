@@ -147,7 +147,7 @@ class Position
      * @Serializer\Type("boolean")
      * @Serializer\SerializedName("isCash")
      *
-     * @ORM\Column(name="isCash", type="boolean", nullable=false)
+     * @ORM\Column(name="is_cash", type="boolean", nullable=false)
      */
     private $isCash = false;
 
