@@ -2,9 +2,9 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\ShareheadShare;
 use App\Entity\Watchlist;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,22 +14,12 @@ use Symfony\Component\HttpFoundation\Response;
 class WatchlistController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/watchlist", name="list_watchlist")
-     * @param Request $request
-     * @return View
-     */
-    public function listWatchlistEntries(Request $request): View
+    #[Route('/watchlist', name: 'list_watchlist', methods: ['GET'])]
+    public function listWatchlistEntries(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request);
 
-        $entries = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
-//        foreach($entries as $entry) {
-//            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-//            if (null !== $shareheadShare) {
-//                $entry->setTitle($shareheadShare->getName());
-//            }
-//        }
+        $entries = $entityManager->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
 
         return View::create($entries, Response::HTTP_CREATED);
     }
@@ -38,9 +28,10 @@ class WatchlistController extends BaseController
     /**
      * @Rest\Post("/watchlist", name="create_watchlist_entry")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function createWatchlistEntry(Request $request): View
+    public function createWatchlistEntry(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request);
 
@@ -55,18 +46,12 @@ class WatchlistController extends BaseController
         $watchlistEntry->setStartDate(new \DateTime());
         $watchlistEntry->setShareheadId($shareheadId);
 
-        $this->getDoctrine()->getManager()->persist($watchlistEntry);
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->persist($watchlistEntry);
+        $entityManager->flush();
 
         $this->makeLogEntry('add watchlist-entry', $watchlistEntry);
 
-        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
-//        foreach($watchlist as $entry) {
-//            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-//            if (null !== $shareheadShare) {
-//                $entry->setTitle($shareheadShare->getName());
-//            }
-//        }
+        $watchlist = $entityManager->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
 
         return new View($watchlist, Response::HTTP_CREATED);
     }
@@ -76,25 +61,20 @@ class WatchlistController extends BaseController
      * @Rest\Delete("/watchlist/{shareheadId}", name="delete_watchlist_entry")
      * @param Request $request
      * @param int $shareheadId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function deleteWatchlistEntry(Request $request, int $shareheadId): View
+    public function deleteWatchlistEntry(Request $request, int $shareheadId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request);
 
-        $watchlistEntry = $this->getDoctrine()->getRepository(Watchlist::class)->findOneBy(['portfolio' => $portfolio, 'shareheadId' => $shareheadId]);
-        $this->getDoctrine()->getManager()->remove($watchlistEntry);
-        $this->getDoctrine()->getManager()->flush();
+        $watchlistEntry = $entityManager->getRepository(Watchlist::class)->findOneBy(['portfolio' => $portfolio, 'shareheadId' => $shareheadId]);
+        $entityManager->remove($watchlistEntry);
+        $entityManager->flush();
 
         $this->makeLogEntry('remove watchlist-entry', $watchlistEntry);
 
-        $watchlist = $this->getDoctrine()->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
-//        foreach($watchlist as $entry) {
-//            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-//            if (null !== $shareheadShare) {
-//                $entry->setTitle($shareheadShare->getName());
-//            }
-//        }
+        $watchlist = $entityManager->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
 
         return new View($watchlist, Response::HTTP_OK);
     }
