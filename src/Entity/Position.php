@@ -194,6 +194,13 @@ class Position
     private ?string $targetType;
 
     /**
+     * @Serializer\Type("string")
+     * @Serializer\SerializedName("markedLines")
+     */
+    #[ORM\Column(name: "marked_lines", type: "json", nullable: true)]
+    private ?string $markedLines;
+
+    /**
      * @Serializer\Type("ArrayCollection<App\Entity\Label>")
      */
     #[ORM\ManyToMany(targetEntity: Label::class)]
@@ -906,6 +913,16 @@ class Position
     public function setTargetType(?string $targetType): void
     {
         $this->targetType = $targetType;
+    }
+
+    public function getMarkedLines(): ?string
+    {
+        return $this->markedLines;
+    }
+
+    public function setMarkedLines(?string $markedLines): void
+    {
+        $this->markedLines = $markedLines;
     }
 
     /**
