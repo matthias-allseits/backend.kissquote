@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Watchlist;
 use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -14,10 +15,15 @@ use Symfony\Component\HttpFoundation\Response;
 class WatchlistController extends BaseController
 {
 
-    #[Route('/watchlist', name: 'list_watchlist', methods: ['GET'])]
+    /**
+     * @Rest\Get ("/watchlist", name="list_watchlist")
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @return View
+     */
     public function listWatchlistEntries(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $entries = $entityManager->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
 
@@ -33,7 +39,7 @@ class WatchlistController extends BaseController
      */
     public function createWatchlistEntry(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
 
@@ -49,7 +55,7 @@ class WatchlistController extends BaseController
         $entityManager->persist($watchlistEntry);
         $entityManager->flush();
 
-        $this->makeLogEntry('add watchlist-entry', $watchlistEntry);
+        $this->makeLogEntry('add watchlist-entry', $watchlistEntry, $entityManager);
 
         $watchlist = $entityManager->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
 
@@ -66,13 +72,13 @@ class WatchlistController extends BaseController
      */
     public function deleteWatchlistEntry(Request $request, int $shareheadId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $watchlistEntry = $entityManager->getRepository(Watchlist::class)->findOneBy(['portfolio' => $portfolio, 'shareheadId' => $shareheadId]);
         $entityManager->remove($watchlistEntry);
         $entityManager->flush();
 
-        $this->makeLogEntry('remove watchlist-entry', $watchlistEntry);
+        $this->makeLogEntry('remove watchlist-entry', $watchlistEntry, $entityManager);
 
         $watchlist = $entityManager->getRepository(Watchlist::class)->findBy(['portfolio' => $portfolio], ['startDate' => 'DESC']);
 

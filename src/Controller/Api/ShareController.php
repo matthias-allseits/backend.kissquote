@@ -3,7 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Share;
-use App\Entity\ShareheadShare;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -17,24 +17,12 @@ class ShareController extends AbstractFOSRestController
     /**
      * @Rest\Get ("/share", name="list_shares")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function listShares(Request $request): View
+    public function listShares(Request $request, EntityManagerInterface $entityManager): View
     {
-        $shares = $this->getDoctrine()->getRepository(Share::class)->findAll();
-
-        return View::create($shares, Response::HTTP_CREATED);
-    }
-
-
-    /**
-     * @Rest\Get ("/share/sharehead", name="list_sharehead_shares")
-     * @param Request $request
-     * @return View
-     */
-    public function listShareheadShares(Request $request): View
-    {
-        $shares = $this->getDoctrine()->getRepository(ShareheadShare::class)->findAll();
+        $shares = $entityManager->getRepository(Share::class)->findAll();
 
         return View::create($shares, Response::HTTP_CREATED);
     }

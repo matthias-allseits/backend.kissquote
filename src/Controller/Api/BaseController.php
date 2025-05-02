@@ -10,6 +10,7 @@ use App\Entity\Position;
 use App\Entity\PositionLog;
 use App\Entity\Sector;
 use App\Entity\Strategy;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -19,51 +20,52 @@ class BaseController extends AbstractFOSRestController
 {
 
     /** @var Portfolio */
-    protected $portfolio;
+    protected Portfolio $portfolio;
 
 
-    protected function makeLogEntry(string $action, $object): void
+    protected function makeLogEntry(string $action, $object, EntityManagerInterface $entityManager): void
     {
         $logEntry = new LogEntry();
         $logEntry->setPortfolio($this->portfolio);
         $logEntry->setDateTime(new \DateTime());
         $logEntry->setAction($action);
         $logEntry->setResult($object);
-        $this->getDoctrine()->getManager()->persist($logEntry);
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->persist($logEntry);
+        $entityManager->flush();
     }
 
 
-    protected function addPositionLogEntry(string $log, Position $position): void
+    protected function addPositionLogEntry(string $log, Position $position, EntityManagerInterface $entityManager): void
     {
         $logEntry = new PositionLog();
         $logEntry->setPosition($position);
         $logEntry->setDate(new \DateTime());
         $logEntry->setLog($log);
         $logEntry->setEmoticon('😑');
-        $this->getDoctrine()->getManager()->persist($logEntry);
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->persist($logEntry);
+        $entityManager->flush();
     }
 
 
     /**
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return Portfolio|mixed|object
      */
-    protected function getPortfolioByAuth(Request $request)
+    protected function getPortfolioByAuth(Request $request, EntityManagerInterface $entityManager): mixed
     {
         $key = $request->headers->get('Authorization');
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+        $portfolio = $entityManager->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         if (null === $portfolio) {
             throw new AccessDeniedException();
         } else {
-            $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $currencies = $entityManager->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setCurrencies($currencies);
-            $sectors = $this->getDoctrine()->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $sectors = $entityManager->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setSectors($sectors);
-            $strategies = $this->getDoctrine()->getRepository(Strategy::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $strategies = $entityManager->getRepository(Strategy::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setStrategies($strategies);
-            $labels = $this->getDoctrine()->getRepository(Label::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $labels = $entityManager->getRepository(Label::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setLabels($labels);
             $this->portfolio = $portfolio;
         }

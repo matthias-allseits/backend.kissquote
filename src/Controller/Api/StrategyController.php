@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Position;
 use App\Entity\Strategy;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -18,11 +19,12 @@ class StrategyController extends BaseController
     /**
      * @Rest\Get ("/strategy", name="list_strategies")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function listStrategies(Request $request): View
+    public function listStrategies(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $strategies = $portfolio->getStrategies();
 
@@ -33,11 +35,12 @@ class StrategyController extends BaseController
     /**
      * @Rest\Post("/strategy", name="create_strategy")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function createStrategy(Request $request): View
+    public function createStrategy(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -48,8 +51,8 @@ class StrategyController extends BaseController
         if (null === $existingStrategy) {
             $postedStrategy->setPortfolioId($portfolio->getId());
 
-            $this->getDoctrine()->getManager()->persist($postedStrategy);
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->persist($postedStrategy);
+            $entityManager->flush();
         }
 
         return new View("Strategy Creation Successfully", Response::HTTP_OK);
@@ -60,11 +63,12 @@ class StrategyController extends BaseController
      * @Rest\Put("/strategy/{strategyId}", name="update_strategy")
      * @param Request $request
      * @param int $strategyId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function updateStrategy(Request $request, int $strategyId): View
+    public function updateStrategy(Request $request, int $strategyId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -76,11 +80,11 @@ class StrategyController extends BaseController
         if (null !== $existingStrategy && $puttedStrategy->getId() == $existingStrategy->getId()) {
             $existingStrategy->setName($puttedStrategy->getName());
 
-            $this->getDoctrine()->getManager()->persist($existingStrategy);
+            $entityManager->persist($existingStrategy);
 
-            $this->makeLogEntry('update strategy', $existingStrategy->getName());
+            $this->makeLogEntry('update strategy', $existingStrategy->getName(), $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return new View("Strategy Update Successfully", Response::HTTP_OK);
         } else {
@@ -95,25 +99,26 @@ class StrategyController extends BaseController
      * @Rest\Delete("/strategy/{strategyId}", name="delete_strategy")
      * @param Request $request
      * @param int $strategyId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function deleteStrategy(Request $request, int $strategyId): View
+    public function deleteStrategy(Request $request, int $strategyId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $strategy = $this->getDoctrine()->getRepository(Strategy::class)->find($strategyId);
+        $strategy = $entityManager->getRepository(Strategy::class)->find($strategyId);
 
-        $affectedPositions = $this->getDoctrine()->getRepository(Position::class)->findBy(['strategy' => $strategyId]);
+        $affectedPositions = $entityManager->getRepository(Position::class)->findBy(['strategy' => $strategyId]);
         foreach($affectedPositions as $position) {
             $position->setStrategy(null);
-            $this->getDoctrine()->getManager()->persist($position);
-            $this->addPositionLogEntry('Entferne gelöschten Sektor: ' . $strategy->getName(), $position);
+            $entityManager->persist($position);
+            $this->addPositionLogEntry('Entferne gelöschten Sektor: ' . $strategy->getName(), $position, $entityManager);
         }
-        $this->getDoctrine()->getManager()->remove($strategy);
+        $entityManager->remove($strategy);
 
-        $this->makeLogEntry('delete strategy', $strategy);
+        $this->makeLogEntry('delete strategy', $strategy, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         return new View("Strategy Delete Successfully", Response::HTTP_OK);
     }

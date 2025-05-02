@@ -3,8 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Currency;
-use App\Entity\LogEntry;
-use App\Entity\Portfolio;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -19,11 +18,12 @@ class CurrencyController extends BaseController
     /**
      * @Rest\Get ("/currency", name="list_currencies")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function listCurrencies(Request $request): View
+    public function listCurrencies(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $currencies = $portfolio->getCurrencies();
 
@@ -35,11 +35,12 @@ class CurrencyController extends BaseController
      * todo: probably useless?
      * @Rest\Post("/currency", name="create_currency")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function createCurrency(Request $request): View
+    public function createCurrency(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -50,8 +51,8 @@ class CurrencyController extends BaseController
         if (null === $existingCurrency) {
             $postedCurrency->setPortfolioId($portfolio->getId());
 
-            $this->getDoctrine()->getManager()->persist($postedCurrency);
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->persist($postedCurrency);
+            $entityManager->flush();
         }
 
         return new View("Currency Creation Successfully", Response::HTTP_OK);
@@ -62,11 +63,12 @@ class CurrencyController extends BaseController
      * @Rest\Put("/currency/{currencyId}", name="update_currency")
      * @param Request $request
      * @param int $currencyId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function updateCurrency(Request $request, int $currencyId): View
+    public function updateCurrency(Request $request, int $currencyId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -82,11 +84,11 @@ class CurrencyController extends BaseController
             $existingCurrency->setName($puttedCurrency->getName());
             $existingCurrency->setRate($puttedCurrency->getRate());
 
-            $this->getDoctrine()->getManager()->persist($existingCurrency);
+            $entityManager->persist($existingCurrency);
 
-            $this->makeLogEntry('update currency', $existingCurrency->getName() . ' new rate: ' . $existingCurrency->getRate());
+            $this->makeLogEntry('update currency', $existingCurrency->getName() . ' new rate: ' . $existingCurrency->getRate(), $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return new View("Currency Update Successfully", Response::HTTP_OK);
         } else {

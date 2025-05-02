@@ -2,10 +2,9 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\LogEntry;
-use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Transaction;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -21,13 +20,14 @@ class TransactionController extends BaseController
      * @Rest\Get ("/transaction/{transactionId}", name="get_transaction")
      * @param Request $request
      * @param int $transactionId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function getTransaction(Request $request, int $transactionId): View
+    public function getTransaction(Request $request, int $transactionId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
+        $transaction = $entityManager->getRepository(Transaction::class)->find($transactionId);
         $transaction->setPosition(null);
 
         return View::create($transaction, Response::HTTP_CREATED);
@@ -37,12 +37,12 @@ class TransactionController extends BaseController
     /**
      * @Rest\Post("/transaction", name="create_transaction")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
-     * @throws \Exception
      */
-    public function createTransaction(Request $request): View
+    public function createTransaction(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         /** @var Transaction $transaction */
@@ -69,9 +69,9 @@ class TransactionController extends BaseController
             $cashPosition->setActiveFrom($transaction->getDate());
             $cashPosition->setCurrency($currency);
             $cashPosition->setIsCash(true);
-            $this->getDoctrine()->getManager()->persist($cashPosition);
+            $entityManager->persist($cashPosition);
 
-            $this->makeLogEntry('forced creation of new cash-position', $cashPosition);
+            $this->makeLogEntry('forced creation of new cash-position', $cashPosition, $entityManager);
         }
         if (false === $transaction->getPosition()->isCash()) {
             $cashTransaction = new Transaction();
@@ -81,16 +81,16 @@ class TransactionController extends BaseController
             $cashTransaction->setDate($transaction->getDate());
             $cashTransaction->setTitle($transaction->getTitle());
             $cashTransaction->setRate($transaction->calculateCashValueNet());
-            $this->getDoctrine()->getManager()->persist($cashTransaction);
-            $this->makeLogEntry('forced new cash-transaction', $cashTransaction);
+            $entityManager->persist($cashTransaction);
+            $this->makeLogEntry('forced new cash-transaction', $cashTransaction, $entityManager);
         }
 
-        $this->getDoctrine()->getManager()->persist($position);
-        $this->getDoctrine()->getManager()->persist($transaction);
+        $entityManager->persist($position);
+        $entityManager->persist($transaction);
 
-        $this->makeLogEntry('create new transaction', $transaction);
+        $this->makeLogEntry('create new transaction', $transaction, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         $transaction->setPosition(null);
         return View::create($transaction, Response::HTTP_OK);
@@ -101,14 +101,14 @@ class TransactionController extends BaseController
      * @Rest\Put("/transaction/{transactionId}", name="update_transaction")
      * @param Request $request
      * @param int $transactionId
+     * @param EntityManagerInterface $entityManager
      * @return View
-     * @throws \Exception
      */
-    public function updateTransaction(Request $request, int $transactionId): View
+    public function updateTransaction(Request $request, int $transactionId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $existingTransaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
+        $existingTransaction = $entityManager->getRepository(Transaction::class)->find($transactionId);
         if (null === $existingTransaction) {
             throw new AccessDeniedException();
         }
@@ -137,12 +137,12 @@ class TransactionController extends BaseController
             $position->setActiveFrom($updatedTransaction->getDate());
         }
 
-        $this->getDoctrine()->getManager()->persist($position);
-        $this->getDoctrine()->getManager()->persist($existingTransaction);
+        $entityManager->persist($position);
+        $entityManager->persist($existingTransaction);
 
-        $this->makeLogEntry('update transaction', $existingTransaction);
+        $this->makeLogEntry('update transaction', $existingTransaction, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         $updatedTransaction->setPosition(null);
         return View::create($updatedTransaction, Response::HTTP_OK);
@@ -153,15 +153,16 @@ class TransactionController extends BaseController
      * @Rest\Delete("/transaction/{transactionId}", name="delete_transaction")
      * @param Request $request
      * @param int $transactionId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function deleteTransaction(Request $request, int $transactionId): View
+    public function deleteTransaction(Request $request, int $transactionId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
-        $this->getDoctrine()->getManager()->remove($transaction);
-        $this->getDoctrine()->getManager()->flush();
+        $transaction = $entityManager->getRepository(Transaction::class)->find($transactionId);
+        $entityManager->remove($transaction);
+        $entityManager->flush();
 
         return new View("Transaction Delete Successfully", Response::HTTP_OK);
     }

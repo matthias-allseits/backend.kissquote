@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\BankAccount;
 use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +21,7 @@ class BankAccountController extends BaseController
      */
     public function createBankAccount(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
@@ -32,7 +33,7 @@ class BankAccountController extends BaseController
             $bankAccount->setPortfolio($portfolio);
             $entityManager->persist($bankAccount);
 
-            $this->makeLogEntry('create new bank-account', $bankAccount);
+            $this->makeLogEntry('create new bank-account', $bankAccount, $entityManager);
 
             $entityManager->flush();
         }
@@ -50,7 +51,7 @@ class BankAccountController extends BaseController
      */
     public function updateBankAccount(Request $request, int $accountId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
@@ -62,7 +63,7 @@ class BankAccountController extends BaseController
             $this->portfolio = $bankAccount->getPortfolio();
             $bankAccount->setName($content->name);
 
-            $this->makeLogEntry('update bank-account', $oldName . ' -> ' . $content->name);
+            $this->makeLogEntry('update bank-account', $oldName . ' -> ' . $content->name, $entityManager);
 
             $entityManager->flush();
         } else {
@@ -82,12 +83,12 @@ class BankAccountController extends BaseController
      */
     public function deleteBankAccount(Request $request, int $accountId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $bankAccount = $entityManager->getRepository(BankAccount::class)->find($accountId);
         $entityManager->remove($bankAccount);
 
-        $this->makeLogEntry('delete bank-account', $bankAccount);
+        $this->makeLogEntry('delete bank-account', $bankAccount, $entityManager);
 
         $entityManager->flush();
 

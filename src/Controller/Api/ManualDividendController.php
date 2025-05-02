@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\ManualDividend;
 use App\Entity\Share;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -18,11 +19,12 @@ class ManualDividendController extends BaseController
     /**
      * @Rest\Post("/manualDividend", name="create_manual_dividend")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function createManualDividend(Request $request): View
+    public function createManualDividend(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
 
@@ -31,13 +33,13 @@ class ManualDividendController extends BaseController
         /** @var ManualDividend $postedDividend */
         $postedDividend = $serializer->deserialize(json_encode($content), ManualDividend::class, 'json');
 
-        $share = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $postedDividend->getShare()->getId()]);
+        $share = $entityManager->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $postedDividend->getShare()->getId()]);
         $postedDividend->setShare($share);
 
-        $this->getDoctrine()->getManager()->persist($postedDividend);
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->persist($postedDividend);
+        $entityManager->flush();
 
-        $this->makeLogEntry('add manual-dividend', $postedDividend);
+        $this->makeLogEntry('add manual-dividend', $postedDividend, $entityManager);
 
         return new View($postedDividend, Response::HTTP_CREATED);
     }
@@ -47,12 +49,13 @@ class ManualDividendController extends BaseController
      * @Rest\Put("/manualDividend/{dividendId}", name="update_manual_dividend")
      * @param Request $request
      * @param int $dividendId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function updateManualDividend(Request $request, int $dividendId): View
+    public function updateManualDividend(Request $request, int $dividendId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
-        $shares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
+        $shares = $entityManager->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
         $portfolio->setShares($shares);
 
         $serializer = SerializerBuilder::create()->build();
@@ -68,11 +71,11 @@ class ManualDividendController extends BaseController
             $existingDividend->setAmount($puttedDividend->getAmount());
             $existingDividend->setYear($puttedDividend->getYear());
 
-            $this->getDoctrine()->getManager()->persist($existingDividend);
+            $entityManager->persist($existingDividend);
 
-            $this->makeLogEntry('update manual-dividend', $puttedDividend);
+            $this->makeLogEntry('update manual-dividend', $puttedDividend, $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return new View($existingDividend, Response::HTTP_OK);
         } else {
@@ -87,18 +90,19 @@ class ManualDividendController extends BaseController
      * @Rest\Delete("/manualDividend/{dividendId}", name="delete_manual_dividend")
      * @param Request $request
      * @param int $dividendId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function deleteManualDividend(Request $request, int $dividendId): View
+    public function deleteManualDividend(Request $request, int $dividendId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $manualDividend = $this->getDoctrine()->getRepository(ManualDividend::class)->find($dividendId);
+        $manualDividend = $entityManager->getRepository(ManualDividend::class)->find($dividendId);
         if ($manualDividend->getShare()->getPortfolioId() == $portfolio->getId()) {
-            $this->getDoctrine()->getManager()->remove($manualDividend);
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->remove($manualDividend);
+            $entityManager->flush();
 
-            $this->makeLogEntry('remove manual-dividend', $manualDividend);
+            $this->makeLogEntry('remove manual-dividend', $manualDividend, $entityManager);
         }
 
         return new View(null, Response::HTTP_OK);

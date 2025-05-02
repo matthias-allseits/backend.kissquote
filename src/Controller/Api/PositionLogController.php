@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Position;
 use App\Entity\PositionLog;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -19,13 +19,14 @@ class PositionLogController extends BaseController
      * @Rest\Get ("/position-log/{logId}", name="get_positionlog")
      * @param Request $request
      * @param int $logId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function getPositionLog(Request $request, int $logId): View
+    public function getPositionLog(Request $request, int $logId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $positionLog = $this->getDoctrine()->getRepository(PositionLog::class)->find($logId);
+        $positionLog = $entityManager->getRepository(PositionLog::class)->find($logId);
         $positionLog->setPosition(null);
 
         return View::create($positionLog, Response::HTTP_CREATED);
@@ -35,12 +36,12 @@ class PositionLogController extends BaseController
     /**
      * @Rest\Post("/position-log", name="create_position_log")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
-     * @throws \Exception
      */
-    public function createPositionLog(Request $request): View
+    public function createPositionLog(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -55,12 +56,12 @@ class PositionLogController extends BaseController
             $positionLog->setPosition($position);
         }
 
-        $this->getDoctrine()->getManager()->persist($position);
-        $this->getDoctrine()->getManager()->persist($positionLog);
+        $entityManager->persist($position);
+        $entityManager->persist($positionLog);
 
-        $this->makeLogEntry('create new PositionLog', $positionLog);
+        $this->makeLogEntry('create new PositionLog', $positionLog, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         $positionLog->setPosition(null);
         return View::create($positionLog, Response::HTTP_OK);
@@ -71,15 +72,15 @@ class PositionLogController extends BaseController
      * @Rest\Put("/position-log/{logId}", name="update_position_log")
      * @param Request $request
      * @param int $logId
+     * @param EntityManagerInterface $entityManager
      * @return View
-     * @throws \Exception
      */
-    public function updatePositionLog(Request $request, int $logId): View
+    public function updatePositionLog(Request $request, int $logId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         /** @var PositionLog $existingPositionLog */
-        $existingPositionLog = $this->getDoctrine()->getRepository(PositionLog::class)->find($logId);
+        $existingPositionLog = $entityManager->getRepository(PositionLog::class)->find($logId);
         if (null === $existingPositionLog) {
             throw new AccessDeniedException();
         }
@@ -107,12 +108,12 @@ class PositionLogController extends BaseController
         }
         $existingPositionLog->setPinned($updatedPositionLog->isPinned());
 
-        $this->getDoctrine()->getManager()->persist($position);
-        $this->getDoctrine()->getManager()->persist($existingPositionLog);
+        $entityManager->persist($position);
+        $entityManager->persist($existingPositionLog);
 
-        $this->makeLogEntry('update Position-Log', $existingPositionLog);
+        $this->makeLogEntry('update Position-Log', $existingPositionLog, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         $updatedPositionLog->setPosition(null);
         return View::create($updatedPositionLog, Response::HTTP_OK);
@@ -123,15 +124,16 @@ class PositionLogController extends BaseController
      * @Rest\Delete("/position-log/{logId}", name="delete_position_log")
      * @param Request $request
      * @param int $logId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function deletePositionLog(Request $request, int $logId): View
+    public function deletePositionLog(Request $request, int $logId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $positionLog = $this->getDoctrine()->getRepository(PositionLog::class)->find($logId);
-        $this->getDoctrine()->getManager()->remove($positionLog);
-        $this->getDoctrine()->getManager()->flush();
+        $positionLog = $entityManager->getRepository(PositionLog::class)->find($logId);
+        $entityManager->remove($positionLog);
+        $entityManager->flush();
 
         return new View("PositionLog Delete Successfully", Response::HTTP_OK);
     }

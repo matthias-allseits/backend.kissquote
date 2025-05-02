@@ -3,8 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Entity\Feedback;
-use App\Entity\FeedbackProposal;
 use App\Entity\Portfolio;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -19,11 +19,13 @@ class FeedbackController extends AbstractFOSRestController
     /**
      * @Rest\Get ("/feedback/proposals/{lang}", name="list_proposals")
      * @param Request $request
+     * @param string $lang
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function listProposals(Request $request, string $lang): View
+    public function listProposals(Request $request, string $lang, EntityManagerInterface $entityManager): View
     {
-        $proposals = $this->getDoctrine()->getRepository(FeedbackProposal::class)->findBy(['lang' => $lang]);
+        $proposals = $entityManager->getRepository(FeedbackProposal::class)->findBy(['lang' => $lang]);
 
         return View::create($proposals, Response::HTTP_CREATED);
     }
@@ -32,14 +34,15 @@ class FeedbackController extends AbstractFOSRestController
     /**
      * @Rest\Post("/feedback", name="create_feedback")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function createFeedback(Request $request): View
+    public function createFeedback(Request $request, EntityManagerInterface $entityManager): View
     {
         $key = $request->headers->get('Authorization');
         $portfolio = null;
         if (null !== $key) {
-            $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
+            $portfolio = $entityManager->getRepository(Portfolio::class)->findOneBy(['hashKey' => $key]);
         }
 
         $serializer = SerializerBuilder::create()->build();
@@ -48,8 +51,8 @@ class FeedbackController extends AbstractFOSRestController
         $feedback->setPortfolio($portfolio);
         $feedback->setDateTime(new \DateTime());
 
-        $this->getDoctrine()->getManager()->persist($feedback);
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->persist($feedback);
+        $entityManager->flush();
 
         return new View("Feedback Creation Successfully", Response::HTTP_OK);
     }

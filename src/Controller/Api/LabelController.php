@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Label;
 use App\Entity\Position;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -18,11 +19,12 @@ class LabelController extends BaseController
     /**
      * @Rest\Get ("/label", name="list_labels")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function listLabels(Request $request): View
+    public function listLabels(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $labels = $portfolio->getLabels();
 
@@ -33,11 +35,12 @@ class LabelController extends BaseController
     /**
      * @Rest\Post("/label", name="create_label")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function createLabel(Request $request): View
+    public function createLabel(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -48,8 +51,8 @@ class LabelController extends BaseController
         if (null === $existingLabel) {
             $postedLabel->setPortfolioId($portfolio->getId());
 
-            $this->getDoctrine()->getManager()->persist($postedLabel);
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->persist($postedLabel);
+            $entityManager->flush();
         }
 
         return new View("Label Creation Successfully", Response::HTTP_OK);
@@ -60,11 +63,12 @@ class LabelController extends BaseController
      * @Rest\Put("/label/{labelId}", name="update_label")
      * @param Request $request
      * @param int $labelId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function updateLabel(Request $request, int $labelId): View
+    public function updateLabel(Request $request, int $labelId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -80,11 +84,11 @@ class LabelController extends BaseController
             $existingLabel->setName($puttedLabel->getName());
             $existingLabel->setColor($puttedLabel->getColor());
 
-            $this->getDoctrine()->getManager()->persist($existingLabel);
+            $entityManager->persist($existingLabel);
 
-            $this->makeLogEntry('update label', $existingLabel->getName());
+            $this->makeLogEntry('update label', $existingLabel->getName(), $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return new View("Label Update Successfully", Response::HTTP_OK);
         } else {
@@ -99,15 +103,16 @@ class LabelController extends BaseController
      * @Rest\Delete("/label/{labelId}", name="delete_label")
      * @param Request $request
      * @param int $labelId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function deleteLabel(Request $request, int $labelId): View
+    public function deleteLabel(Request $request, int $labelId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $label = $this->getDoctrine()->getRepository(Label::class)->find($labelId);
+        $label = $entityManager->getRepository(Label::class)->find($labelId);
 
-        $query = $this->getDoctrine()->getManager()->createQuery(
+        $query = $entityManager->createQuery(
             'SELECT p FROM App\Entity\Position p
                 JOIN p.labels l
                 WHERE l.id = :labelId
@@ -119,14 +124,14 @@ class LabelController extends BaseController
         $positions = $query->getResult();
         foreach($positions as $position) {
             $position->removeLabel($label);
-            $this->getDoctrine()->getManager()->persist($position);
+            $entityManager->persist($position);
         }
 
-        $this->getDoctrine()->getManager()->remove($label);
+        $entityManager->remove($label);
 
-        $this->makeLogEntry('delete label', $label);
+        $this->makeLogEntry('delete label', $label, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         return new View("Label Delete Successfully", Response::HTTP_OK);
     }

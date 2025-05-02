@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Position;
 use App\Entity\Sector;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
@@ -18,11 +19,12 @@ class SectorController extends BaseController
     /**
      * @Rest\Get ("/sector", name="list_sectors")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function listSectors(Request $request): View
+    public function listSectors(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $sectors = $portfolio->getSectors();
 
@@ -33,11 +35,12 @@ class SectorController extends BaseController
     /**
      * @Rest\Post("/sector", name="create_sector")
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function createSector(Request $request): View
+    public function createSector(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -48,8 +51,8 @@ class SectorController extends BaseController
         if (null === $existingSector) {
             $postedSector->setPortfolioId($portfolio->getId());
 
-            $this->getDoctrine()->getManager()->persist($postedSector);
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->persist($postedSector);
+            $entityManager->flush();
         }
 
         return new View("Sector Creation Successfully", Response::HTTP_OK);
@@ -60,11 +63,12 @@ class SectorController extends BaseController
      * @Rest\Put("/sector/{sectorId}", name="update_sector")
      * @param Request $request
      * @param int $sectorId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function updateSector(Request $request, int $sectorId): View
+    public function updateSector(Request $request, int $sectorId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
@@ -76,11 +80,11 @@ class SectorController extends BaseController
         if (null !== $existingSector && $puttedSector->getId() == $existingSector->getId()) {
             $existingSector->setName($puttedSector->getName());
 
-            $this->getDoctrine()->getManager()->persist($existingSector);
+            $entityManager->persist($existingSector);
 
-            $this->makeLogEntry('update sector', $existingSector->getName());
+            $this->makeLogEntry('update sector', $existingSector->getName(), $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return new View("Sector Update Successfully", Response::HTTP_OK);
         } else {
@@ -95,25 +99,26 @@ class SectorController extends BaseController
      * @Rest\Delete("/sector/{sectorId}", name="delete_sector")
      * @param Request $request
      * @param int $sectorId
+     * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function deleteSector(Request $request, int $sectorId): View
+    public function deleteSector(Request $request, int $sectorId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $sector = $this->getDoctrine()->getRepository(Sector::class)->find($sectorId);
+        $sector = $entityManager->getRepository(Sector::class)->find($sectorId);
 
-        $affectedPositions = $this->getDoctrine()->getRepository(Position::class)->findBy(['sector' => $sectorId]);
+        $affectedPositions = $entityManager->getRepository(Position::class)->findBy(['sector' => $sectorId]);
         foreach($affectedPositions as $position) {
             $position->setSector(null);
-            $this->getDoctrine()->getManager()->persist($position);
-            $this->addPositionLogEntry('Entferne gelöschten Sektor: ' . $sector->getName(), $position);
+            $entityManager->persist($position);
+            $this->addPositionLogEntry('Entferne gelöschten Sektor: ' . $sector->getName(), $position, $entityManager);
         }
-        $this->getDoctrine()->getManager()->remove($sector);
+        $entityManager->remove($sector);
 
-        $this->makeLogEntry('delete sector', $sector);
+        $this->makeLogEntry('delete sector', $sector, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         return new View("Sector Delete Successfully", Response::HTTP_OK);
     }
