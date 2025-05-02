@@ -12,6 +12,7 @@ use App\Service\BalanceService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,7 @@ class PositionController extends BaseController
      * @param EntityManagerInterface $entityManager
      * @return View
      */
+    #[Route('/api/position/{positionId}', name: 'get_position', requirements: ['positionId' => '\d+'], methods: ['GET', 'OPTIONS'])]
     public function getPosition(Request $request, int $positionId, BalanceService $balanceService, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

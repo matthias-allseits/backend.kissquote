@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\StockrateRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 
 
-#[ORM\Entity()]
+#[ORM\Entity(repositoryClass: StockrateRepository::class)]
 #[ORM\Index(name: "isin_idx", columns: ["isin"])]
 class Stockrate
 {
