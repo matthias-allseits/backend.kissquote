@@ -207,8 +207,8 @@ class PositionController extends BaseController
      * @Rest\Put("/position/{positionId}", name="update_position")
      * @param Request $request
      * @param int $positionId
+     * @param BalanceService $balanceService
      * @return View
-     * @throws \Exception
      */
     public function updatePosition(Request $request, int $positionId, BalanceService $balanceService): View
     {
@@ -421,6 +421,25 @@ class PositionController extends BaseController
         $this->addPositionLogEntry('Entferne Label: ' . $label->getName(), $position);
 
         return new View("Label Removed Successfully", Response::HTTP_OK);
+    }
+
+
+    /**
+     * @Rest\Get("/position/{positionId}/toggle-markable/{key}", name="toggle_position_markable")
+     * @param Request $request
+     * @param int $positionId
+     * @param string $key
+     * @return View
+     */
+    public function togglePositionMarkable(Request $request, int $positionId, string $key): View
+    {
+        /** @var Position $position */
+        $position = $this->getDoctrine()->getRepository(Position::class)->find($positionId);
+        $position->toggleMarkable($key);
+        $this->getDoctrine()->getManager()->persist($position);
+        $this->getDoctrine()->getManager()->flush();
+
+        return new View("Markable Toggled Successfully", Response::HTTP_OK);
     }
 
 

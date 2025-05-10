@@ -253,6 +253,15 @@ class Position
     private $targetPrice;
 
     /**
+     * @var string
+     * @Serializer\Type("string")
+     * @Serializer\SerializedName("markedLines")
+     *
+     * @ORM\Column(name="marked_lines", type="json", nullable=true)
+     */
+    private $markedLines;
+
+    /**
      * @var string|null
      * @Serializer\Type("string")
      * @Serializer\SerializedName("targetType")
@@ -594,6 +603,23 @@ class Position
 
 //        echo 'result: ' . $value . "\n";
         return $value;
+    }
+
+
+    public function toggleMarkable(string $key): void
+    {
+        $markables = json_decode($this->markedLines);
+        if (is_array($markables) && in_array($key, $markables)) {
+            $index = array_search($key, $markables);
+            unset($markables[$index]);
+        } else {
+            if (!is_array($markables)) {
+                $markables = [];
+            }
+            $markables[] = $key;
+        }
+
+        $this->markedLines = json_encode($markables);
     }
 
 
@@ -993,6 +1019,16 @@ class Position
     public function setTargetType(?string $targetType): void
     {
         $this->targetType = $targetType;
+    }
+
+    public function getMarkedLines(): string
+    {
+        return $this->markedLines;
+    }
+
+    public function setMarkedLines(string $markedLines): void
+    {
+        $this->markedLines = $markedLines;
     }
 
     /**

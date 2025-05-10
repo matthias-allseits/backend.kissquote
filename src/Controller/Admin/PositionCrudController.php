@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 
 
 class PositionCrudController extends AbstractCrudController
@@ -37,6 +38,7 @@ class PositionCrudController extends AbstractCrudController
             DateField::new('manualDividendPayDate')->hideOnIndex(),
             NumberField::new('manualDividendAmount')->hideOnIndex(),
             AssociationField::new('labels')->hideOnIndex(),
+            TextAreaField::new('markedLines')->hideOnIndex(),
             BooleanField::new('active'),
             BooleanField::new('isCash'),
         ];
