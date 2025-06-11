@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Currency;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,12 +16,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class CurrencyController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/currency", name="list_currencies")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/currency', name: 'list_currencies', methods: ['GET', 'OPTIONS'])]
     public function listCurrencies(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

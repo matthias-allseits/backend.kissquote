@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 
 #[ORM\Entity()]
@@ -15,6 +15,7 @@ class BankAccount
     #[ORM\Column]
     private int $id;
 
+    #[Ignore]
     #[ORM\ManyToOne(targetEntity: Portfolio::class, inversedBy: 'bankAccounts')]
     #[ORM\JoinColumn(name: 'portfolio_id', referencedColumnName: 'id')]
     private Portfolio $portfolio;
@@ -102,38 +103,6 @@ class BankAccount
     public function setName(string $name): void
     {
         $this->name = $name;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getTransfersFrom(): Collection
-    {
-        return $this->transfersFrom;
-    }
-
-    /**
-     * @param Collection $transfersFrom
-     */
-    public function setTransfersFrom(Collection $transfersFrom): void
-    {
-        $this->transfersFrom = $transfersFrom;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getTransfersTo(): Collection
-    {
-        return $this->transfersTo;
-    }
-
-    /**
-     * @param Collection $transfersTo
-     */
-    public function setTransfersTo(Collection $transfersTo): void
-    {
-        $this->transfersTo = $transfersTo;
     }
 
     /**

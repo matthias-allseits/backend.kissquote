@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+
 
 #[ORM\Entity()]
 #[ORM\Index(name: "positionactionindex", columns: ["position_id"])]
@@ -17,47 +20,28 @@ class Transaction
     #[ORM\Column]
     private int $id;
 
-    /**
-     * @Serializer\Type("App\Entity\Position")
-     */
+    #[Ignore]
     #[ORM\ManyToOne(targetEntity: Position::class, inversedBy: 'transactions')]
     #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id', nullable: false)]
     private Position $position;
 
-    /**
-     * @Serializer\Type("App\Entity\Currency")
-     */
     #[ORM\ManyToOne(targetEntity: Currency::class)]
     #[ORM\JoinColumn(name: 'currency_id', referencedColumnName: 'id')]
     private Currency $currency;
 
-    /**
-     * @Serializer\Type("string")
-     */
     #[ORM\Column(name: "title", type: "string", length: 64, unique: false, nullable: true)]
     private ?string $title;
 
-    /**
-     * @Serializer\Type("DateTime<'Y-m-d'>")
-     */
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[ORM\Column(name: "date", type: "date", nullable: false)]
     private \DateTime $date;
 
-    /**
-     * @Serializer\Type("float")
-     */
     #[ORM\Column(name: "quantity", type: "float", precision: 10, scale: 0, nullable: false)]
     private float $quantity;
 
-    /**
-     * @Serializer\Type("float")
-     */
     #[ORM\Column(name: "rate", type: "float", precision: 10, scale: 0, nullable: false)]
     private float $rate;
 
-    /**
-     * @Serializer\Type("float")
-     */
     #[ORM\Column(name: "fee", type: "float", precision: 10, scale: 0, nullable: true)]
     private ?float $fee;
 
@@ -107,121 +91,76 @@ class Transaction
         return in_array($this->title, self::TITLES_NEGATIVE);
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return Currency|null
-     */
     public function getCurrency(): ?Currency
     {
         return $this->currency;
     }
 
-    /**
-     * @param Currency|null $currency
-     */
     public function setCurrency(?Currency $currency): void
     {
         $this->currency = $currency;
     }
 
-    /**
-     * @return Position|null
-     */
     public function getPosition(): ?Position
     {
         return $this->position;
     }
 
-    /**
-     * @param Position|null $position
-     */
     public function setPosition(?Position $position): void
     {
         $this->position = $position;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * @param string|null $title
-     */
     public function setTitle(?string $title): void
     {
         $this->title = $title;
     }
 
-    /**
-     * @return \DateTime|null
-     */
     public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    /**
-     * @param \DateTime $date
-     */
     public function setDate(\DateTime $date): void
     {
         $this->date = $date;
     }
 
-    /**
-     * @return float|null
-     */
     public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
-    /**
-     * @param float $quantity
-     */
     public function setQuantity(float $quantity): void
     {
         $this->quantity = $quantity;
     }
 
-    /**
-     * @return float|null
-     */
     public function getRate(): ?float
     {
         return $this->rate;
     }
 
-    /**
-     * @param float $rate
-     */
     public function setRate(float $rate): void
     {
         $this->rate = $rate;
     }
 
-    /**
-     * @return float|null
-     */
     public function getFee(): ?float
     {
         return $this->fee;
     }
 
-    /**
-     * @param float|null $fee
-     */
     public function setFee(?float $fee): void
     {
         $this->fee = $fee;

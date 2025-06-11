@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 
 #[ORM\Entity()]
@@ -22,31 +22,20 @@ class Share
     #[ORM\Column(name: "portfolio_id", type: "integer", nullable: true)]
     private ?int $portfolioId;
 
-    /**
-     * @Serializer\Type("App\Entity\Marketplace")
-     */
     #[ORM\ManyToOne(targetEntity: Marketplace::class)]
     #[ORM\JoinColumn(name: 'marketplace_id', referencedColumnName: 'id')]
     private ?Marketplace $marketplace;
 
-    /**
-     * @Serializer\Type("string")
-     */
     #[ORM\Column(name: "name", type: "string", length: 64, unique: false, nullable: false)]
     private string $name;
 
-    /**
-     * @Serializer\Type("string")
-     */
     #[ORM\Column(name: "shortname", type: "string", length: 16, unique: false, nullable: false)]
     private string $shortname;
 
-    /**
-     * @Serializer\Type("string")
-     */
     #[ORM\Column(name: "isin", type: "string", length: 16, unique: false, nullable: false)]
     private string $isin;
 
+    #[Ignore]
     #[ORM\OneToMany(targetEntity: Position::class, mappedBy: "share", cascade: ["remove"])]
     private array|Collection $positions;
 
@@ -88,113 +77,71 @@ class Share
         return $url;
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return Currency|null
-     */
     public function getCurrency(): ?Currency
     {
         return $this->currency;
     }
 
-    /**
-     * @param Currency|null $currency
-     */
     public function setCurrency(?Currency $currency): void
     {
         $this->currency = $currency;
     }
 
-    /**
-     * @return int|null
-     */
     public function getPortfolioId(): ?int
     {
         return $this->portfolioId;
     }
 
-    /**
-     * @param int $portfolioId
-     */
     public function setPortfolioId(int $portfolioId): void
     {
         $this->portfolioId = $portfolioId;
     }
 
-    /**
-     * @return Marketplace|null
-     */
     public function getMarketplace(): ?Marketplace
     {
         return $this->marketplace;
     }
 
-    /**
-     * @param Marketplace|null $marketplace
-     */
     public function setMarketplace(?Marketplace $marketplace): void
     {
         $this->marketplace = $marketplace;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string|null
-     */
     public function getShortname(): ?string
     {
         return $this->shortname;
     }
 
-    /**
-     * @param string $shortname
-     */
     public function setShortname(string $shortname): void
     {
         $this->shortname = $shortname;
     }
 
-    /**
-     * @return string|null
-     */
     public function getIsin(): ?string
     {
         return $this->isin;
     }
 
-    /**
-     * @param string $isin
-     */
     public function setIsin(string $isin): void
     {
         $this->isin = $isin;
     }
 
-    /**
-     * @return Position[]
-     */
     public function getPositions(): array
     {
         $positions = $this->positions->toArray();
@@ -202,26 +149,17 @@ class Share
         return $positions;
     }
 
-    /**
-     * @param Position[] $positions
-     */
     public function setPositions(array $positions): void
     {
         $this->positions = $positions;
     }
 
-    /**
-     * @return ManualDividend[]|Collection
-     */
-    public function getManualDividends()
+    public function getManualDividends(): array
     {
         return $this->manualDividends;
     }
 
-    /**
-     * @param ManualDividend[]|Collection $manualDividends
-     */
-    public function setManualDividends($manualDividends): void
+    public function setManualDividends(array $manualDividends): void
     {
         $this->manualDividends = $manualDividends;
     }

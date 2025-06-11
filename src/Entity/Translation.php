@@ -49,65 +49,41 @@ class Translation
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getKey(): ?string
     {
         return $this->key;
     }
 
-    /**
-     * @param string $key
-     */
     public function setKey(string $key): void
     {
         $this->key = $key;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDe(): ?string
     {
         return $this->de;
     }
 
-    /**
-     * @param string|null $de
-     */
     public function setDe(?string $de): void
     {
         $this->de = $de;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEn(): ?string
     {
         return $this->en;
     }
 
-    /**
-     * @param string|null $en
-     */
     public function setEn(?string $en): void
     {
         $this->en = $en;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFr(): ?string
     {
         return $this->fr;
     }
 
-    /**
-     * @param string|null $fr
-     */
     public function setFr(?string $fr): void
     {
         $this->fr = $fr;

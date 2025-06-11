@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 
 #[ORM\Entity()]
@@ -16,17 +16,11 @@ class Watchlist
     #[ORM\Column]
     private int $id;
 
-    /**
-     * @Serializer\Exclude()
-     */
+    #[Ignore]
     #[ORM\ManyToOne(targetEntity: Portfolio::class, inversedBy: 'watchlistEntries')]
     #[ORM\JoinColumn(name: 'portfolio_id', referencedColumnName: 'id')]
     private Portfolio $portfolio;
 
-    /**
-     * @Serializer\Type("integer")
-     * @Serializer\SerializedName("shareheadId")
-     */
     #[ORM\Column(name: "sharehead_id", type: "integer", nullable: false)]
     private int $shareheadId;
 
@@ -34,10 +28,7 @@ class Watchlist
     private DateTime $startDate;
 
 
-    /**
-     * @var string|null
-     */
-    private $title;
+    private ?string $title;
 
 
     public function __construct()
@@ -51,73 +42,46 @@ class Watchlist
     }
 
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return Portfolio
-     */
     public function getPortfolio(): ?Portfolio
     {
         return $this->portfolio;
     }
 
-    /**
-     * @param Portfolio $portfolio
-     */
     public function setPortfolio(Portfolio $portfolio): void
     {
         $this->portfolio = $portfolio;
     }
 
-    /**
-     * @return int
-     */
     public function getShareheadId(): ?int
     {
         return $this->shareheadId;
     }
 
-    /**
-     * @param int $shareheadId
-     */
     public function setShareheadId(int $shareheadId): void
     {
         $this->shareheadId = $shareheadId;
     }
 
-    /**
-     * @return DateTime
-     */
     public function getStartDate(): DateTime
     {
         return $this->startDate;
     }
 
-    /**
-     * @param DateTime $startDate
-     */
     public function setStartDate(DateTime $startDate): void
     {
         $this->startDate = $startDate;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * @param string|null $title
-     */
     public function setTitle(?string $title): void
     {
         $this->title = $title;

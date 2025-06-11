@@ -6,6 +6,7 @@ use App\Entity\Position;
 use App\Entity\Strategy;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +17,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class StrategyController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/strategy", name="list_strategies")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/strategy', name: 'list_strategies', methods: ['GET', 'OPTIONS'])]
     public function listStrategies(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

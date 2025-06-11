@@ -6,6 +6,7 @@ use App\Entity\Position;
 use App\Entity\Sector;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +17,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class SectorController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/sector", name="list_sectors")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/sector', name: 'list_sectors', methods: ['GET', 'OPTIONS'])]
     public function listSectors(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

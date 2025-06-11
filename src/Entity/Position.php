@@ -8,7 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 
 #[ORM\Entity()]
@@ -25,207 +27,107 @@ class Position
     #[ORM\Column]
     private int $id;
 
-    /**
-     * @Serializer\Type("App\Entity\BankAccount")
-     * @Serializer\SerializedName("bankAccount")
-     */
+    #[Ignore]
     #[ORM\ManyToOne(targetEntity: BankAccount::class, cascade: ["remove", "persist"], inversedBy: 'positions')]
     #[JoinColumn(name: 'bank_account_id', referencedColumnName: 'id')]
     private ?BankAccount $bankAccount;
 
+    #[Ignore]
     #[ORM\OneToOne(targetEntity: Position::class, inversedBy: 'position')]
     #[JoinColumn(name: 'underlying_id', referencedColumnName: 'id')]
     private ?Position $underlying;
 
+    #[Ignore]
     #[ORM\OneToOne(targetEntity: Position::class, mappedBy: 'underlying')]
     private ?Position $position;
 
-    /**
-     * @Serializer\Type("App\Entity\Share")
-     */
     #[ORM\ManyToOne(targetEntity: Share::class, inversedBy: 'positions')]
     #[ORM\JoinColumn(name: 'share_id', referencedColumnName: 'id', nullable: true)]
     private ?Share $share;
 
-    /**
-     * @Serializer\Type("App\Entity\Currency")
-     */
     #[ORM\ManyToOne(targetEntity: Currency::class)]
     #[ORM\JoinColumn(name: 'currency_id', referencedColumnName: 'id')]
     private Currency $currency;
 
-    /**
-     * @Serializer\Type("App\Entity\Sector")
-     */
     #[ORM\ManyToOne(targetEntity: Sector::class)]
     #[ORM\JoinColumn(name: 'sector_id', referencedColumnName: 'id')]
     private ?Sector $sector;
 
-    /**
-     * @Serializer\Type("App\Entity\Strategy")
-     */
     #[ORM\ManyToOne(targetEntity: Strategy::class)]
     #[ORM\JoinColumn(name: 'strategy_id', referencedColumnName: 'id')]
     private ?Strategy $strategy;
 
-    /**
-     * @Serializer\Type("boolean")
-     */
     #[ORM\Column(name: "active", type: "boolean", nullable: false)]
     private bool $active = true;
 
-    /**
-     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
-     * @Serializer\SerializedName("activeFrom")
-     */
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[ORM\Column(name: "active_from", type: "date", nullable: true)]
     private ?DateTime $activeFrom;
 
-    /**
-     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
-     * @Serializer\SerializedName("activeUntil")
-     */
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[ORM\Column(name: "active_until", type: "date", nullable: true)]
     private ?DateTime $activeUntil;
 
-    /**
-     * @Serializer\Type("ArrayCollection<App\Entity\Transaction>")
-     */
     #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: "position", cascade: ["remove", "persist"])]
     private array|Collection $transactions;
 
-    /**
-     * @Serializer\Type("ArrayCollection<App\Entity\PositionLog>")
-     */
     #[ORM\OneToMany(targetEntity: PositionLog::class, mappedBy: "position", cascade: ["remove", "persist"])]
     private array|Collection $logEntries;
 
-    /**
-     * @Serializer\Type("boolean")
-     * @Serializer\SerializedName("isCash")
-     */
     #[ORM\Column(name: "is_cash", type: "boolean", nullable: false)]
     private bool $isCash = false;
 
-    /**
-     * @Serializer\Type("string")
-     * @Serializer\SerializedName("dividendPeriodicity")
-     */
     #[ORM\Column(name: "dividend_periodicity", type: "string", length: 32, unique: false, nullable: true)]
     private ?string $dividendPeriodicity;
 
-    /**
-     * @Serializer\Type("integer")
-     * @Serializer\SerializedName("manualDrawdown")
-     */
     #[ORM\Column(name: "manual_drawdown", type: "smallint", nullable: true)]
     private ?int $manualDrawdown;
 
-    /**
-     * @Serializer\Type("integer")
-     * @Serializer\SerializedName("manualDividendDrop")
-     */
     #[ORM\Column(name: "manual_dividend_drop", type: "smallint", nullable: true)]
     private ?int $manualDividendDrop;
 
-    /**
-     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
-     * @Serializer\SerializedName("manualDividendExDate")
-     */
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[ORM\Column(name: "manual_dividend_ex_date", type: "date", nullable: true)]
     private ?DateTime $manualDividendExDate;
 
-    /**
-     * @Serializer\Type("DateTime<'Y-m-d', '', ['Y-m-d', 'Y-m-d H:i:s']>")
-     * @Serializer\SerializedName("manualDividendPayDate")
-     */
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[ORM\Column(name: "manual_dividend_pay_date", type: "date", nullable: true)]
     private ?DateTime $manualDividendPayDate;
 
-    /**
-     * @Serializer\Type("float")
-     * @Serializer\SerializedName("manualDividendAmount")
-     */
     #[ORM\Column(name: "manual_dividend_amount", type: "float", precision: 10, scale: 3, nullable: true)]
     private ?float $manualDividendAmount;
 
-    /**
-     * @Serializer\Type("integer")
-     * @Serializer\SerializedName("shareheadId")
-     */
     #[ORM\Column(name: "sharehead_id", type: "integer", nullable: true)]
     private ?int $shareheadId;
 
-    /**
-     * @Serializer\Type("float")
-     * @Serializer\SerializedName("stopLoss")
-     */
     #[ORM\Column(name: "stop_loss", type: "float", precision: 10, scale: 3, nullable: true)]
     private ?float $stopLoss;
 
-    /**
-     * @Serializer\Type("float")
-     * @Serializer\SerializedName("manualDividend")
-     */
     #[ORM\Column(name: "manual_dividend", type: "float", precision: 10, scale: 3, nullable: true)]
     private ?float $manualDividend;
 
-    /**
-     * @Serializer\Type("float")
-     * @Serializer\SerializedName("manualTargetPrice")
-     * used to change the value in the target-value list. If set it overrules all analyst target-prices
-     */
     #[ORM\Column(name: "manual_target_price", type: "float", precision: 10, scale: 3, nullable: true)]
     private ?float $manualTargetPrice;
 
-    /**
-     * @Serializer\Type("float")
-     * @Serializer\SerializedName("targetPrice")
-     * used to mark the limit, this position will be marked green in frontend. showed also in share-chart
-     */
     #[ORM\Column(name: "target_price", type: "float", precision: 10, scale: 3, nullable: true)]
     private ?float $targetPrice;
 
-    /**
-     * @Serializer\Type("string")
-     * @Serializer\SerializedName("targetType")
-     */
     #[ORM\Column(name: "target_type", type: "string", length: 8, unique: false, nullable: true)]
     private ?string $targetType;
 
-    /**
-     * @Serializer\Type("string")
-     * @Serializer\SerializedName("markedLines")
-     */
     #[ORM\Column(name: "marked_lines", type: "json", nullable: true)]
     private ?string $markedLines;
 
-    /**
-     * @Serializer\Type("ArrayCollection<App\Entity\Label>")
-     */
     #[ORM\ManyToMany(targetEntity: Label::class)]
     #[ORM\JoinTable(name: "position_label")]
     #[ORM\JoinColumn(name: "position_id", referencedColumnName: "id")]
     #[ORM\InverseJoinColumn(name: "label_id", referencedColumnName: "id")]
     private array|Collection $labels;
 
-    /**
-     * Used for assign this position to another position as underlying
-     * @Serializer\Type("integer")
-     * @Serializer\SerializedName("motherId")
-     */
     private ?int $motherId;
-
-
-// todo: add annotations
-//    private $rates;
 
     private ?Balance $balance;
 
-    /**
-     * @Serializer\Type("string")
-     * @Serializer\SerializedName("bankAccountName")
-     */
     private ?string $bankAccountName;
 
 
@@ -239,7 +141,7 @@ class Position
 
     public function __construct()
     {
-        $this->labels = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->labels = new ArrayCollection();
     }
 
     public function __toString()
@@ -254,6 +156,8 @@ class Position
     }
 
 
+
+    #[Ignore]
     public function getCountOfSharesByDate(\DateTime $date = null): float
     {
         if (null == $date) {
@@ -286,7 +190,7 @@ class Position
         return $quantity;
     }
 
-
+    #[Ignore]
     public function getAveragePayedPriceGross(): ?float
     {
         if ($this->getCountOfSharesByDate()) {
@@ -296,7 +200,7 @@ class Position
         return null;
     }
 
-
+    #[Ignore]
     public function getAveragePayedPriceNet(): ?float
     {
         if ($this->getCountOfSharesByDate()) {
@@ -306,7 +210,7 @@ class Position
         return null;
     }
 
-
+    #[Ignore]
     public function getBreakEventPrice(): ?float
     {
         if ($this->getCountOfSharesByDate()) {
@@ -316,7 +220,7 @@ class Position
         return null;
     }
 
-
+    #[Ignore]
     public function getSummedInvestmentGross(): int
     {
         $value = 0;
@@ -336,7 +240,7 @@ class Position
         return round($value);
     }
 
-
+    #[Ignore]
     public function getSummedInvestmentNet(): int
     {
         $value = 0;
@@ -355,7 +259,7 @@ class Position
         return round($value);
     }
 
-
+    #[Ignore]
     public function getSummedFees(): int
     {
         $value = 0;
@@ -370,6 +274,7 @@ class Position
         return round($value);
     }
 
+    #[Ignore]
     public function getCollectedDividends(): int
     {
         $value = 0;
@@ -384,7 +289,7 @@ class Position
         return round($value);
     }
 
-
+    #[Ignore]
     public function getCollectedDividendsCurrency(): string
     {
         $result = '';
@@ -406,7 +311,7 @@ class Position
         return $result;
     }
 
-
+    #[Ignore]
     public function getCollectedInterest(): int
     {
         $value = 0;
@@ -421,7 +326,7 @@ class Position
         return round($value);
     }
 
-
+    #[Ignore]
     public function getCollectedCoupons(): int
     {
         $value = 0;
@@ -437,6 +342,7 @@ class Position
     }
 
 
+    #[Ignore]
     public function getLastDividendTransactionByDate(DateTime $startDate = null): ?Transaction
     {
         $hit = null;
@@ -469,6 +375,7 @@ class Position
         return $hit;
     }
 
+    #[Ignore]
     public function calculateNextDividendPayment(): int
     {
         $value = 0;
@@ -499,7 +406,7 @@ class Position
         return $value;
     }
 
-
+    #[Ignore]
     public function getCashValue(): float
     {
         $value = 0;
@@ -516,178 +423,129 @@ class Position
         return $value;
     }
 
+    #[Ignore]
+    public function toggleMarkable(string $key): void
+    {
+        $markables = json_decode($this->markedLines);
+        if (is_array($markables) && in_array($key, $markables)) {
+            $index = array_search($key, $markables);
+            unset($markables[$index]);
+        } else {
+            if (!is_array($markables)) {
+                $markables = [];
+            }
+            $markables[] = $key;
+        }
 
-    /**
-     * @return int
-     */
+        $this->markedLines = json_encode($markables);
+    }
+
+
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return BankAccount|null
-     */
     public function getBankAccount(): ?BankAccount
     {
         return $this->bankAccount;
     }
 
-    /**
-     * @param BankAccount|null $bankAccount
-     */
     public function setBankAccount(?BankAccount $bankAccount): void
     {
         $this->bankAccount = $bankAccount;
     }
 
-    /**
-     * @return Position|null
-     */
     public function getUnderlying(): ?Position
     {
         return $this->underlying;
     }
 
-    /**
-     * @param Position|null $underlying
-     */
     public function setUnderlying(?Position $underlying): void
     {
         $this->underlying = $underlying;
     }
 
-    /**
-     * @return int|null
-     */
     public function getMotherId(): ?int
     {
         return $this->motherId;
     }
 
-    /**
-     * @param int|null $motherId
-     */
     public function setMotherId(?int $motherId): void
     {
         $this->motherId = $motherId;
     }
 
-    /**
-     * @return Share|null
-     */
     public function getShare(): ?Share
     {
         return $this->share;
     }
 
-    /**
-     * @param Share|null $share
-     */
     public function setShare(?Share $share): void
     {
         $this->share = $share;
     }
 
-    /**
-     * @return Currency|null
-     */
     public function getCurrency(): ?Currency
     {
         return $this->currency;
     }
 
-    /**
-     * @param Currency|null $currency
-     */
     public function setCurrency(?Currency $currency): void
     {
         $this->currency = $currency;
     }
 
-    /**
-     * @return Sector|null
-     */
     public function getSector(): ?Sector
     {
         return $this->sector;
     }
 
-    /**
-     * @param Sector|null $sector
-     */
     public function setSector(?Sector $sector): void
     {
         $this->sector = $sector;
     }
 
-    /**
-     * @return Strategy|null
-     */
     public function getStrategy(): ?Strategy
     {
         return $this->strategy;
     }
 
-    /**
-     * @param Strategy|null $strategy
-     */
     public function setStrategy(?Strategy $strategy): void
     {
         $this->strategy = $strategy;
     }
 
-    /**
-     * @return bool
-     */
     public function isActive(): bool
     {
         return $this->active;
     }
 
-    /**
-     * @param bool $active
-     */
     public function setActive(bool $active): void
     {
         $this->active = $active;
     }
 
-    /**
-     * @return DateTime|null
-     */
     public function getActiveFrom(): ?DateTime
     {
         return $this->activeFrom;
     }
 
-    /**
-     * @param DateTime|null $activeFrom
-     */
     public function setActiveFrom(?DateTime $activeFrom): void
     {
         $this->activeFrom = $activeFrom;
     }
 
-    /**
-     * @return DateTime|null
-     */
     public function getActiveUntil(): ?DateTime
     {
         return $this->activeUntil;
     }
 
-    /**
-     * @param DateTime|null $activeUntil
-     */
     public function setActiveUntil(?DateTime $activeUntil): void
     {
         $this->activeUntil = $activeUntil;
     }
 
-    /**
-     * @return Collection|Transaction[]
-     */
     public function getTransactions(): array
     {
         if (null !== $this->transactions) {
@@ -705,97 +563,61 @@ class Position
         return [];
     }
 
-    /**
-     * @param Transaction $transaction
-     */
-    public function removeTransaction(Transaction $transaction)
+    public function removeTransaction(Transaction $transaction): void
     {
         $this->transactions->removeElement($transaction);
     }
 
-    /**
-     * @param array|ArrayCollection $transactions
-     */
     public function setTransactions(ArrayCollection|array $transactions): void
     {
         $this->transactions = $transactions;
     }
 
-    /**
-     * @return Collection|PositionLog[]
-     */
     public function getLogEntries(): Collection
     {
         return $this->logEntries;
     }
 
-    /**
-     * @param $logEntries
-     */
     public function setLogEntries($logEntries): void
     {
         $this->logEntries = $logEntries;
     }
 
-    /**
-     * @return bool
-     */
     public function isCash(): bool
     {
         return $this->isCash;
     }
 
-    /**
-     * @param bool $isCash
-     */
     public function setIsCash(bool $isCash): void
     {
         $this->isCash = $isCash;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDividendPeriodicity(): ?string
     {
         return $this->dividendPeriodicity;
     }
 
-    /**
-     * @param string|null $dividendPeriodicity
-     */
     public function setDividendPeriodicity(?string $dividendPeriodicity): void
     {
         $this->dividendPeriodicity = $dividendPeriodicity;
     }
 
-    /**
-     * @return int|null
-     */
     public function getManualDrawdown(): ?int
     {
         return $this->manualDrawdown;
     }
 
-    /**
-     * @param int|null $manualDrawdown
-     */
     public function setManualDrawdown(?int $manualDrawdown): void
     {
         $this->manualDrawdown = $manualDrawdown;
     }
 
-    /**
-     * @return int|null
-     */
     public function getManualDividendDrop(): ?int
     {
         return $this->manualDividendDrop;
     }
 
-    /**
-     * @param int|null $manualDividendDrop
-     */
     public function setManualDividendDrop(?int $manualDividendDrop): void
     {
         $this->manualDividendDrop = $manualDividendDrop;
@@ -831,33 +653,21 @@ class Position
         $this->manualDividendAmount = $manualDividendAmount;
     }
 
-    /**
-     * @return int|null
-     */
     public function getShareheadId(): ?int
     {
         return $this->shareheadId;
     }
 
-    /**
-     * @param int|null $shareheadId
-     */
     public function setShareheadId(?int $shareheadId): void
     {
         $this->shareheadId = $shareheadId;
     }
 
-    /**
-     * @return float|null
-     */
     public function getStopLoss(): ?float
     {
         return $this->stopLoss;
     }
 
-    /**
-     * @param float|null $stopLoss
-     */
     public function setStopLoss(?float $stopLoss): void
     {
         $this->stopLoss = $stopLoss;
@@ -883,33 +693,21 @@ class Position
         $this->manualTargetPrice = $manualTargetPrice;
     }
 
-    /**
-     * @return float|null
-     */
     public function getTargetPrice(): ?float
     {
         return $this->targetPrice;
     }
 
-    /**
-     * @param float|null $targetPrice
-     */
     public function setTargetPrice(?float $targetPrice): void
     {
         $this->targetPrice = $targetPrice;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTargetType(): ?string
     {
         return $this->targetType;
     }
 
-    /**
-     * @param string|null $targetType
-     */
     public function setTargetType(?string $targetType): void
     {
         $this->targetType = $targetType;
@@ -925,49 +723,31 @@ class Position
         $this->markedLines = $markedLines;
     }
 
-    /**
-     * @return Collection
-     */
     public function getLabels(): Collection
     {
         return $this->labels;
     }
 
-    /**
-     * @param Collection $labels
-     */
     public function setLabels(Collection $labels): void
     {
         $this->labels = $labels;
     }
 
-    /**
-     * @param Label $label
-     */
     public function addLabel(Label $label): void
     {
         $this->labels[] = $label;
     }
 
-    /**
-     * @param Label $label
-     */
     public function removeLabel(Label $label)
     {
         $this->labels->removeElement($label);
     }
 
-    /**
-     * @return Balance|null
-     */
     public function getBalance(): ?Balance
     {
         return $this->balance;
     }
 
-    /**
-     * @param Balance|null $balance
-     */
     public function setBalance(?Balance $balance): void
     {
         $this->balance = $balance;
@@ -976,6 +756,11 @@ class Position
     public function setBankAccountName(?string $bankAccountName): void
     {
         $this->bankAccountName = $bankAccountName;
+    }
+
+    public function getBankAccountName(): ?string
+    {
+        return $this->bankAccountName;
     }
 
 }

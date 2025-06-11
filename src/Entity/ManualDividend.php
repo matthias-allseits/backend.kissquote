@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity()]
 #[ORM\Index(name: "shareindex", columns: ["share_id"])]
@@ -14,22 +14,14 @@ class ManualDividend
     #[ORM\Column]
     private int $id;
 
-	/**
-     * @Serializer\Type("App\Entity\Share")
-	 */
+    #[Ignore]
     #[ORM\ManyToOne(targetEntity: Share::class, inversedBy: "manualDividends")]
     #[ORM\JoinColumn(name: 'share_id', referencedColumnName: 'id', nullable: false)]
 	private Share $share;
 
-    /**
-     * @Serializer\Type("integer")
-     */
     #[ORM\Column(name: "year", type: "integer", nullable: false)]
     private int $year;
 
-    /**
-     * @Serializer\Type("integer")
-     */
     #[ORM\Column(name: "amount", type: "integer", nullable: false)]
     private int $amount;
 
@@ -40,57 +32,36 @@ class ManualDividend
     }
 
 
-    /**
-     * @return integer
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return Share|null
-     */
     public function getShare(): ?Share
     {
         return $this->share;
     }
 
-    /**
-     * @param Share $share
-     */
     public function setShare(Share $share): void
     {
         $this->share = $share;
     }
 
-    /**
-     * @return int|null
-     */
     public function getYear(): ?int
     {
         return $this->year;
     }
 
-    /**
-     * @param int $year
-     */
     public function setYear(int $year): void
     {
         $this->year = $year;
     }
 
-    /**
-     * @return int|null
-     */
     public function getAmount(): ?int
     {
         return $this->amount;
     }
 
-    /**
-     * @param int $amount
-     */
     public function setAmount(int $amount): void
     {
         $this->amount = $amount;

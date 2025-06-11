@@ -15,12 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 class WatchlistController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/watchlist", name="list_watchlist")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/watchlist', name: 'list_watchlist', methods: ['GET', 'OPTIONS'])]
     public function listWatchlistEntries(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

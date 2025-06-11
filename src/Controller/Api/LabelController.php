@@ -6,6 +6,7 @@ use App\Entity\Label;
 use App\Entity\Position;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +17,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class LabelController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/label", name="list_labels")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/label', name: 'list_labels', methods: ['GET', 'OPTIONS'])]
     public function listLabels(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
