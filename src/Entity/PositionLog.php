@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 #[ORM\Entity()]
 class PositionLog
@@ -18,6 +20,7 @@ class PositionLog
     #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id', nullable: false)]
     private Position $position;
 
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[ORM\Column(name: "date", type: "date", nullable: false)]
     private \DateTime $date;
 
@@ -60,7 +63,9 @@ class PositionLog
 
     public function setPosition(?Position $position): void
     {
-        $this->position = $position;
+        if ($position instanceof Position) {
+            $this->position = $position;
+        }
     }
 
     public function getDate(): ?\DateTime
