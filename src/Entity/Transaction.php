@@ -113,7 +113,9 @@ class Transaction
 
     public function setPosition(?Position $position): void
     {
-        $this->position = $position;
+        if ($position instanceof Position) {
+            $this->position = $position;
+        }
     }
 
     public function getTitle(): ?string

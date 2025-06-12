@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 
 #[ORM\Entity()]
@@ -24,6 +26,7 @@ class Watchlist
     #[ORM\Column(name: "sharehead_id", type: "integer", nullable: false)]
     private int $shareheadId;
 
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[ORM\Column(name: "start_date", type: "date", nullable: false)]
     private DateTime $startDate;
 

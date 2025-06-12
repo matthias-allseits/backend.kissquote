@@ -4,10 +4,8 @@ namespace App\Controller\Api;
 
 use App\Entity\Watchlist;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,17 +24,10 @@ class WatchlistController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/watchlist", name="create_watchlist_entry")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/watchlist', name: 'create_watchlist_entry', methods: ['POST', 'OPTIONS'])]
     public function createWatchlistEntry(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
-
-        $serializer = SerializerBuilder::create()->build();
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
@@ -58,13 +49,7 @@ class WatchlistController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/watchlist/{shareheadId}", name="delete_watchlist_entry")
-     * @param Request $request
-     * @param int $shareheadId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/watchlist/{shareheadId}', name: 'delete_watchlist_entry', methods: ['DELETE', 'OPTIONS'])]
     public function deleteWatchlistEntry(Request $request, int $shareheadId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

@@ -28,7 +28,7 @@ class ManualDividend
 
     public function __toString()
     {
-        return (string) $this->share->getName() . ' has a manual-dividend of ' . $this->amount . ' for year ' . $this->year;
+        return $this->share->getName() . ' has a manual-dividend of ' . $this->amount . ' for year ' . $this->year;
     }
 
 
