@@ -24,6 +24,12 @@ class Currency
     private float $rate;
 
 
+    // todo: find out, why this is here necessary for put-currency endpoint
+    public function __construct()
+    {
+        $this->id = 1;
+    }
+
     public function __toString()
     {
         return $this->name;

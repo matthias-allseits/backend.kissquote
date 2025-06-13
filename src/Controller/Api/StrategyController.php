@@ -5,13 +5,12 @@ namespace App\Controller\Api;
 use App\Entity\Position;
 use App\Entity\Strategy;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class StrategyController extends BaseController
@@ -28,20 +27,13 @@ class StrategyController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/strategy", name="create_strategy")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function createStrategy(Request $request, EntityManagerInterface $entityManager): View
+    #[Route('/api/strategy', name: 'create_strategy', methods: ['POST', 'OPTIONS'])]
+    public function createStrategy(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
         /** @var Strategy $postedStrategy */
-        $postedStrategy = $serializer->deserialize(json_encode($content), Strategy::class, 'json');
+        $postedStrategy = $serializer->deserialize($request->getContent(), Strategy::class, 'json');
 
         $existingStrategy = $portfolio->getStrategyByName($postedStrategy->getName());
         if (null === $existingStrategy) {
@@ -51,29 +43,21 @@ class StrategyController extends BaseController
             $entityManager->flush();
         }
 
-        return new View("Strategy Creation Successfully", Response::HTTP_OK);
+        return new View($postedStrategy, Response::HTTP_OK);
     }
 
 
-    /**
-     * @Rest\Put("/strategy/{strategyId}", name="update_strategy")
-     * @param Request $request
-     * @param int $strategyId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function updateStrategy(Request $request, int $strategyId, EntityManagerInterface $entityManager): View
+    #[Route('/api/strategy/{strategyId}', name: 'update_strategy', methods: ['PUT', 'OPTIONS'])]
+    public function updateStrategy(Request $request, int $strategyId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
         /** @var Strategy $puttedStrategy */
-        $puttedStrategy = $serializer->deserialize(json_encode($content), Strategy::class, 'json');
+        $puttedStrategy = $serializer->deserialize($request->getContent(), Strategy::class, 'json');
 
-        $existingStrategy = $portfolio->getStrategyById($puttedStrategy->getId());
+        $existingStrategy = $portfolio->getStrategyById($strategyId);
 
-        if (null !== $existingStrategy && $puttedStrategy->getId() == $existingStrategy->getId()) {
+        if (null !== $existingStrategy && $existingStrategy->getId() == $strategyId) {
             $existingStrategy->setName($puttedStrategy->getName());
 
             $entityManager->persist($existingStrategy);
@@ -82,23 +66,18 @@ class StrategyController extends BaseController
 
             $entityManager->flush();
 
-            return new View("Strategy Update Successfully", Response::HTTP_OK);
+            return new View($existingStrategy, Response::HTTP_OK);
         } else {
 
+//            return new View($puttedStrategy, Response::HTTP_OK);
             throw new AccessDeniedException();
         }
 
     }
 
 
-    /**
-     * @Rest\Delete("/strategy/{strategyId}", name="delete_strategy")
-     * @param Request $request
-     * @param int $strategyId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function deleteStrategy(Request $request, int $strategyId, EntityManagerInterface $entityManager): View
+    #[Route('/api/strategy/{strategyId}', name: 'delete_strategy', methods: ['DELETE', 'OPTIONS'])]
+    public function deleteStrategy(Request $request, int $strategyId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 

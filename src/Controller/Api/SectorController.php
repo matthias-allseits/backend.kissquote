@@ -5,13 +5,12 @@ namespace App\Controller\Api;
 use App\Entity\Position;
 use App\Entity\Sector;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class SectorController extends BaseController
@@ -28,20 +27,13 @@ class SectorController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/sector", name="create_sector")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function createSector(Request $request, EntityManagerInterface $entityManager): View
+    #[Route('/api/sector', name: 'create_sector', methods: ['POST', 'OPTIONS'])]
+    public function createSector(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
         /** @var Sector $postedSector */
-        $postedSector = $serializer->deserialize(json_encode($content), Sector::class, 'json');
+        $postedSector = $serializer->deserialize($request->getContent(), Sector::class, 'json');
 
         $existingSector = $portfolio->getSectorByName($postedSector->getName());
         if (null === $existingSector) {
@@ -51,29 +43,21 @@ class SectorController extends BaseController
             $entityManager->flush();
         }
 
-        return new View("Sector Creation Successfully", Response::HTTP_OK);
+        return new View($postedSector, Response::HTTP_OK);
     }
 
 
-    /**
-     * @Rest\Put("/sector/{sectorId}", name="update_sector")
-     * @param Request $request
-     * @param int $sectorId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function updateSector(Request $request, int $sectorId, EntityManagerInterface $entityManager): View
+    #[Route('/api/sector/{sectorId}', name: 'update_sector', methods: ['PUT', 'OPTIONS'])]
+    public function updateSector(Request $request, int $sectorId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
         /** @var Sector $puttedSector */
-        $puttedSector = $serializer->deserialize(json_encode($content), Sector::class, 'json');
+        $puttedSector = $serializer->deserialize($request->getContent(), Sector::class, 'json');
 
-        $existingSector = $portfolio->getSectorById($puttedSector->getId());
+        $existingSector = $portfolio->getSectorById($sectorId);
 
-        if (null !== $existingSector && $puttedSector->getId() == $existingSector->getId()) {
+        if (null !== $existingSector && $sectorId == $existingSector->getId()) {
             $existingSector->setName($puttedSector->getName());
 
             $entityManager->persist($existingSector);
@@ -82,7 +66,7 @@ class SectorController extends BaseController
 
             $entityManager->flush();
 
-            return new View("Sector Update Successfully", Response::HTTP_OK);
+            return new View($existingSector, Response::HTTP_OK);
         } else {
 
             throw new AccessDeniedException();
@@ -91,13 +75,7 @@ class SectorController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/sector/{sectorId}", name="delete_sector")
-     * @param Request $request
-     * @param int $sectorId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/sector/{sectorId}', name: 'delete_sector', methods: ['DELETE', 'OPTIONS'])]
     public function deleteSector(Request $request, int $sectorId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

@@ -4,13 +4,12 @@ namespace App\Controller\Api;
 
 use App\Entity\Currency;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class CurrencyController extends BaseController
@@ -29,19 +28,14 @@ class CurrencyController extends BaseController
 
     /**
      * todo: probably useless?
-     * @Rest\Post("/currency", name="create_currency")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
      */
-    public function createCurrency(Request $request, EntityManagerInterface $entityManager): View
+//    #[Route('/api/currency', name: 'create_currency', methods: ['POST', 'OPTIONS'])]
+    public function createCurrency(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
         /** @var Currency $postedCurrency */
-        $postedCurrency = $serializer->deserialize(json_encode($content), Currency::class, 'json');
+        $postedCurrency = $serializer->deserialize($request->getContent(), Currency::class, 'json');
 
         $existingCurrency = $portfolio->getCurrencyByName($postedCurrency->getName());
         if (null === $existingCurrency) {
@@ -51,32 +45,21 @@ class CurrencyController extends BaseController
             $entityManager->flush();
         }
 
-        return new View("Currency Creation Successfully", Response::HTTP_OK);
+        return new View($postedCurrency, Response::HTTP_OK);
     }
 
 
-    /**
-     * @Rest\Put("/currency/{currencyId}", name="update_currency")
-     * @param Request $request
-     * @param int $currencyId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function updateCurrency(Request $request, int $currencyId, EntityManagerInterface $entityManager): View
+    #[Route('/api/currency/{currencyId}', name: 'update_currency', methods: ['PUT', 'OPTIONS'])]
+    public function updateCurrency(Request $request, int $currencyId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
-//        unset($content->balance);
-//        unset($content->transactions);
-//        var_dump($content);
         /** @var Currency $puttedCurrency */
-        $puttedCurrency = $serializer->deserialize(json_encode($content), Currency::class, 'json');
+        $puttedCurrency = $serializer->deserialize($request->getContent(), Currency::class, 'json');
 
-        $existingCurrency = $portfolio->getCurrencyById($puttedCurrency->getId());
+        $existingCurrency = $portfolio->getCurrencyById($currencyId);
 
-        if (null !== $existingCurrency && $puttedCurrency->getId() == $existingCurrency->getId()) {
+        if (null !== $existingCurrency && $existingCurrency->getId() == $currencyId) {
             $existingCurrency->setName($puttedCurrency->getName());
             $existingCurrency->setRate($puttedCurrency->getRate());
 
@@ -86,7 +69,7 @@ class CurrencyController extends BaseController
 
             $entityManager->flush();
 
-            return new View("Currency Update Successfully", Response::HTTP_OK);
+            return new View($existingCurrency, Response::HTTP_OK);
         } else {
 
             throw new AccessDeniedException();

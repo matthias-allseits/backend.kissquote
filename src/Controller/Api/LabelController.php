@@ -5,13 +5,12 @@ namespace App\Controller\Api;
 use App\Entity\Label;
 use App\Entity\Position;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class LabelController extends BaseController
@@ -28,20 +27,13 @@ class LabelController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/label", name="create_label")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function createLabel(Request $request, EntityManagerInterface $entityManager): View
+    #[Route('/api/label', name: 'create_label', methods: ['POST', 'OPTIONS'])]
+    public function createLabel(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
         /** @var Label $postedLabel */
-        $postedLabel = $serializer->deserialize(json_encode($content), Label::class, 'json');
+        $postedLabel = $serializer->deserialize($request->getContent(), Label::class, 'json');
 
         $existingLabel = $portfolio->getLabelByName($postedLabel->getName());
         if (null === $existingLabel) {
@@ -55,28 +47,17 @@ class LabelController extends BaseController
     }
 
 
-    /**
-     * @Rest\Put("/label/{labelId}", name="update_label")
-     * @param Request $request
-     * @param int $labelId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function updateLabel(Request $request, int $labelId, EntityManagerInterface $entityManager): View
+    #[Route('/api/label/{labelId}', name: 'update_label', methods: ['PUT', 'OPTIONS'])]
+    public function updateLabel(Request $request, int $labelId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
-//        unset($content->balance);
-//        unset($content->transactions);
-//        var_dump($content);
         /** @var Label $puttedLabel */
-        $puttedLabel = $serializer->deserialize(json_encode($content), Label::class, 'json');
+        $puttedLabel = $serializer->deserialize($request->getContent(), Label::class, 'json');
 
-        $existingLabel = $portfolio->getLabelById($puttedLabel->getId());
+        $existingLabel = $portfolio->getLabelById($labelId);
 
-        if (null !== $existingLabel && $puttedLabel->getId() == $existingLabel->getId()) {
+        if (null !== $existingLabel && $existingLabel->getId() == $labelId) {
             $existingLabel->setName($puttedLabel->getName());
             $existingLabel->setColor($puttedLabel->getColor());
 
@@ -95,13 +76,7 @@ class LabelController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/label/{labelId}", name="delete_label")
-     * @param Request $request
-     * @param int $labelId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/label/{labelId}', name: 'delete_label', methods: ['DELETE', 'OPTIONS'])]
     public function deleteLabel(Request $request, int $labelId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
