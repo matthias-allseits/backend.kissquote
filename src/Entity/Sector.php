@@ -21,6 +21,13 @@ class Sector
     private string $name;
 
 
+    // todo: find out, why this is here necessary for put-position endpoint
+    public function __construct()
+    {
+        $this->id = 1;
+    }
+
+
     public function __clone()
     {
         $this->id = null;

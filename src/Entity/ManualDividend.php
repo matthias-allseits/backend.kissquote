@@ -26,6 +26,13 @@ class ManualDividend
     private int $amount;
 
 
+    // todo: find out, why this is here necessary for put-manual-dividend endpoint
+    public function __construct()
+    {
+        $this->share = new Share();
+        $this->share->setId(1);
+    }
+
     public function __toString()
     {
         return $this->share->getName() . ' has a manual-dividend of ' . $this->amount . ' for year ' . $this->year;

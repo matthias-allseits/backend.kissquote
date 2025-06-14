@@ -29,6 +29,12 @@ class Marketplace
     private string $isinKey;
 
 
+    // todo: find out, why this is here necessary for put-position endpoint
+    public function __construct()
+    {
+        $this->id = 1;
+    }
+
     public function __toString()
     {
         return $this->name . ' ' . $this->getPlace();

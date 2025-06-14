@@ -4,7 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\BankAccount;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,12 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 class BankAccountController extends BaseController
 {
 
-    /**
-     * @Rest\Post("/bank-account", name="create_account")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/bank-account', name: 'create_account', methods: ['POST', 'OPTIONS'])]
     public function createBankAccount(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
@@ -42,13 +37,7 @@ class BankAccountController extends BaseController
     }
 
 
-    /**
-     * @Rest\Put("/bank-account/{accountId}", name="update_account")
-     * @param Request $request
-     * @param int $accountId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/bank-account/{accountId}', name: 'update_account', methods: ['PUT', 'OPTIONS'])]
     public function updateBankAccount(Request $request, int $accountId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
@@ -74,13 +63,7 @@ class BankAccountController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/bank-account/{accountId}", name="delete_account")
-     * @param Request $request
-     * @param int $accountId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/bank-account/{accountId}', name: 'update_account', methods: ['DELETE', 'OPTIONS'])]
     public function deleteBankAccount(Request $request, int $accountId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

@@ -65,73 +65,46 @@ class BankAccount
         return $this->getName() . ' (' . $this->getPortfolio() . ')';
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return Portfolio|null
-     */
     public function getPortfolio(): ?Portfolio
     {
         return $this->portfolio;
     }
 
-    /**
-     * @param Portfolio $portfolio
-     */
     public function setPortfolio(Portfolio $portfolio): void
     {
         $this->portfolio = $portfolio;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @param Position $position
-     */
     public function addPosition(Position $position): void
     {
         $this->positions[] = $position;
     }
 
-    /**
-     * @param Position $bankAccount
-     */
-    public function removePosition(Position $bankAccount)
+    public function removePosition(Position $bankAccount): void
     {
         $this->positions->removeElement($bankAccount);
     }
 
-    /**
-     * @param Position[]|Collection $positions
-     */
-    public function setPositions($positions): void
+    public function setPositions(array $positions): void
     {
         $this->positions = $positions;
     }
 
-    /**
-     * @return Position[]
-     */
     public function getPositions(): array
     {
         if (is_array($this->positions)) {

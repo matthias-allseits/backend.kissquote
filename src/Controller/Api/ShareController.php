@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ShareController extends AbstractFOSRestController
 {
 
+    // todo: probably useless?
     /**
      * @Rest\Get ("/share", name="list_shares")
      * @param Request $request
