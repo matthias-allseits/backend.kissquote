@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\BankAccount;
 use App\Entity\Label;
 use App\Entity\Marketplace;
 use App\Entity\Portfolio;
@@ -18,29 +19,25 @@ use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class PositionController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/position/{positionId}", name="get_position", requirements={"positionId"="\d+"})
-     * @param Request $request
-     * @param int $positionId
-     * @param BalanceService $balanceService
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
     #[Route('/api/position/{positionId}', name: 'get_position', requirements: ['positionId' => '\d+'], methods: ['GET', 'OPTIONS'])]
-    public function getPosition(Request $request, int $positionId, BalanceService $balanceService, EntityManagerInterface $entityManager): View
+    public function getPosition(Request $request, int $positionId, BalanceService $balanceService, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $position = $entityManager->getRepository(Position::class)->find($positionId);
+
         if ($position->getBankAccount()) {
             $position->setBankAccountName($position->getBankAccount()->getName());
         }
-        $position->setBankAccount(null);
 
         $motherPosition = $entityManager->getRepository(Position::class)->findOneBy(['underlying' => $position]);
         if (null !== $motherPosition) {
@@ -57,16 +54,22 @@ class PositionController extends BaseController
             $position->getUnderlying()->setLogEntries(new ArrayCollection(array_reverse($position->getLogEntries()->toArray())));
         }
 
-        return View::create($position, Response::HTTP_CREATED);
+        $data = $serializer->serialize($position, 'json',
+//            ['groups' => ['product-view']]
+        );
+
+        return new Response($data);
     }
 
 
+    // todo: probably useless?
     /**
      * @Rest\Get ("/position", name="list_positions")
      * @param Request $request
      * @param EntityManagerInterface $entityManager
      * @return View
      */
+//    #[Route('/api/position', name: 'list_positions', methods: ['GET', 'OPTIONS'])]
     public function listPositions(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
@@ -75,19 +78,14 @@ class PositionController extends BaseController
         foreach($positions as $position) {
             $position->setBankAccount(null);
             $position->setShare(null);
-            $position->setCurrency(null);
+//            $position->setCurrency(null); Cannot assign null to property App\\Entity\\Position::$currency of type App\\Entity\\Currency
         }
 
         return View::create($positions, Response::HTTP_CREATED);
     }
 
 
-    /**
-     * @Rest\Get ("/position/active", name="list_active_positions")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/position/active', name: 'list_active_positions', methods: ['GET', 'OPTIONS'])]
     public function listActivePositions(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
@@ -98,7 +96,7 @@ class PositionController extends BaseController
             if ($position->isActive()) {
                 $position->setBankAccount(null);
 //                $position->setShare(null);
-                $position->setCurrency(null);
+//                $position->setCurrency(null);
                 $position->setTransactions(new ArrayCollection());
                 $activePositions[] = $position;
             }
@@ -114,11 +112,10 @@ class PositionController extends BaseController
      * @param EntityManagerInterface $entityManager
      * @return View
      */
-    public function persistPositionsBunch(Request $request, EntityManagerInterface $entityManager): View
+    public function persistPositionsBunch(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
         $rawPositions = json_decode($request->getContent());
         $bankAccount = null;
         /** @var Position[] $positions */
@@ -153,17 +150,11 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/position", name="create_position")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function createPosition(Request $request, EntityManagerInterface $entityManager): View
+    #[Route('/api/position', name: 'create_position', methods: ['POST', 'OPTIONS'])]
+    public function createPosition(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
-        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
+        list($portfolio, $position) = $this->preparePositionCreation($request, $entityManager, $serializer);
 
-        $position = $this->deserializePosition($request, $portfolio, $entityManager);
         $this->persistShare($portfolio, $position, $entityManager);
         $this->persistCurrency($portfolio, $position, $position, $entityManager);
 
@@ -179,21 +170,15 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/position/cash", name="create_cash_position")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function createCashPosition(Request $request, EntityManagerInterface $entityManager): View
+    #[Route('/api/position/cash', name: 'create_cash_position', methods: ['POST', 'OPTIONS'])]
+    public function createCashPosition(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
-        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
+        list($portfolio, $position) = $this->preparePositionCreation($request, $entityManager, $serializer);
 
-        $position = $this->deserializePosition($request, $portfolio, $entityManager);
         $this->persistCurrency($portfolio, $position, $position, $entityManager);
 
         // happens in case of a import
-        if ($position->getShare()->getId() == 0) {
+        if ($position->getShare() && $position->getShare()->getId() == 0) {
             $position->setShare(null);
         }
 
@@ -206,19 +191,11 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @Rest\Put("/position/{positionId}", name="update_position")
-     * @param Request $request
-     * @param int $positionId
-     * @param BalanceService $balanceService
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function updatePosition(Request $request, int $positionId, BalanceService $balanceService, EntityManagerInterface $entityManager): View
+    #[Route('/api/position/{positionId}', name: 'update_position', methods: ['PUT', 'OPTIONS'])]
+    public function updatePosition(Request $request, int $positionId, BalanceService $balanceService, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
         $content = json_decode($request->getContent());
         $removeUnderlying = false;
         if (isset($content->removeUnderlying)) {
@@ -228,83 +205,83 @@ class PositionController extends BaseController
         unset($content->transactions);
         unset($content->underlying);
 //        var_dump($content);
-        /** @var Position $newPosition */
-        $newPosition = $serializer->deserialize(json_encode($content), Position::class, 'json');
+        /** @var Position $puttedPosition */
+        $puttedPosition = $serializer->deserialize(json_encode($content), Position::class, 'json');
 
         /** @var Position $oldPosition */
-        $oldPosition = $entityManager->getRepository(Position::class)->find($newPosition->getId());
+        $oldPosition = $entityManager->getRepository(Position::class)->find($positionId);
         if (null !== $oldPosition) {
-            $oldPosition->setDividendPeriodicity($newPosition->getDividendPeriodicity());
-            $oldPosition->setActiveFrom($newPosition->getActiveFrom());
-            $oldPosition->setActiveUntil($newPosition->getActiveUntil());
-            $oldPosition->setActive($newPosition->isActive());
-            $oldPosition->setShareheadId($newPosition->getShareheadId());
-            $oldPosition->getShare()->setName($newPosition->getShare()->getName());
-            $oldPosition->getShare()->setShortname($newPosition->getShare()->getShortname());
-            $oldPosition->getShare()->setIsin($newPosition->getShare()->getIsin());
-            if ($oldPosition->getManualDrawdown() != $newPosition->getManualDrawdown()) {
-                if ($newPosition->getManualDrawdown() > 0) {
-                    $this->addPositionLogEntry('Setze manuellen Drawdown auf: ' . $newPosition->getManualDrawdown() . '%', $oldPosition, $entityManager);
+            $oldPosition->setDividendPeriodicity($puttedPosition->getDividendPeriodicity());
+            $oldPosition->setActiveFrom($puttedPosition->getActiveFrom());
+            $oldPosition->setActiveUntil($puttedPosition->getActiveUntil());
+            $oldPosition->setActive($puttedPosition->isActive());
+            $oldPosition->setShareheadId($puttedPosition->getShareheadId());
+            $oldPosition->getShare()->setName($puttedPosition->getShare()->getName());
+            $oldPosition->getShare()->setShortname($puttedPosition->getShare()->getShortname());
+            $oldPosition->getShare()->setIsin($puttedPosition->getShare()->getIsin());
+            if ($oldPosition->getManualDrawdown() != $puttedPosition->getManualDrawdown()) {
+                if ($puttedPosition->getManualDrawdown() > 0) {
+                    $this->addPositionLogEntry('Setze manuellen Drawdown auf: ' . $puttedPosition->getManualDrawdown() . '%', $oldPosition, $entityManager);
                 } else {
                     $this->addPositionLogEntry('Entferne manuellen Drawdown', $oldPosition, $entityManager);
                 }
             }
-            $oldPosition->setManualDrawdown($newPosition->getManualDrawdown());
+            $oldPosition->setManualDrawdown($puttedPosition->getManualDrawdown());
 
-            if ($oldPosition->getManualDividendDrop() !== $newPosition->getManualDividendDrop()) {
-                if (is_int($newPosition->getManualDividendDrop()) > 0) {
-                    $this->addPositionLogEntry('Setze manuellen Dividend Drop auf: ' . $newPosition->getManualDividendDrop() . '%', $oldPosition, $entityManager);
+            if ($oldPosition->getManualDividendDrop() !== $puttedPosition->getManualDividendDrop()) {
+                if (is_int($puttedPosition->getManualDividendDrop()) > 0) {
+                    $this->addPositionLogEntry('Setze manuellen Dividend Drop auf: ' . $puttedPosition->getManualDividendDrop() . '%', $oldPosition, $entityManager);
                 } else {
                     $this->addPositionLogEntry('Entferne manuellen Dividend Drop', $oldPosition, $entityManager);
                 }
             }
-            $oldPosition->setManualDividendDrop($newPosition->getManualDividendDrop());
+            $oldPosition->setManualDividendDrop($puttedPosition->getManualDividendDrop());
 
-            if ($oldPosition->getManualDividend() !== $newPosition->getManualDividend()) {
-                if ($newPosition->getManualDividend() > 0) {
-                    $this->addPositionLogEntry('Setze manuelle Dividende auf: ' . $newPosition->getManualDividend(), $oldPosition, $entityManager);
+            if ($oldPosition->getManualDividend() !== $puttedPosition->getManualDividend()) {
+                if ($puttedPosition->getManualDividend() > 0) {
+                    $this->addPositionLogEntry('Setze manuelle Dividende auf: ' . $puttedPosition->getManualDividend(), $oldPosition, $entityManager);
                 } else {
                     $this->addPositionLogEntry('Entferne manuelle Dividende', $oldPosition, $entityManager);
                 }
             }
-            $oldPosition->setManualDividend($newPosition->getManualDividend());
+            $oldPosition->setManualDividend($puttedPosition->getManualDividend());
 
-            if ($oldPosition->getManualTargetPrice() !== $newPosition->getManualTargetPrice()) {
-                if ($newPosition->getManualTargetPrice() > 0) {
-                    $this->addPositionLogEntry('Setze manuellen Target-Price auf: ' . $newPosition->getManualTargetPrice(), $oldPosition, $entityManager);
+            if ($oldPosition->getManualTargetPrice() !== $puttedPosition->getManualTargetPrice()) {
+                if ($puttedPosition->getManualTargetPrice() > 0) {
+                    $this->addPositionLogEntry('Setze manuellen Target-Price auf: ' . $puttedPosition->getManualTargetPrice(), $oldPosition, $entityManager);
                 } else {
                     $this->addPositionLogEntry('Entferne manuellen Target-Price', $oldPosition, $entityManager);
                 }
             }
-            $oldPosition->setManualTargetPrice($newPosition->getManualTargetPrice());
+            $oldPosition->setManualTargetPrice($puttedPosition->getManualTargetPrice());
 
-            if ($oldPosition->getStopLoss() !== $newPosition->getStopLoss()) {
-                if ($newPosition->getStopLoss() > 0) {
-                    $this->addPositionLogEntry('Setze Stop-Loss auf: ' . $newPosition->getStopLoss(), $oldPosition, $entityManager);
+            if ($oldPosition->getStopLoss() !== $puttedPosition->getStopLoss()) {
+                if ($puttedPosition->getStopLoss() > 0) {
+                    $this->addPositionLogEntry('Setze Stop-Loss auf: ' . $puttedPosition->getStopLoss(), $oldPosition, $entityManager);
                 } else {
                     $this->addPositionLogEntry('Entferne Stop-Loss', $oldPosition, $entityManager);
                 }
             }
-            $oldPosition->setStopLoss($newPosition->getStopLoss());
+            $oldPosition->setStopLoss($puttedPosition->getStopLoss());
 
-            if ($oldPosition->getTargetPrice() !== $newPosition->getTargetPrice() || $oldPosition->getTargetType() !== $newPosition->getTargetType()) {
-                if ($newPosition->getTargetPrice() > 0) {
-                    $this->addPositionLogEntry('Setze Target-Price (' . $newPosition->getTargetType() . ') auf: ' . $newPosition->getTargetPrice(), $oldPosition, $entityManager);
+            if ($oldPosition->getTargetPrice() !== $puttedPosition->getTargetPrice() || $oldPosition->getTargetType() !== $puttedPosition->getTargetType()) {
+                if ($puttedPosition->getTargetPrice() > 0) {
+                    $this->addPositionLogEntry('Setze Target-Price (' . $puttedPosition->getTargetType() . ') auf: ' . $puttedPosition->getTargetPrice(), $oldPosition, $entityManager);
                 } else {
                     $this->addPositionLogEntry('Entferne Target-Price', $oldPosition, $entityManager);
-                    $newPosition->setTargetType(null);
-                    $newPosition->setTargetPrice(null);
+                    $puttedPosition->setTargetType(null);
+                    $puttedPosition->setTargetPrice(null);
                 }
             }
-            $oldPosition->setTargetPrice($newPosition->getTargetPrice());
-            $oldPosition->setTargetType($newPosition->getTargetType());
+            $oldPosition->setTargetPrice($puttedPosition->getTargetPrice());
+            $oldPosition->setTargetType($puttedPosition->getTargetType());
 
-            $marketplace = $entityManager->getRepository(Marketplace::class)->find($newPosition->getShare()->getMarketplace()->getId());
+            $marketplace = $entityManager->getRepository(Marketplace::class)->find($puttedPosition->getShare()->getMarketplace()->getId());
             $oldPosition->getShare()->setMarketplace($marketplace);
 
             $sector = null;
-            if ($newPosition->getSector()) {
-                $sector = $entityManager->getRepository(Sector::class)->find($newPosition->getSector()->getId());
+            if ($puttedPosition->getSector()) {
+                $sector = $entityManager->getRepository(Sector::class)->find($puttedPosition->getSector()->getId());
             }
             if ($oldPosition->getSector() != $sector) {
                 if (null === $sector && null !== $oldPosition->getSector()) {
@@ -316,8 +293,8 @@ class PositionController extends BaseController
             $oldPosition->setSector($sector);
 
             $strategy = null;
-            if ($newPosition->getStrategy()) {
-                $strategy = $entityManager->getRepository(Strategy::class)->find($newPosition->getStrategy()->getId());
+            if ($puttedPosition->getStrategy()) {
+                $strategy = $entityManager->getRepository(Strategy::class)->find($puttedPosition->getStrategy()->getId());
             }
             if ($oldPosition->getStrategy() != $strategy) {
                 if (null === $strategy && null !== $oldPosition->getStrategy()) {
@@ -334,7 +311,7 @@ class PositionController extends BaseController
                 $entityManager->remove($obsoletePosition);
             }
 
-            $this->persistCurrency($portfolio, $newPosition, $oldPosition, $entityManager);
+            $this->persistCurrency($portfolio, $puttedPosition, $oldPosition, $entityManager);
 
             $entityManager->persist($oldPosition);
 
@@ -353,18 +330,13 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/position/{positionId}", name="delete_position")
-     * @param Request $request
-     * @param int $positionId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/position/{positionId}', name: 'delete_position', methods: ['DELETE', 'OPTIONS'])]
     public function deletePosition(Request $request, int $positionId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         $position = $entityManager->getRepository(Position::class)->find($positionId);
+        $position->setBankAccount(null);
         $entityManager->remove($position);
 
         $this->makeLogEntry('delete position', $position, $entityManager);
@@ -375,14 +347,7 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @Rest\Get("/position/{positionId}/label/{labelId}", name="add_position_label")
-     * @param Request $request
-     * @param int $positionId
-     * @param int $labelId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/position/{positionId}/label/{labelId}', name: 'add_position_label', methods: ['GET', 'OPTIONS'])]
     public function addPositionLabel(Request $request, int $positionId, int $labelId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
@@ -399,7 +364,7 @@ class PositionController extends BaseController
 
         $this->addPositionLogEntry('Füge Label hinzu: ' . $label->getName(), $position, $entityManager);
 
-        return new View("Label Removed Successfully", Response::HTTP_OK);
+        return new View("Label Added Successfully", Response::HTTP_OK);
     }
 
 
@@ -431,22 +396,32 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @param Request $request
-     * @param Portfolio $portfolio
-     * @param EntityManagerInterface $entityManager
-     * @return Position
-     */
-    private function deserializePosition(Request $request, Portfolio $portfolio, EntityManagerInterface $entityManager): Position
+    #[Route('/api/position/{positionId}/toggle-markable/{key}', name: 'toggle_position_markables', methods: ['GET', 'OPTIONS'])]
+    public function togglePositionMarkable(Request $request, int $positionId, string $key, EntityManagerInterface $entityManager): View
     {
-        $serializer = SerializerBuilder::create()->build();
         /** @var Position $position */
-        $position = $serializer->deserialize($request->getContent(), Position::class, 'json');
+        $position = $entityManager->getRepository(Position::class)->find($positionId);
+        $position->toggleMarkable($key);
+        $entityManager->persist($position);
+        $entityManager->flush();
 
-        $bankAccount = null;
+        return new View("Markable Toggled Successfully", Response::HTTP_OK);
+    }
+
+
+    private function preparePositionCreation(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): array
+    {
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
+
+        // todo: probably no longer necessary
+        $content = json_decode($request->getContent());
+        $bankAccount = $serializer->deserialize(json_encode($content->bankAccount), BankAccount::class, 'json');
+        $content->bankAccount = null;
+        $position = $serializer->deserialize(json_encode($content), Position::class, 'json');
+
         $motherPosition = null;
-        if ($position->getBankAccount()) {
-            $bankAccount = $portfolio->getBankAccountById($position->getBankAccount()->getId());
+        if ($bankAccount) {
+            $bankAccount = $portfolio->getBankAccountById($bankAccount->getId());
         }
         if ($position->getMotherId() > 0) {
             $motherPosition = $portfolio->getPositionById($position->getMotherId());
@@ -460,15 +435,10 @@ class PositionController extends BaseController
             }
         }
 
-        return $position;
+        return array($portfolio, $position);
     }
 
 
-    /**
-     * @param Position $position
-     * @param Portfolio $portfolio
-     * @param EntityManagerInterface $entityManager
-     */
     private function persistTransactions(Position $position, Portfolio $portfolio, EntityManagerInterface $entityManager): void
     {
         $entityManager->persist($position);
@@ -491,11 +461,6 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @param Portfolio $portfolio
-     * @param Position $position
-     * @param EntityManagerInterface $entityManager
-     */
     private function persistShare(Portfolio $portfolio, Position $position, EntityManagerInterface $entityManager): void
     {
         // todo: get share by isin is not enough. currency is missing
@@ -514,12 +479,6 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @param Portfolio $portfolio
-     * @param Position $sourcePosition
-     * @param Position $targetPosition
-     * @param EntityManagerInterface $entityManager
-     */
     private function persistCurrency(Portfolio $portfolio, Position $sourcePosition, Position $targetPosition, EntityManagerInterface $entityManager): void
     {
         $currency = $portfolio->getCurrencyByName($sourcePosition->getCurrency()->getName());

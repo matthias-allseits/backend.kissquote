@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -26,6 +27,9 @@ class BankAccount
     #[ORM\OneToMany(targetEntity: Position::class, mappedBy: "bankAccount")]
     private array|Collection $positions;
 
+    public function __construct() {
+        $this->positions = new ArrayCollection();
+    }
 
     public function getCashPositionByCurrency(Currency $currency): ?Position
     {
@@ -68,6 +72,11 @@ class BankAccount
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getPortfolio(): ?Portfolio

@@ -49,6 +49,11 @@ class Translation
         return $this->id;
     }
 
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getKey(): ?string
     {
         return $this->key;

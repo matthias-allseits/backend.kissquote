@@ -50,6 +50,11 @@ class Watchlist
         return $this->id;
     }
 
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getPortfolio(): ?Portfolio
     {
         return $this->portfolio;

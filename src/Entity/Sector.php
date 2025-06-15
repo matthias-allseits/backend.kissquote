@@ -44,6 +44,11 @@ class Sector
         return $this->id;
     }
 
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getPortfolioId(): ?int
     {
         return $this->portfolioId;
