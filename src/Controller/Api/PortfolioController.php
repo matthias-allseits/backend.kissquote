@@ -21,6 +21,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
@@ -66,13 +67,7 @@ class PortfolioController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/portfolio/restore", name="restore_portfolio")
-     * @param Request $request
-     * @param BalanceService $balanceService
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/portfolio/restore', name: 'restore_portfolio', methods: ['POST', 'OPTIONS'])]
     public function restorePortfolio(Request $request, BalanceService $balanceService, EntityManagerInterface $entityManager): View
     {
         // todo: implement a better solution
@@ -432,12 +427,6 @@ class PortfolioController extends BaseController
                 }
             }
         }
-//        foreach ($portfolio->getWatchlistEntries() as $entry) {
-//            $shareheadShare = $this->getDoctrine()->getRepository(ShareheadShare::class)->findOneBy(['shareheadId' => $entry->getShareheadId()]);
-//            if (null !== $shareheadShare) {
-//                $entry->setTitle($shareheadShare->getName());
-//            }
-//        }
 
         return $portfolio;
     }

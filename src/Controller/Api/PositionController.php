@@ -368,14 +368,7 @@ class PositionController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/position/{positionId}/label/{labelId}", name="delete_position_label")
-     * @param Request $request
-     * @param int $positionId
-     * @param int $labelId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/position/{positionId}/label/{labelId}', name: 'delete_position_label', methods: ['DELETE', 'OPTIONS'])]
     public function deletePositionLabel(Request $request, int $positionId, int $labelId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
