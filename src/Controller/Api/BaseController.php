@@ -9,6 +9,7 @@ use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\PositionLog;
 use App\Entity\Sector;
+use App\Entity\Share;
 use App\Entity\Strategy;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -59,6 +60,8 @@ class BaseController extends AbstractFOSRestController
         if (null === $portfolio) {
             throw new AccessDeniedException();
         } else {
+            $shares = $entityManager->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $portfolio->setShares($shares);
             $currencies = $entityManager->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setCurrencies($currencies);
             $sectors = $entityManager->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);

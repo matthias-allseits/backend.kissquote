@@ -30,7 +30,7 @@ class Sector
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id = 1;
     }
 
 

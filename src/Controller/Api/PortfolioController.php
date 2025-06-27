@@ -28,12 +28,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class PortfolioController extends BaseController
 {
 
-    /**
-     * @Rest\Post("/portfolio", name="create_portfolio")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/portfolio', name: 'create_portfolio', methods: ['POST', 'OPTIONS'])]
     public function createPortfolio(Request $request, EntityManagerInterface $entityManager): View
     {
         // todo: implement missing try catch loop since the randoms will not be unique...
@@ -79,14 +74,7 @@ class PortfolioController extends BaseController
     }
 
 
-    /**
-     * @Rest\Post("/portfolio/time-warp", name="timewarp_portfolio")
-     * @param Request $request
-     * @param BalanceService $balanceService
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     * @throws \Exception
-     */
+    #[Route('/api/portfolio/time-warp', name: 'timewarp_portfolio', methods: ['POST', 'OPTIONS'])]
     public function timewarpedPortfolio(Request $request, BalanceService $balanceService, EntityManagerInterface $entityManager): View
     {
         $key = $request->headers->get('Authorization');
@@ -128,12 +116,7 @@ class PortfolioController extends BaseController
     }
 
 
-    /**
-     * @Rest\Get("/portfolio/demo", name="create_demo_portfolio")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/portfolio/demo', name: 'create_demo_portfolio', methods: ['GET', 'OPTIONS'])]
     public function createDemoPortfolio(Request $request, EntityManagerInterface $entityManager): View
     {
         // todo: implement missing try catch loop since the randoms will not be unique...

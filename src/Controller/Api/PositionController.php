@@ -62,29 +62,6 @@ class PositionController extends BaseController
     }
 
 
-    // todo: probably useless?
-    /**
-     * @Rest\Get ("/position", name="list_positions")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-//    #[Route('/api/position', name: 'list_positions', methods: ['GET', 'OPTIONS'])]
-    public function listPositions(Request $request, EntityManagerInterface $entityManager): View
-    {
-        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
-
-        $positions = $portfolio->getAllPositions();
-        foreach($positions as $position) {
-            $position->setBankAccount(null);
-            $position->setShare(null);
-//            $position->setCurrency(null); Cannot assign null to property App\\Entity\\Position::$currency of type App\\Entity\\Currency
-        }
-
-        return View::create($positions, Response::HTTP_CREATED);
-    }
-
-
     #[Route('/api/position/active', name: 'list_active_positions', methods: ['GET', 'OPTIONS'])]
     public function listActivePositions(Request $request, EntityManagerInterface $entityManager): View
     {
@@ -106,6 +83,7 @@ class PositionController extends BaseController
     }
 
 
+    // todo: probably only used at portfolio-import I will test laaater...
     /**
      * @Rest\Post("/position/bunch", name="create_position_bunch")
      * @param Request $request

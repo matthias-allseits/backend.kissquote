@@ -40,35 +40,23 @@ class ManualDividendController extends BaseController
     }
 
 
-    /**
-     * @Rest\Put("/manualDividend/{dividendId}", name="update_manual_dividend")
-     * @param Request $request
-     * @param int $dividendId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/manualDividend/{dividendId}', name: 'update_manual_dividend', methods: ['PUT', 'OPTIONS'])]
     public function updateManualDividend(Request $request, int $dividendId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
-        $shares = $entityManager->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
-        $portfolio->setShares($shares);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
-
-        /** @var ManualDividend $puttedDividend */
-        $puttedDividend = $serializer->deserialize(json_encode($content), ManualDividend::class, 'json');
+        $data = json_decode($request->getContent());
 
         /** @var ManualDividend $existingDividend */
         $existingDividend = $portfolio->getManualDividendById($dividendId);
 
-        if (null !== $existingDividend && $puttedDividend->getId() == $existingDividend->getId()) {
-            $existingDividend->setAmount($puttedDividend->getAmount());
-            $existingDividend->setYear($puttedDividend->getYear());
+        if (null !== $existingDividend && $dividendId == $existingDividend->getId()) {
+            $existingDividend->setAmount($data->amount);
+            $existingDividend->setYear($data->year);
 
             $entityManager->persist($existingDividend);
 
-            $this->makeLogEntry('update manual-dividend', $puttedDividend, $entityManager);
+            $this->makeLogEntry('update manual-dividend', $existingDividend, $entityManager);
 
             $entityManager->flush();
 
@@ -81,13 +69,7 @@ class ManualDividendController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/manualDividend/{dividendId}", name="delete_manual_dividend")
-     * @param Request $request
-     * @param int $dividendId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/manualDividend/{dividendId}', name: 'delete_manual_dividend', methods: ['DELETE', 'OPTIONS'])]
     public function deleteManualDividend(Request $request, int $dividendId, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);

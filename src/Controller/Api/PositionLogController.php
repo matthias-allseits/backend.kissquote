@@ -15,26 +15,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 class PositionLogController extends BaseController
 {
 
-    // todo: probably useless?
-    // I guess yes
-    /**
-     * @Rest\Get ("/position-log/{logId}", name="get_positionlog")
-     * @param Request $request
-     * @param int $logId
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
-    public function getPositionLog(Request $request, int $logId, EntityManagerInterface $entityManager): View
-    {
-        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
-
-        $positionLog = $entityManager->getRepository(PositionLog::class)->find($logId);
-        $positionLog->setPosition(null);
-
-        return View::create($positionLog, Response::HTTP_CREATED);
-    }
-
-
     #[Route('/api/position/{positionId}/position-log', name: 'create_position_log', methods: ['POST', 'OPTIONS'])]
     public function createPositionLog(Request $request, int $positionId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {

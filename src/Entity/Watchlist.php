@@ -31,7 +31,7 @@ class Watchlist
     private DateTime $startDate;
 
 
-    private ?string $title;
+    private string $title = '';
 
 
     public function __construct()
