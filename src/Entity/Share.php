@@ -82,6 +82,11 @@ class Share
         return $this->id;
     }
 
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getCurrency(): ?Currency
     {
         return $this->currency;
@@ -156,7 +161,7 @@ class Share
 
     public function getManualDividends(): array
     {
-        return $this->manualDividends;
+        return $this->manualDividends->toArray();
     }
 
     public function setManualDividends(array $manualDividends): void

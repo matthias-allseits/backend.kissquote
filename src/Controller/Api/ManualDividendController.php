@@ -6,6 +6,7 @@ use App\Entity\ManualDividend;
 use App\Entity\Share;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,24 +17,18 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ManualDividendController extends BaseController
 {
 
-    /**
-     * @Rest\Post("/manualDividend", name="create_manual_dividend")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return View
-     */
+    #[Route('/api/manualDividend', name: 'create_manual_dividend', methods: ['POST', 'OPTIONS'])]
     public function createManualDividend(Request $request, EntityManagerInterface $entityManager): View
     {
         $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
+        $data = json_decode($request->getContent());
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
-        /** @var ManualDividend $postedDividend */
-        $postedDividend = $serializer->deserialize(json_encode($content), ManualDividend::class, 'json');
+        $share = $entityManager->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $data->shareId]);
 
-        $share = $entityManager->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $postedDividend->getShare()->getId()]);
+        $postedDividend = new ManualDividend();
+        $postedDividend->setYear($data->year);
+        $postedDividend->setAmount($data->amount);
         $postedDividend->setShare($share);
 
         $entityManager->persist($postedDividend);
