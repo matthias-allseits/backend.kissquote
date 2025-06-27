@@ -141,7 +141,20 @@ class Position
 
     public function __construct()
     {
+//        $this->id = 1; // todo: find out, why this is newly necessary for post new position endpoint
+        $this->bankAccount = new BankAccount(); // todo: find out, why this is newly necessary for post new position endpoint
+        $this->bankAccount->setId(1);
         $this->labels = new ArrayCollection();
+        $this->manualDrawdown = null;
+        $this->manualDividend = null;
+        $this->manualDividendDrop = null;
+        $this->manualTargetPrice = null;
+        $this->targetPrice = null;
+        $this->targetType = null;
+        $this->stopLoss = null;
+        $this->motherId = null;
+        $this->sector = null;
+        $this->strategy = null;
     }
 
     public function __toString()
@@ -444,6 +457,11 @@ class Position
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getBankAccount(): ?BankAccount

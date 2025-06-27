@@ -27,7 +27,7 @@ class Currency
     // todo: find out, why this is here necessary for put-currency endpoint
     public function __construct()
     {
-        $this->id = 1;
+//        $this->id = 1;
     }
 
     public function __toString()
@@ -38,6 +38,11 @@ class Currency
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getPortfolioId(): ?int

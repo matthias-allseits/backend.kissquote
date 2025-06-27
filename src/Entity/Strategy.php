@@ -11,7 +11,7 @@ class Strategy
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int $id;
+    private int $id = 1;
 
     #[ORM\Column(name: "portfolio_id", type: "integer", nullable: true)]
     private ?int $portfolioId;
@@ -23,7 +23,7 @@ class Strategy
     // todo: find out, why this is here necessary for put-strategy endpoint
     public function __construct()
     {
-        $this->id = 1;
+//        $this->id = 1;
     }
 
     public function __toString()
@@ -34,6 +34,11 @@ class Strategy
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getPortfolioId(): ?int
