@@ -239,9 +239,9 @@ class Position
         $value = 0;
         if (null !== $this->transactions) {
             foreach($this->getTransactions() as $transaction) {
-                if ($transaction->getTitle() == 'Kauf') {
+                if ($transaction->getTitle() == 'Kauf' || $transaction->getTitle() == 'Spin-in') {
                     $value += $transaction->calculateTransactionCostsGross();
-                } elseif ($transaction->getTitle() == 'Verkauf') {
+                } elseif ($transaction->getTitle() == 'Verkauf' || $transaction->getTitle() == 'Spin-off') {
                     $value -= $transaction->calculateTransactionCostsNet();
                     $value += $transaction->getFee();
                 } elseif (in_array($transaction->getTitle(), ['Zins', 'Coupon'])) {
@@ -259,9 +259,9 @@ class Position
         $value = 0;
         if (null !== $this->transactions) {
             foreach($this->getTransactions() as $transaction) {
-                if ($transaction->getTitle() == 'Kauf') {
+                if ($transaction->getTitle() == 'Kauf' || $transaction->getTitle() == 'Spin-in') {
                     $value += $transaction->calculateTransactionCostsNet();
-                } elseif ($transaction->getTitle() == 'Verkauf') {
+                } elseif ($transaction->getTitle() == 'Verkauf' || $transaction->getTitle() == 'Spin-off') {
                     $value -= $transaction->calculateTransactionCostsNet();
                 } elseif (in_array($transaction->getTitle(), ['Zins', 'Coupon'])) {
                     $value -= $transaction->getRate();
