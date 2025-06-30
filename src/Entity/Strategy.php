@@ -20,12 +20,6 @@ class Strategy
     private string $name;
 
 
-    // todo: find out, why this is here necessary for put-strategy endpoint
-    public function __construct()
-    {
-//        $this->id = 1;
-    }
-
     public function __toString()
     {
         return $this->name;

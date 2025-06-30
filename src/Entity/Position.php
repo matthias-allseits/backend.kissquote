@@ -141,9 +141,6 @@ class Position
 
     public function __construct()
     {
-//        $this->id = 1; // todo: find out, why this is newly necessary for post new position endpoint
-        $this->bankAccount = new BankAccount(); // todo: find out, why this is newly necessary for post new position endpoint
-        $this->bankAccount->setId(1);
         $this->labels = new ArrayCollection();
         $this->manualDrawdown = null;
         $this->manualDividend = null;
