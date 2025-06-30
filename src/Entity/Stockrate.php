@@ -36,7 +36,7 @@ class Stockrate
     private \DateTime $date;
 
     #[ORM\Column(name: "rate", type: "float", precision: 10, scale: 3, nullable: false)]
-    private float $rate;
+    private ?float $rate = null;
 
     #[ORM\Column(name: "high", type: "float", precision: 10, scale: 3, nullable: true)]
     private $high;
