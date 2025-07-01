@@ -97,6 +97,12 @@ class Position
     #[ORM\Column(name: "manual_dividend_amount", type: "float", precision: 10, scale: 3, nullable: true)]
     private ?float $manualDividendAmount;
 
+    #[ORM\Column(name: "manual_average_performance", type: "float", precision: 10, scale: 3, nullable: true)]
+    private ?float $manualAveragePerformance;
+
+    #[ORM\Column(name: "manual_average_rate", type: "float", precision: 10, scale: 3, nullable: true)]
+    private ?float $manualLastAverageRate;
+
     #[ORM\Column(name: "sharehead_id", type: "integer", nullable: true)]
     private ?int $shareheadId;
 
@@ -666,6 +672,26 @@ class Position
     public function setManualDividendAmount(?float $manualDividendAmount): void
     {
         $this->manualDividendAmount = $manualDividendAmount;
+    }
+
+    public function getManualAveragePerformance(): ?float
+    {
+        return $this->manualAveragePerformance;
+    }
+
+    public function setManualAveragePerformance(?float $manualAveragePerformance): void
+    {
+        $this->manualAveragePerformance = $manualAveragePerformance;
+    }
+
+    public function getManualLastAverageRate(): ?float
+    {
+        return $this->manualLastAverageRate;
+    }
+
+    public function setManualLastAverageRate(?float $manualLastAverageRate): void
+    {
+        $this->manualLastAverageRate = $manualLastAverageRate;
     }
 
     public function getShareheadId(): ?int
