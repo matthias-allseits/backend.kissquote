@@ -5,7 +5,6 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 
 
 #[ORM\Entity()]
@@ -33,31 +32,26 @@ class Portfolio
 
     /**
      * @var Share[]
-     * @Serializer\Exclude()
      */
     private array $shares;
 
     /**
      * @var Currency[]
-     * @Serializer\Exclude()
      */
     private array $currencies;
 
     /**
      * @var Sector[]
-     * @Serializer\Exclude()
      */
     private array $sectors;
 
     /**
      * @var Strategy[]
-     * @Serializer\Exclude()
      */
     private array $strategies;
 
     /**
      * @var Label[]
-     * @Serializer\Exclude()
      */
     private array $labels;
 
