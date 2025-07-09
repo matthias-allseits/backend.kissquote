@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Constraints\DateTime;
 
 class ShareRatesCrawler extends Command
 {
-    protected static $defaultName = 'kissquote:rates-crawler';
     private $entityManager;
     private $spiderHelper;
     /** @var OutputInterface $output */
@@ -38,6 +37,7 @@ class ShareRatesCrawler extends Command
     protected function configure()
     {
         $this
+            ->setName('kissquote:rates-crawler')
             ->setDescription('Crawls for last rates for every user-share')
             ->setHelp('Crawls for last rates for every user-share')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Forces the flush')
@@ -46,7 +46,7 @@ class ShareRatesCrawler extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->verbose = $input->getOption('verbose');
         $shareId = $input->getOption('shareId');
@@ -157,6 +157,7 @@ class ShareRatesCrawler extends Command
             $output->writeln('---------------------------');
         }
 
+        return Command::SUCCESS;
     }
 
 

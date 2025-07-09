@@ -2,126 +2,73 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 
 
-/**
- * Marketplace
- *
- * @ORM\Table(name="marketplace")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Marketplace
 {
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="name", type="string", length=64, nullable=false)
-     */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 64, unique: false, nullable: false)]
+    private string $name;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="place", type="string", length=64, nullable=false)
-     */
-    private $place;
+    #[ORM\Column(name: "place", type: "string", length: 64, unique: false, nullable: false)]
+    private string $place;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="currency", type="string", length=4, nullable=false)
-     */
-    private $currency;
+    #[ORM\Column(name: "currency", type: "string", length: 4, unique: false, nullable: false)]
+    private string $currency;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="url_key", type="string", length=5, nullable=false)
-     */
-    private $urlKey;
+    #[ORM\Column(name: "url_key", type: "string", length: 5, unique: false, nullable: false)]
+    private string $urlKey;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="isin_key", type="string", length=4, nullable=false)
-     */
-    private $isinKey;
+    #[ORM\Column(name: "isin_key", type: "string", length: 4, unique: false, nullable: false)]
+    private string $isinKey;
 
 
     public function __toString()
     {
-        return (string) $this->name . ' ' . $this->getPlace();
+        return $this->name . ' ' . $this->getPlace();
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
     public function getPlace(): ?string
     {
         return $this->place;
     }
 
-    /**
-     * @param string $place
-     */
     public function setPlace(string $place): void
     {
         $this->place = $place;
     }
 
-    /**
-     * @return string
-     */
     public function getCurrency(): ?string
     {
         return $this->currency;
     }
 
-    /**
-     * @param string $currency
-     */
     public function setCurrency(string $currency): void
     {
         $this->currency = $currency;
@@ -137,17 +84,11 @@ class Marketplace
         $this->urlKey = $urlKey;
     }
 
-    /**
-     * @return string
-     */
     public function getIsinKey(): ?string
     {
         return $this->isinKey;
     }
 
-    /**
-     * @param string $isinKey
-     */
     public function setIsinKey(string $isinKey): void
     {
         $this->isinKey = $isinKey;

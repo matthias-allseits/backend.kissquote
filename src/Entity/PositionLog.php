@@ -3,83 +3,40 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
-/**
- * PositionLog
- *
- * @ORM\Table(name="position_log")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class PositionLog
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
-	/**
-	 * @var integer
-     * @Serializer\Type("integer")
-	 *
-	 * @ORM\Column(name="id", type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="IDENTITY")
-	 */
-	private $id;
+    #[Ignore]
+    #[ORM\ManyToOne(targetEntity: Position::class, inversedBy: 'logEntries')]
+    #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id', nullable: false)]
+    private Position $position;
 
-    /**
-     * @var Position
-     * @Serializer\Type("App\Entity\Position")
-     *
-     * @ORM\ManyToOne(targetEntity="Position")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="position_id", referencedColumnName="id", nullable=false)
-     * })
-     */
-    private $position;
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
+    #[ORM\Column(name: "date", type: "date", nullable: false)]
+    private \DateTime $date;
 
-    /**
-     * @var \DateTime
-     * @Serializer\Type("DateTime<'Y-m-d'>")
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
-     */
-    private $date;
+    #[ORM\Column(name: "log", type: "string", length: 256, unique: false, nullable: false)]
+    private string $log;
 
-    /**
-     * @var string
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="log", type="string", length=256, nullable=false)
-     */
-    private $log;
+    #[ORM\Column(name: "emoticon", type: "string", length: 8, unique: false, nullable: true)]
+    private ?string $emoticon;
 
-    /**
-     * @var string|null
-     * @Serializer\Type("string")
-     *
-     * @ORM\Column(name="emoticon", type="string", length=8, nullable=true)
-     */
-    private $emoticon;
-
-    /**
-     * @var boolean
-     * @Serializer\Type("boolean")
-     *
-     * @ORM\Column(name="demo", type="boolean", nullable=false)
-     */
+    #[ORM\Column(name: "demo", type: "boolean", nullable: false)]
     private bool $demo = true;
 
-    /**
-     * @var boolean
-     * @Serializer\Type("boolean")
-     *
-     * @ORM\Column(name="pinned", type="boolean", nullable=false)
-     */
+    #[ORM\Column(name: "pinned", type: "boolean", nullable: false)]
     private bool $pinned = false;
 
-    /**
-     * @var integer
-     * @Serializer\Type("integer")
-     */
-    private $positionId;
+    private int $positionId;
 
 
     public function __clone()
@@ -94,73 +51,53 @@ class PositionLog
     }
 
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return Position|null
-     */
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getPosition(): ?Position
     {
         return $this->position;
     }
 
-    /**
-     * @param Position|null $position
-     */
     public function setPosition(?Position $position): void
     {
-        $this->position = $position;
+        if ($position instanceof Position) {
+            $this->position = $position;
+        }
     }
 
-    /**
-     * @return \DateTime|null
-     */
     public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    /**
-     * @param \DateTime $date
-     */
     public function setDate(\DateTime $date): void
     {
         $this->date = $date;
     }
 
-    /**
-     * @return string|null
-     */
     public function getLog(): ?string
     {
         return $this->log;
     }
 
-    /**
-     * @param string $log
-     */
     public function setLog(string $log): void
     {
         $this->log = $log;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEmoticon(): ?string
     {
         return $this->emoticon;
     }
 
-    /**
-     * @param string|null $emoticon
-     */
     public function setEmoticon(?string $emoticon): void
     {
         $this->emoticon = $emoticon;

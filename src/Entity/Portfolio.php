@@ -5,92 +5,55 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use JMS\Serializer\Annotation\MaxDepth;
 
 
-/**
- * Portfolio
- *
- * @ORM\Table(name="portfolio")
- * @ORM\Entity
- */
+#[ORM\Entity()]
 class Portfolio
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
+    #[ORM\Column(name: "user_name", type: "string", length: 32, unique: true, nullable: true)]
+    private ?string $userName;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="user_name", type="string", length=32, nullable=true, unique=true)
-     */
-    private $userName;
+    #[ORM\Column(name: "hash_key", type: "string", length: 32, unique: true, nullable: true)]
+    private ?string $hashKey;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="hash_key", type="string", length=32, nullable=true, unique=true)
-     */
-    private $hashKey;
+    #[ORM\Column(name: "start_date", type: "date", nullable: false)]
+    private DateTime $startDate;
 
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="start_date", type="date", nullable=false)
-     */
-    private $startDate;
+    #[ORM\OneToMany(targetEntity: BankAccount::class, mappedBy: "portfolio", cascade: ["remove", "persist"])]
+    private array|Collection $bankAccounts;
 
-    /**
-     * @var Collection|BankAccount[]
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\BankAccount", mappedBy="portfolio", cascade={"remove", "persist"})
-     */
-    private $bankAccounts;
-
-    /**
-     * @var Collection|Watchlist[]
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Watchlist", mappedBy="portfolio", cascade={"remove", "persist"})
-     */
-    private $watchlistEntries;
+    #[ORM\OneToMany(targetEntity: Watchlist::class, mappedBy: "portfolio", cascade: ["remove", "persist"])]
+    private array|Collection $watchlistEntries;
 
     /**
      * @var Share[]
-     * @Serializer\Exclude()
      */
-    private $shares;
+    private array $shares;
 
     /**
      * @var Currency[]
-     * @Serializer\Exclude()
      */
-    private $currencies;
+    private array $currencies;
 
     /**
      * @var Sector[]
-     * @Serializer\Exclude()
      */
-    private $sectors;
+    private array $sectors;
 
     /**
      * @var Strategy[]
-     * @Serializer\Exclude()
      */
-    private $strategies;
+    private array $strategies;
 
     /**
      * @var Label[]
-     * @Serializer\Exclude()
      */
-    private $labels;
+    private array $labels;
 
 
     public function __clone() {
@@ -130,6 +93,7 @@ class Portfolio
     public function getAllPositions(): array
     {
         $positions = [];
+        /** @var BankAccount $account */
         foreach($this->bankAccounts as $account) {
             $positions = array_merge($positions, $account->getPositions());
         }

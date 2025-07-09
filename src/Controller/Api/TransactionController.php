@@ -2,53 +2,45 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\LogEntry;
-use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Transaction;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class TransactionController extends BaseController
 {
 
-    /**
-     * @Rest\Get ("/transaction/{transactionId}", name="get_transaction")
-     * @param Request $request
-     * @param int $transactionId
-     * @return View
-     */
-    public function getTransaction(Request $request, int $transactionId): View
+    #[Route('/api/position/{positionId}/transaction/{transactionId}', name: 'get_transaction', methods: ['GET', 'OPTIONS'])]
+    public function getTransaction(Request $request, int $positionId, int $transactionId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
-        $transaction->setPosition(null);
+        $position = $portfolio->getPositionById($positionId);
+        if (null === $position) {
+            throw new AccessDeniedException();
+        }
+
+        $transaction = $entityManager->getRepository(Transaction::class)->find($transactionId);
 
         return View::create($transaction, Response::HTTP_CREATED);
     }
 
 
-    /**
-     * @Rest\Post("/transaction", name="create_transaction")
-     * @param Request $request
-     * @return View
-     * @throws \Exception
-     */
-    public function createTransaction(Request $request): View
+    #[Route('/api/position/{positionId}/transaction', name: 'create_transaction', methods: ['POST', 'OPTIONS'])]
+    public function createTransaction(Request $request, int $positionId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
         /** @var Transaction $transaction */
         $transaction = $serializer->deserialize($request->getContent(), Transaction::class, 'json');
 
-        $position = $portfolio->getPositionById($transaction->getPosition()->getId());
+        $position = $portfolio->getPositionById($positionId);
         if (null === $position) {
             throw new AccessDeniedException();
         } else {
@@ -69,9 +61,9 @@ class TransactionController extends BaseController
             $cashPosition->setActiveFrom($transaction->getDate());
             $cashPosition->setCurrency($currency);
             $cashPosition->setIsCash(true);
-            $this->getDoctrine()->getManager()->persist($cashPosition);
+            $entityManager->persist($cashPosition);
 
-            $this->makeLogEntry('forced creation of new cash-position', $cashPosition);
+            $this->makeLogEntry('forced creation of new cash-position', $cashPosition, $entityManager);
         }
         if (false === $transaction->getPosition()->isCash()) {
             $cashTransaction = new Transaction();
@@ -81,43 +73,35 @@ class TransactionController extends BaseController
             $cashTransaction->setDate($transaction->getDate());
             $cashTransaction->setTitle($transaction->getTitle());
             $cashTransaction->setRate($transaction->calculateCashValueNet());
-            $this->getDoctrine()->getManager()->persist($cashTransaction);
-            $this->makeLogEntry('forced new cash-transaction', $cashTransaction);
+            $entityManager->persist($cashTransaction);
+            $this->makeLogEntry('forced new cash-transaction', $cashTransaction, $entityManager);
         }
 
-        $this->getDoctrine()->getManager()->persist($position);
-        $this->getDoctrine()->getManager()->persist($transaction);
+        $entityManager->persist($position);
+        $entityManager->persist($transaction);
 
-        $this->makeLogEntry('create new transaction', $transaction);
+        $this->makeLogEntry('create new transaction', $transaction, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
-        $transaction->setPosition(null);
         return View::create($transaction, Response::HTTP_OK);
     }
 
 
-    /**
-     * @Rest\Put("/transaction/{transactionId}", name="update_transaction")
-     * @param Request $request
-     * @param int $transactionId
-     * @return View
-     * @throws \Exception
-     */
-    public function updateTransaction(Request $request, int $transactionId): View
+    #[Route('/api/position/{positionId}/transaction/{transactionId}', name: 'update_transaction', methods: ['PUT', 'OPTIONS'])]
+    public function updateTransaction(Request $request, int $positionId, int $transactionId, EntityManagerInterface $entityManager, SerializerInterface $serializer): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $existingTransaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
+        $existingTransaction = $entityManager->getRepository(Transaction::class)->find($transactionId);
         if (null === $existingTransaction) {
             throw new AccessDeniedException();
         }
 
-        $serializer = SerializerBuilder::create()->build();
         /** @var Transaction $updatedTransaction */
         $updatedTransaction = $serializer->deserialize($request->getContent(), Transaction::class, 'json');
 
-        $position = $portfolio->getPositionById($updatedTransaction->getPosition()->getId());
+        $position = $portfolio->getPositionById($positionId);
         if (null === $position) {
             throw new AccessDeniedException();
         } else {
@@ -137,31 +121,25 @@ class TransactionController extends BaseController
             $position->setActiveFrom($updatedTransaction->getDate());
         }
 
-        $this->getDoctrine()->getManager()->persist($position);
-        $this->getDoctrine()->getManager()->persist($existingTransaction);
+        $entityManager->persist($position);
+        $entityManager->persist($existingTransaction);
 
-        $this->makeLogEntry('update transaction', $existingTransaction);
+        $this->makeLogEntry('update transaction', $existingTransaction, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
-        $updatedTransaction->setPosition(null);
         return View::create($updatedTransaction, Response::HTTP_OK);
     }
 
 
-    /**
-     * @Rest\Delete("/transaction/{transactionId}", name="delete_transaction")
-     * @param Request $request
-     * @param int $transactionId
-     * @return View
-     */
-    public function deleteTransaction(Request $request, int $transactionId): View
+    #[Route('/api/position/{positionId}/transaction/{transactionId}', name: 'delete_transaction', methods: ['DELETE', 'OPTIONS'])]
+    public function deleteTransaction(Request $request, int $transactionId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $transaction = $this->getDoctrine()->getRepository(Transaction::class)->find($transactionId);
-        $this->getDoctrine()->getManager()->remove($transaction);
-        $this->getDoctrine()->getManager()->flush();
+        $transaction = $entityManager->getRepository(Transaction::class)->find($transactionId);
+        $entityManager->remove($transaction);
+        $entityManager->flush();
 
         return new View("Transaction Delete Successfully", Response::HTTP_OK);
     }

@@ -3,9 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Entity\BankAccount;
-use App\Entity\LogEntry;
-use App\Entity\Portfolio;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,14 +13,10 @@ use Symfony\Component\HttpFoundation\Response;
 class BankAccountController extends BaseController
 {
 
-    /**
-     * @Rest\Post("/bank-account", name="create_account")
-     * @param Request $request
-     * @return View
-     */
-    public function createBankAccount(Request $request): View
+    #[Route('/api/bank-account', name: 'create_account', methods: ['POST', 'OPTIONS'])]
+    public function createBankAccount(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
@@ -31,40 +26,35 @@ class BankAccountController extends BaseController
             $bankAccount = new BankAccount();
             $bankAccount->setName($content->name);
             $bankAccount->setPortfolio($portfolio);
-            $this->getDoctrine()->getManager()->persist($bankAccount);
+            $entityManager->persist($bankAccount);
 
-            $this->makeLogEntry('create new bank-account', $bankAccount);
+            $this->makeLogEntry('create new bank-account', $bankAccount, $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
         }
 
         return View::create($bankAccount, Response::HTTP_OK);
     }
 
 
-    /**
-     * @Rest\Put("/bank-account/{accountId}", name="update_account")
-     * @param Request $request
-     * @param int $accountId
-     * @return View
-     */
-    public function updateBankAccount(Request $request, int $accountId): View
+    #[Route('/api/bank-account/{accountId}', name: 'update_account', methods: ['PUT', 'OPTIONS'])]
+    public function updateBankAccount(Request $request, int $accountId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
         // todo: implement a better solution
         $content = json_decode($request->getContent());
 
         /** @var BankAccount $bankAccount */
-        $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
+        $bankAccount = $entityManager->getRepository(BankAccount::class)->find($accountId);
         if (null !== $bankAccount) {
             $oldName = $bankAccount->getName();
             $this->portfolio = $bankAccount->getPortfolio();
             $bankAccount->setName($content->name);
 
-            $this->makeLogEntry('update bank-account', $oldName . ' -> ' . $content->name);
+            $this->makeLogEntry('update bank-account', $oldName . ' -> ' . $content->name, $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
         } else {
             return View::create(null, Response::HTTP_NOT_FOUND);
         }
@@ -73,22 +63,17 @@ class BankAccountController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/bank-account/{accountId}", name="delete_account")
-     * @param Request $request
-     * @param int $accountId
-     * @return View
-     */
-    public function deleteBankAccount(Request $request, int $accountId): View
+    #[Route('/api/bank-account/{accountId}', name: 'update_account', methods: ['DELETE', 'OPTIONS'])]
+    public function deleteBankAccount(Request $request, int $accountId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $bankAccount = $this->getDoctrine()->getRepository(BankAccount::class)->find($accountId);
-        $this->getDoctrine()->getManager()->remove($bankAccount);
+        $bankAccount = $entityManager->getRepository(BankAccount::class)->find($accountId);
+        $entityManager->remove($bankAccount);
 
-        $this->makeLogEntry('delete bank-account', $bankAccount);
+        $this->makeLogEntry('delete bank-account', $bankAccount, $entityManager);
 
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->flush();
 
         return new View("Bank-Account Delete Successfully", Response::HTTP_OK);
     }

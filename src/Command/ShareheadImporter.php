@@ -27,13 +27,14 @@ class ShareheadImporter extends Command
     protected function configure()
     {
         $this
+            ->setName('kissquote:sharehead-import')
             ->setDescription('Imports and updates all shares from sharehead')
             ->setHelp('Imports and updates all shares from sharehead')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Forces the flush')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('force')) {
             $force = true;
@@ -88,5 +89,7 @@ class ShareheadImporter extends Command
         if ($force) {
             $this->entityManager->flush();
         }
+
+        return Command::SUCCESS;
     }
 }

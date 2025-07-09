@@ -9,56 +9,39 @@ use App\Entity\Stockrate;
 class Balance
 {
 
-    /** @var float */
-    private $amount;
+    private float $amount;
 
-    /** @var float */
-    private $firstRate;
+    private ?float $firstRate;
 
-    /** @var float */
-    private $averagePayedPriceGross;
+    private ?float $averagePayedPriceGross;
 
-    /** @var float */
-    private $averagePayedPriceNet;
+    private ?float $averagePayedPriceNet;
 
-    /** @var float */
-    private $breakEvenPrice;
+    private ?float $breakEvenPrice;
 
-    /** @var int */
-    private $investment;
+    private int $investment;
 
-    /** @var int */
-    private $transactionFeesTotal;
+    private int $transactionFeesTotal;
 
-    /** @var int */
-    private $collectedDividends;
+    private int $collectedDividends;
 
-    /** @var string */
-    private $collectedDividendsCurrency;
+    private string $collectedDividendsCurrency;
 
-    /** @var int */
-    private $projectedNextDividendPayment;
+    private ?int $projectedNextDividendPayment;
 
-    /** @var string */
-    private $projectedNextDividendCurrency;
+    private ?string $projectedNextDividendCurrency;
 
-    /** @var int */
-    private $collectedInterest;
+    private int $collectedInterest;
 
-    /** @var int */
-    private $collectedCoupons;
+    private int $collectedCoupons;
 
-    /** @var Stockrate|null */
-    private $lastRate;
+    private ?Stockrate $lastRate;
 
-    /** @var float */
-    private $cashValue;
+    private float $cashValue;
 
-    /** @var int */
-    private $closedResult;
+    private int $closedResult;
 
-    /** @var float[] */
-    private $performance = [];
+    private array $performance = [];
 
 
     public function __construct(Position $position)
@@ -98,18 +81,177 @@ class Balance
         $this->lastRate = null;
     }
 
-    /**
-     * @param Stockrate|null $lastRate
-     */
+    public function getLastRate(): ?Stockrate
+    {
+        return $this->lastRate;
+    }
+
     public function setLastRate(?Stockrate $lastRate): void
     {
         $this->lastRate = $lastRate;
     }
 
-    /**
-     * @param array $performance
-     */
     public function setPerformanceData(array $performance): void
+    {
+        $this->performance = $performance;
+    }
+
+    public function getAmount(): float
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(float $amount): void
+    {
+        $this->amount = $amount;
+    }
+
+    public function getFirstRate(): float
+    {
+        return $this->firstRate;
+    }
+
+    public function setFirstRate(float $firstRate): void
+    {
+        $this->firstRate = $firstRate;
+    }
+
+    public function getAveragePayedPriceGross(): float
+    {
+        return $this->averagePayedPriceGross;
+    }
+
+    public function setAveragePayedPriceGross(float $averagePayedPriceGross): void
+    {
+        $this->averagePayedPriceGross = $averagePayedPriceGross;
+    }
+
+    public function getAveragePayedPriceNet(): float
+    {
+        return $this->averagePayedPriceNet;
+    }
+
+    public function setAveragePayedPriceNet(float $averagePayedPriceNet): void
+    {
+        $this->averagePayedPriceNet = $averagePayedPriceNet;
+    }
+
+    public function getBreakEvenPrice(): float
+    {
+        return $this->breakEvenPrice;
+    }
+
+    public function setBreakEvenPrice(float $breakEvenPrice): void
+    {
+        $this->breakEvenPrice = $breakEvenPrice;
+    }
+
+    public function getInvestment(): int
+    {
+        return $this->investment;
+    }
+
+    public function setInvestment(int $investment): void
+    {
+        $this->investment = $investment;
+    }
+
+    public function getTransactionFeesTotal(): int
+    {
+        return $this->transactionFeesTotal;
+    }
+
+    public function setTransactionFeesTotal(int $transactionFeesTotal): void
+    {
+        $this->transactionFeesTotal = $transactionFeesTotal;
+    }
+
+    public function getCollectedDividends(): int
+    {
+        return $this->collectedDividends;
+    }
+
+    public function setCollectedDividends(int $collectedDividends): void
+    {
+        $this->collectedDividends = $collectedDividends;
+    }
+
+    public function getCollectedDividendsCurrency(): string
+    {
+        return $this->collectedDividendsCurrency;
+    }
+
+    public function setCollectedDividendsCurrency(string $collectedDividendsCurrency): void
+    {
+        $this->collectedDividendsCurrency = $collectedDividendsCurrency;
+    }
+
+    public function getProjectedNextDividendPayment(): int
+    {
+        return $this->projectedNextDividendPayment;
+    }
+
+    public function setProjectedNextDividendPayment(int $projectedNextDividendPayment): void
+    {
+        $this->projectedNextDividendPayment = $projectedNextDividendPayment;
+    }
+
+    public function getProjectedNextDividendCurrency(): string
+    {
+        return $this->projectedNextDividendCurrency;
+    }
+
+    public function setProjectedNextDividendCurrency(string $projectedNextDividendCurrency): void
+    {
+        $this->projectedNextDividendCurrency = $projectedNextDividendCurrency;
+    }
+
+    public function getCollectedInterest(): int
+    {
+        return $this->collectedInterest;
+    }
+
+    public function setCollectedInterest(int $collectedInterest): void
+    {
+        $this->collectedInterest = $collectedInterest;
+    }
+
+    public function getCollectedCoupons(): int
+    {
+        return $this->collectedCoupons;
+    }
+
+    public function setCollectedCoupons(int $collectedCoupons): void
+    {
+        $this->collectedCoupons = $collectedCoupons;
+    }
+
+    public function getCashValue(): float
+    {
+        return $this->cashValue;
+    }
+
+    public function setCashValue(float $cashValue): void
+    {
+        $this->cashValue = $cashValue;
+    }
+
+    public function getClosedResult(): int
+    {
+        return $this->closedResult;
+    }
+
+    public function setClosedResult(int $closedResult): void
+    {
+        $this->closedResult = $closedResult;
+    }
+
+    public function getPerformance(): array
+    {
+        return $this->performance;
+    }
+
+    public function setPerformance(array $performance): void
     {
         $this->performance = $performance;
     }

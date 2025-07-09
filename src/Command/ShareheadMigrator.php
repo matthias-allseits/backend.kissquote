@@ -16,10 +16,8 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ShareheadMigrator extends Command
 {
-    protected static $defaultName = 'kissquote:sharehead-migrator';
     private $entityManager;
     private $spiderHelper;
-    private $output;
     private $sleep = 5;
 
     public function __construct(EntityManagerInterface $entityManager, SpiderHelper $spiderHelper)
@@ -33,20 +31,20 @@ class ShareheadMigrator extends Command
     protected function configure()
     {
         $this
+            ->setName('kissquote:sharehead-migrator')
             ->setDescription('Tries to find the correct marketplace and swissquote-url for imported sharehead-shares')
             ->setHelp('Tries to find the correct marketplace and swissquote-url for imported sharehead-shares')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Forces the flush')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('force')) {
             $force = true;
         } else {
             $force = false;
         }
-        $this->output = $output;
         $date = new \DateTime();
         if ($date->format('N') == 7) {
             $date->sub(new \DateInterval('P2D'));
@@ -119,6 +117,7 @@ class ShareheadMigrator extends Command
             $output->writeln('---------------------------');
         }
 
+        return Command::SUCCESS;
     }
 
 

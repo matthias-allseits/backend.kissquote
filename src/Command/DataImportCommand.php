@@ -17,7 +17,7 @@ class DataImportCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file = '/home/allseits/Dropbox/backup/kissquote.sql';
         if (is_file($file)) {
@@ -33,6 +33,7 @@ class DataImportCommand extends Command
         }
         $output->writeln('<info>import finished</info>');
 
+        return Command::SUCCESS;
     }
 
 }

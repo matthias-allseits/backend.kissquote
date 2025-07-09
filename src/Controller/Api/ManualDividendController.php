@@ -4,9 +4,9 @@ namespace App\Controller\Api;
 
 use App\Entity\ManualDividend;
 use App\Entity\Share;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -15,64 +15,48 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ManualDividendController extends BaseController
 {
 
-    /**
-     * @Rest\Post("/manualDividend", name="create_manual_dividend")
-     * @param Request $request
-     * @return View
-     */
-    public function createManualDividend(Request $request): View
+    #[Route('/api/manualDividend', name: 'create_manual_dividend', methods: ['POST', 'OPTIONS'])]
+    public function createManualDividend(Request $request, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
+        $data = json_decode($request->getContent());
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
-        /** @var ManualDividend $postedDividend */
-        $postedDividend = $serializer->deserialize(json_encode($content), ManualDividend::class, 'json');
+        $share = $entityManager->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $data->shareId]);
 
-        $share = $this->getDoctrine()->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $postedDividend->getShare()->getId()]);
+        $postedDividend = new ManualDividend();
+        $postedDividend->setYear($data->year);
+        $postedDividend->setAmount($data->amount);
         $postedDividend->setShare($share);
 
-        $this->getDoctrine()->getManager()->persist($postedDividend);
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->persist($postedDividend);
+        $entityManager->flush();
 
-        $this->makeLogEntry('add manual-dividend', $postedDividend);
+        $this->makeLogEntry('add manual-dividend', $postedDividend, $entityManager);
 
         return new View($postedDividend, Response::HTTP_CREATED);
     }
 
 
-    /**
-     * @Rest\Put("/manualDividend/{dividendId}", name="update_manual_dividend")
-     * @param Request $request
-     * @param int $dividendId
-     * @return View
-     */
-    public function updateManualDividend(Request $request, int $dividendId): View
+    #[Route('/api/manualDividend/{dividendId}', name: 'update_manual_dividend', methods: ['PUT', 'OPTIONS'])]
+    public function updateManualDividend(Request $request, int $dividendId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
-        $shares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
-        $portfolio->setShares($shares);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $serializer = SerializerBuilder::create()->build();
-        $content = json_decode($request->getContent());
-
-        /** @var ManualDividend $puttedDividend */
-        $puttedDividend = $serializer->deserialize(json_encode($content), ManualDividend::class, 'json');
+        $data = json_decode($request->getContent());
 
         /** @var ManualDividend $existingDividend */
         $existingDividend = $portfolio->getManualDividendById($dividendId);
 
-        if (null !== $existingDividend && $puttedDividend->getId() == $existingDividend->getId()) {
-            $existingDividend->setAmount($puttedDividend->getAmount());
-            $existingDividend->setYear($puttedDividend->getYear());
+        if (null !== $existingDividend && $dividendId == $existingDividend->getId()) {
+            $existingDividend->setAmount($data->amount);
+            $existingDividend->setYear($data->year);
 
-            $this->getDoctrine()->getManager()->persist($existingDividend);
+            $entityManager->persist($existingDividend);
 
-            $this->makeLogEntry('update manual-dividend', $puttedDividend);
+            $this->makeLogEntry('update manual-dividend', $existingDividend, $entityManager);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return new View($existingDividend, Response::HTTP_OK);
         } else {
@@ -83,22 +67,17 @@ class ManualDividendController extends BaseController
     }
 
 
-    /**
-     * @Rest\Delete("/manualDividend/{dividendId}", name="delete_manual_dividend")
-     * @param Request $request
-     * @param int $dividendId
-     * @return View
-     */
-    public function deleteManualDividend(Request $request, int $dividendId): View
+    #[Route('/api/manualDividend/{dividendId}', name: 'delete_manual_dividend', methods: ['DELETE', 'OPTIONS'])]
+    public function deleteManualDividend(Request $request, int $dividendId, EntityManagerInterface $entityManager): View
     {
-        $portfolio = $this->getPortfolioByAuth($request);
+        $portfolio = $this->getPortfolioByAuth($request, $entityManager);
 
-        $manualDividend = $this->getDoctrine()->getRepository(ManualDividend::class)->find($dividendId);
+        $manualDividend = $entityManager->getRepository(ManualDividend::class)->find($dividendId);
         if ($manualDividend->getShare()->getPortfolioId() == $portfolio->getId()) {
-            $this->getDoctrine()->getManager()->remove($manualDividend);
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->remove($manualDividend);
+            $entityManager->flush();
 
-            $this->makeLogEntry('remove manual-dividend', $manualDividend);
+            $this->makeLogEntry('remove manual-dividend', $manualDividend, $entityManager);
         }
 
         return new View(null, Response::HTTP_OK);

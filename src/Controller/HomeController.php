@@ -8,6 +8,7 @@ use App\Entity\LogEntry;
 use App\Entity\Portfolio;
 use App\Entity\Sector;
 use App\Entity\Share;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,16 +22,16 @@ class HomeController extends AbstractController
     }
 
 
-    public function portfolios(): Response
+    public function portfolios(EntityManagerInterface $entityManager): Response
     {
-        $portfolios = $this->getDoctrine()->getRepository(Portfolio::class)->findAll();
+        $portfolios = $entityManager->getRepository(Portfolio::class)->findAll();
         foreach($portfolios as $portfolio) {
-            $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $currencies = $entityManager->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setCurrencies($currencies);
-            $sectors = $this->getDoctrine()->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);
+            $sectors = $entityManager->getRepository(Sector::class)->findBy(['portfolioId' => $portfolio->getId()]);
             $portfolio->setSectors($sectors);
-            $shares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
-            $portfolio->setShares($shares);
+//            $shares = $entityManager->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
+//            $portfolio->setShares($shares);
         }
 
         return $this->render('home/home.html.twig', [
@@ -39,9 +40,9 @@ class HomeController extends AbstractController
     }
 
 
-    public function feedbacks(): Response
+    public function feedbacks(EntityManagerInterface $entityManager): Response
     {
-        $feedbacks = $this->getDoctrine()->getRepository(Feedback::class)->findAll();
+        $feedbacks = $entityManager->getRepository(Feedback::class)->findAll();
 
         return $this->render('home/feedback.html.twig', [
             'feedbacks' => $feedbacks,
@@ -49,9 +50,9 @@ class HomeController extends AbstractController
     }
 
 
-    public function log(): Response
+    public function log(EntityManagerInterface $entityManager): Response
     {
-        $logEntries = $this->getDoctrine()->getRepository(LogEntry::class)->findBy([], ['dateTime' => 'DESC']);
+        $logEntries = $entityManager->getRepository(LogEntry::class)->findBy([], ['dateTime' => 'DESC']);
 
         return $this->render('home/log.html.twig', [
             'logEntries' => $logEntries,
@@ -60,31 +61,31 @@ class HomeController extends AbstractController
 
 
     // todo: move this method to a action-controller thing...
-    public function deletePortfolio(int $portfolioId): Response
+    public function deletePortfolio(int $portfolioId, EntityManagerInterface $entityManager): Response
     {
-        $portfolio = $this->getDoctrine()->getRepository(Portfolio::class)->find($portfolioId);
+        $portfolio = $entityManager->getRepository(Portfolio::class)->find($portfolioId);
 
         foreach($portfolio->getAllPositions() as $position) {
             foreach($position->getTransactions() as $transaction) {
-                $this->getDoctrine()->getManager()->remove($transaction);
-                $this->getDoctrine()->getManager()->flush();
+                $entityManager->remove($transaction);
+                $entityManager->flush();
             }
-            $this->getDoctrine()->getManager()->remove($position);
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->remove($position);
+            $entityManager->flush();
         }
 
-        $currencies = $this->getDoctrine()->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
+        $currencies = $entityManager->getRepository(Currency::class)->findBy(['portfolioId' => $portfolio->getId()]);
         foreach($currencies as $currency) {
-            $this->getDoctrine()->getManager()->remove($currency);
+            $entityManager->remove($currency);
         }
 
-        $shares = $this->getDoctrine()->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
+        $shares = $entityManager->getRepository(Share::class)->findBy(['portfolioId' => $portfolio->getId()]);
         foreach($shares as $share) {
-            $this->getDoctrine()->getManager()->remove($share);
+            $entityManager->remove($share);
         }
 
-        $this->getDoctrine()->getManager()->remove($portfolio);
-        $this->getDoctrine()->getManager()->flush();
+        $entityManager->remove($portfolio);
+        $entityManager->flush();
 
         return $this->redirectToRoute('app_home');
     }
