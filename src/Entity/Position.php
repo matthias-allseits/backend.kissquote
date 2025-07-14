@@ -147,6 +147,7 @@ class Position
 
     public function __construct()
     {
+        $this->shareheadId = null;
         $this->labels = new ArrayCollection();
         $this->manualDrawdown = null;
         $this->manualDividend = null;
