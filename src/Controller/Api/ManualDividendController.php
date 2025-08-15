@@ -22,7 +22,7 @@ class ManualDividendController extends BaseController
 
         $data = json_decode($request->getContent());
 
-        $share = $entityManager->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $data->share->id]);
+        $share = $entityManager->getRepository(Share::class)->findOneBy(['portfolioId' => $portfolio->getId(), 'id' => $data->shareId]);
 
         $postedDividend = new ManualDividend();
         $postedDividend->setYear($data->year);
